@@ -40,14 +40,17 @@ export async function POST(request: Request) {
     const { email } = validationResult.data;
     const { turnstileToken } = body;
 
-    // 3. Bot Protection: Validate Cloudflare Turnstile token
-    const isBotChallengeValid = await verifyTurnstileToken(turnstileToken, ip);
-    if (!isBotChallengeValid) {
-      logger.security(`Turnstile verification failed for email: ${email}`, request);
-      return NextResponse.json(
-        { error: "Bot verification failed. Please check your network and try again." },
-        { status: 400 }
-      );
+    // 3. Bot Protection: Validate Cloudflare Turnstile token ONLY if provided
+    // The signup page uses rate limiting as primary protection (5/hr per IP)
+    if (turnstileToken) {
+      const isBotChallengeValid = await verifyTurnstileToken(turnstileToken, ip);
+      if (!isBotChallengeValid) {
+        logger.security(`Turnstile verification failed for email: ${email}`, request);
+        return NextResponse.json(
+          { error: "Bot verification failed. Please check your network and try again." },
+          { status: 400 }
+        );
+      }
     }
 
     // Delete any existing OTPs for this email to prevent coupon/OTP reuse

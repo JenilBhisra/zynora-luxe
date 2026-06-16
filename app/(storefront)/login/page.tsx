@@ -22,8 +22,10 @@ function LoginContent() {
     const [error, setError] = useState(urlError === "unauthorized" ? "Access Denied." : "");
     const [isLoading, setIsLoading] = useState(false);
 
-    const finalizeLogin = () => {
-        const destination = consumeRedirectAfterLogin(redirectTo || "/account");
+    const finalizeLogin = (userEmail?: string | null) => {
+        const isAdmin = userEmail?.toLowerCase() === "krishnadiamond404@gmail.com";
+        const defaultDest = isAdmin ? "/admin" : "/account";
+        const destination = consumeRedirectAfterLogin(redirectTo || defaultDest);
         router.replace(destination);
         router.refresh();
     };
@@ -34,8 +36,8 @@ function LoginContent() {
         setError("");
 
         try {
-            await logInWithEmail(email, password);
-            finalizeLogin();
+            const user = await logInWithEmail(email, password);
+            finalizeLogin(user?.email);
         } catch (err: any) {
             console.error("Login error:", err);
             setError(err.message || "Invalid email or password.");
@@ -47,8 +49,8 @@ function LoginContent() {
         setIsLoading(true);
         setError("");
         try {
-            await logInWithGoogle();
-            finalizeLogin();
+            const user = await logInWithGoogle();
+            finalizeLogin(user?.email);
         } catch (err: any) {
             console.error("Google Login error:", err);
             setError(err.message || "Failed to sign in with Google.");

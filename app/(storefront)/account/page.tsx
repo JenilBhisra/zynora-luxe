@@ -4,11 +4,19 @@ import { useAuth } from "@/components/AuthProvider";
 import { logOut } from "@/lib/auth.client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { LayoutDashboard, LogOut, Settings, User, Package, ChevronRight } from "lucide-react";
 
 export default function AccountPage() {
     const { user, loading } = useAuth();
     const router = useRouter();
+    const [isAdmin, setIsAdmin] = useState(false);
+
+    useEffect(() => {
+        if (user && user.email?.toLowerCase() === "krishnadiamond404@gmail.com") {
+            setIsAdmin(true);
+        }
+    }, [user]);
 
     if (loading) {
         return (
@@ -107,7 +115,7 @@ export default function AccountPage() {
                             </div>
                         </Link>
 
-                        {false && (
+                        {isAdmin && (
                             <Link href="/admin" className="block bg-gradient-to-r from-[#D6B25E]/10 to-transparent border border-[#D6B25E]/30 hover:border-[#D6B25E] rounded-2xl p-6 transition-all group mt-6">
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-4">

@@ -1,0 +1,42 @@
+name: Security & Quality Scans
+
+on:
+  push:
+    branches: [ main, master, dev ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  audit-and-scan:
+    name: Security Hardening Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Project Dependencies
+        run: npm ci
+
+      - name: Run ESLint Verification
+        run: npm run lint
+
+      - name: Run TypeScript Compile Check
+        run: npx tsc --noEmit
+
+      - name: Run Security Audit (Audit packages for known vulnerabilities)
+        run: npm audit --audit-level=high
+
+      # Fail-safe Snyk Scan placeholder (Requires SNYK_TOKEN secret in GitHub)
+      # - name: Run Snyk Security Scan
+      #   uses: snyk/actions/node@master
+      #   env:
+      #     SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      #   with:
+      #     args: --severity-threshold=high

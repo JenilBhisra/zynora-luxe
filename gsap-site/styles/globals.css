@@ -1,0 +1,86 @@
+@import './variables.css';
+*{box-sizing:border-box}
+html,body,#root{height:100%}
+html,body{margin:0;padding:0;background:linear-gradient(180deg,var(--color-bg),#071123);color:var(--color-white);font-family:var(--font-sans);-webkit-font-smoothing:antialiased}
+main{max-width:1200px;margin:0 auto;padding:calc(var(--space-5) + 16px)}
+button{font-family:inherit}
+/* utility */
+.container{width:100%;max-width:1200px;margin:0 auto;padding:0 var(--space-4)}
+.section{position:relative;min-height:auto;display:flex;align-items:center;padding:var(--space-6) 0}
+.h-hero{min-height:100vh;display:flex;align-items:center}
+.cta{display:inline-flex;align-items:center;gap:12px;padding:12px 20px;border-radius:10px;background:linear-gradient(90deg,rgba(139,211,255,0.15),rgba(139,211,255,0.06));border:1px solid rgba(139,211,255,0.12);color:var(--color-white)}
+.cta.primary{background:linear-gradient(90deg,#8bd3ff,#6cc4ff);color:#011;box-shadow:0 8px 30px rgba(139,211,255,0.08);border:none}
+.cta.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06)}
+.small-muted{color:var(--color-muted);font-size:14px}
+.card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.03);padding:16px;border-radius:12px}
+/* Responsive grids */
+.feature-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:16px;
+  width:100%
+}
+.feature-item{
+  min-height:0
+}
+.product-grid{
+  display:flex;
+  gap:24px;
+  align-items:center;
+  width:100%
+}
+.reveal-left{
+  flex:1;
+  min-width:0
+}
+.reveal-right{
+  width:420px;
+  flex-shrink:0
+}
+.zoom-grid{
+  display:flex;
+  gap:24px;
+  align-items:center;
+  width:100%
+}
+.zoom-text{
+  flex:1;
+  min-width:0
+}
+.zoom-image{
+  width:420px;
+  flex-shrink:0
+}
+@media (max-width:1024px){
+  .feature-grid{
+    grid-template-columns:repeat(2,1fr)
+  }
+}
+@media (max-width:768px){
+  .section{min-height:auto;padding:48px 0}
+  .h-hero{min-height:80vh;flex-direction:column;gap:20px}
+  main{padding:20px}
+  .feature-grid{
+    grid-template-columns:1fr;
+    gap:12px
+  }
+  .feature-item{
+    min-height:120px
+  }
+  .product-grid{
+    flex-direction:column;
+    gap:16px
+  }
+  .reveal-right{
+    width:100%;
+    max-width:360px
+  }
+  .zoom-grid{
+    flex-direction:column;
+    gap:16px
+  }
+  .zoom-image{
+    width:100%;
+    max-width:360px
+  }
+}

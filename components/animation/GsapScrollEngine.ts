@@ -11,6 +11,7 @@ type EngineOptions = {
     productLayer: HTMLElement;
     textLayer: HTMLElement;
     nextSection?: HTMLElement | null;
+    isMobile?: boolean;
 };
 
 function createSceneTimeline(sceneIn: HTMLElement, sceneOut: HTMLElement, imageIn: HTMLElement, imageOut: HTMLElement) {
@@ -66,6 +67,7 @@ export function createDesktopScrollEngine({
     productLayer,
     textLayer,
     nextSection,
+    isMobile = false,
 }: EngineOptions) {
     gsap.set(scenes, { autoAlpha: 0, y: 18, force3D: true });
     gsap.set(imageLayers, { autoAlpha: 0, scale: 0.95, force3D: true });
@@ -88,10 +90,14 @@ export function createDesktopScrollEngine({
         },
     });
 
+    const parallaxBgY = isMobile ? 0 : -10;
+    const parallaxProductY = isMobile ? 0 : -8;
+    const parallaxTextY = isMobile ? 0 : -14;
+
     master.to(
         backgroundLayer,
         {
-            yPercent: -10,
+            yPercent: parallaxBgY,
             ease: "none",
             duration: 1,
         },
@@ -101,7 +107,7 @@ export function createDesktopScrollEngine({
     master.to(
         productLayer,
         {
-            yPercent: -8,
+            yPercent: parallaxProductY,
             ease: "none",
             duration: 1,
         },
@@ -111,7 +117,7 @@ export function createDesktopScrollEngine({
     master.to(
         textLayer,
         {
-            yPercent: -14,
+            yPercent: parallaxTextY,
             ease: "none",
             duration: 1,
         },

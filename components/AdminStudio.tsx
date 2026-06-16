@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { compressImage } from "@/lib/image-compression";
 
 interface AdminStudioProps {
     isAdmin: boolean;
@@ -254,11 +255,11 @@ export function AdminStudio({ isAdmin }: AdminStudioProps) {
     };
 
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
+        const rawFile = e.target.files?.[0];
+        if (!rawFile) return;
 
         // Size check (max 50MB for images)
-        if (file.size > 50 * 1024 * 1024) {
+        if (rawFile.size > 50 * 1024 * 1024) {
             toast.error("File exceeds 50MB size limit.");
             return;
         }
@@ -267,6 +268,8 @@ export function AdminStudio({ isAdmin }: AdminStudioProps) {
         setUploadProgress(10);
         
         try {
+            const file = await compressImage(rawFile);
+            
             // 1. Upload file using the admin upload API
             const formData = new FormData();
             formData.append("file", file);

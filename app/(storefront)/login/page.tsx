@@ -24,7 +24,7 @@ function LoginContent() {
 
     const finalizeLogin = (userEmail?: string | null) => {
         const isAdmin = userEmail?.toLowerCase() === "krishnadiamond404@gmail.com";
-        const defaultDest = isAdmin ? "/admin" : "/account";
+        const defaultDest = isAdmin ? "/admin" : "/";
         const destination = consumeRedirectAfterLogin(redirectTo || defaultDest);
         router.replace(destination);
         router.refresh();

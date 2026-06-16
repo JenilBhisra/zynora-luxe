@@ -2,6 +2,7 @@
 "use client";
 import { useState } from "react";
 import { toast } from "sonner";
+import { compressImage } from "@/lib/image-compression";
 import Image from "next/image";
 import { Edit2, Trash2, X } from "lucide-react";
 
@@ -181,8 +182,8 @@ export function SettingsTable({ initialSettings }: { initialSettings: any[] }) {
                 toast.error(`${file.name} is invalid type.`);
                 return false;
             }
-            if (file.size > 5 * 1024 * 1024) {
-                toast.error(`${file.name} exceeds 5MB.`);
+            if (file.size > 50 * 1024 * 1024) {
+                toast.error(`${file.name} exceeds 50MB.`);
                 return false;
             }
             return true;
@@ -309,8 +310,9 @@ export function SettingsTable({ initialSettings }: { initialSettings: any[] }) {
 
             if (imageFiles.length > 0) {
                 for (const file of imageFiles) {
+                    const compressedFile = await compressImage(file);
                     const uploadFormData = new FormData();
-                    uploadFormData.append("file", file);
+                    uploadFormData.append("file", compressedFile);
                     uploadFormData.append("type", "settings");
 
                     const uploadRes = await fetch('/api/admin/upload', {

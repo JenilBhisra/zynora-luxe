@@ -71,14 +71,14 @@ const FRAMES: TimelineFrame[] = [
 function SceneText({ frame }: { frame: TimelineFrame }) {
     return (
         <div className="scene-text absolute inset-0 opacity-0 translate-y-4">
-            <p className="mb-5 text-[10px] md:text-[11px] uppercase tracking-[0.34em] text-[#D6B25E]">{frame.kicker}</p>
-            <h2 className="text-[34px] sm:text-[42px] md:text-[56px] leading-[1.02] text-white mb-5">{frame.title}</h2>
-            <p className="text-white/72 text-[15px] md:text-[18px] leading-[1.8] max-w-[52ch] mb-6">{frame.body}</p>
-            <div className="inline-flex items-center gap-3 rounded-full border border-white/15 bg-white/5 px-4 py-2">
-                <span className="h-2 w-2 rounded-full bg-[#D6B25E]" />
-                <span className="text-[11px] uppercase tracking-[0.2em] text-white/72">{frame.trust}</span>
+            <p className="mb-3 sm:mb-5 text-[9px] sm:text-[11px] uppercase tracking-[0.34em] text-[#D6B25E] font-semibold">{frame.kicker}</p>
+            <h2 className="text-[22px] xs:text-[28px] sm:text-[42px] md:text-[56px] leading-[1.02] text-white mb-3 sm:mb-5 font-heading">{frame.title}</h2>
+            <p className="text-white/72 text-[13px] sm:text-[15px] md:text-[18px] leading-[1.6] sm:leading-[1.8] max-w-[52ch] mb-4 sm:mb-6">{frame.body}</p>
+            <div className="inline-flex items-center gap-2 sm:gap-3 rounded-full border border-white/15 bg-white/5 px-3 py-1.5 sm:px-4 sm:py-2">
+                <span className="h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-[#D6B25E]" />
+                <span className="text-[9px] sm:text-[11px] uppercase tracking-[0.2em] text-white/72">{frame.trust}</span>
             </div>
-            {frame.scarcity ? <p className="mt-5 text-[11px] uppercase tracking-[0.2em] text-[#D6B25E]">{frame.scarcity}</p> : null}
+            {frame.scarcity ? <p className="mt-4 sm:mt-5 text-[10px] sm:text-[11px] uppercase tracking-[0.2em] text-[#D6B25E]">{frame.scarcity}</p> : null}
         </div>
     );
 }
@@ -88,7 +88,6 @@ export function ScrollScene({ images, nextSectionSelector, customImages = {}, is
     const bgLayerRef = useRef<HTMLDivElement | null>(null);
     const productLayerRef = useRef<HTMLDivElement | null>(null);
     const textLayerRef = useRef<HTMLDivElement | null>(null);
-    const [isMobile, setIsMobile] = useState(false);
 
     // Merge DB text overrides into each frame
     const mergedFrames = useMemo(() => {
@@ -116,34 +115,8 @@ export function ScrollScene({ images, nextSectionSelector, customImages = {}, is
         if (!rootRef.current) return;
 
         const media = window.matchMedia("(max-width: 1023px)");
-        const syncMobile = () => setIsMobile(media.matches);
-        syncMobile();
-        media.addEventListener("change", syncMobile);
 
         const ctx = gsap.context(() => {
-            if (media.matches) {
-                gsap.utils.toArray<HTMLElement>(".mobile-scene").forEach((scene) => {
-                    gsap.fromTo(
-                        scene,
-                        { autoAlpha: 0, y: 24 },
-                        {
-                            autoAlpha: 1,
-                            y: 0,
-                            duration: 0.7,
-                            ease: "power2.out",
-                            scrollTrigger: {
-                                trigger: scene,
-                                start: "top 82%",
-                                end: "top 40%",
-                                scrub: 0.4,
-                            },
-                        },
-                    );
-                });
-
-                return;
-            }
-
             const textScenes = gsap.utils.toArray<HTMLElement>(".scene-text");
             const imageScenes = gsap.utils.toArray<HTMLElement>(".scene-image");
             const nextSection = nextSectionSelector ? document.querySelector<HTMLElement>(nextSectionSelector) : null;
@@ -163,19 +136,19 @@ export function ScrollScene({ images, nextSectionSelector, customImages = {}, is
                     productLayer: productLayerRef.current,
                     textLayer: textLayerRef.current,
                     nextSection,
+                    isMobile: media.matches,
                 });
             }
         }, rootRef);
 
         return () => {
-            media.removeEventListener("change", syncMobile);
             ctx.revert();
         };
     }, [nextSectionSelector]);
 
     return (
-        <section ref={rootRef} className={`relative bg-[#09090A] ${isMobile ? "py-16" : "min-h-screen"}`}>
-            <div className={`${isMobile ? "" : "scroll-section-sticky"} overflow-hidden`}>
+        <section ref={rootRef} className="relative bg-[#09090A] min-h-screen">
+            <div className="scroll-section-sticky overflow-hidden">
                 <div
                     ref={bgLayerRef}
                     className="absolute inset-0"
@@ -185,75 +158,17 @@ export function ScrollScene({ images, nextSectionSelector, customImages = {}, is
                     }}
                 />
 
-                {!isMobile ? (
-                    <div className="container-custom relative z-10 h-screen py-12 md:py-16">
-                        <div className="grid h-full items-center gap-10 lg:grid-cols-[1.05fr_0.95fr]">
-                            <div ref={productLayerRef} className="relative order-2 lg:order-1 h-[52vh] sm:h-[58vh] lg:h-[70vh] max-h-[760px] will-change-transform">
-                                <div className="absolute inset-0 luxury-shell rounded-[28px] border border-[#D6B25E]/20" />
-                                {timelineImages.map((item, index) => (
-                                    <div key={`${item.src}-${index}`} className="scene-image absolute inset-2 rounded-[24px] overflow-hidden opacity-0 scale-[0.95] will-change-transform">
-                                        <div className="relative h-full w-full">
-                                            <SmartImage src={item.src} alt={item.alt} fill fallbackType="jewelry" className="object-cover" sizes="(max-width: 1024px) 100vw, 50vw" />
-                                            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/12 to-transparent" />
-                                            {/* Admin: edit overlay per scroll scene frame */}
-                                            {isAdmin && (
-                                                <VisualEditButton
-                                                    type="homepage"
-                                                    assetKey={`scroll-scene-${index + 1}`}
-                                                    className="top-3 left-3"
-                                                />
-                                            )}
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-
-                            <div ref={textLayerRef} className="order-1 lg:order-2 relative will-change-transform">
-                                <div className="w-full max-w-[560px] ml-auto">
-                                    <div className="mb-7 flex items-center justify-between">
-                                        <span className="text-[10px] md:text-[11px] uppercase tracking-[0.34em] text-[#D6B25E]">Scroll Storytelling</span>
-                                        <span className="text-[10px] md:text-[11px] uppercase tracking-[0.28em] text-white/55">Scene Flow</span>
-                                    </div>
-
-                                    <div className="relative min-h-[312px] sm:min-h-[332px]">
-                                        {mergedFrames.map((frame) => (
-                                            <SceneText key={frame.id} frame={frame} />
-                                        ))}
-                                    </div>
-
-                                    <div className="mt-8 flex flex-col sm:flex-row gap-4">
-                                        <Link href="/customizer/step-1-diamond" className="inline-flex items-center justify-center px-8 py-4 text-[12px] md:text-[13px] uppercase tracking-[0.18em] font-semibold bg-[#D6B25E] text-[#0B0B0C] btn-gold-hover hover:bg-[#E3C67C] transition-all duration-600 relative group">
-                                            <span className="relative z-10">Start Custom Ring</span>
-                                            <span className="absolute inset-0 shimmer-gold opacity-0 group-hover:opacity-35 duration-600" />
-                                        </Link>
-                                        <Link href="/diamonds" className="inline-flex items-center justify-center px-8 py-4 text-[12px] md:text-[13px] uppercase tracking-[0.18em] font-semibold border border-white/14 text-white premium-hover-lift hover:bg-white/6 hover:border-[#D6B25E]/50 transition-all duration-600 relative group">
-                                            <span className="relative z-10">View Certified Diamonds</span>
-                                            <span className="absolute inset-0 shimmer-gold opacity-0 group-hover:opacity-20 duration-600" />
-                                        </Link>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                ) : (
-                    <div className="container-custom relative z-10 pb-12">
-                        {/* Mobile storyline — stacked scene cards */}
-                        <div className="space-y-10">
-                            {mergedFrames.map((frame, index) => (
-                                <div key={frame.id} className="mobile-scene">
-                                    {/* Image */}
-                                    <div className="relative w-full aspect-[16/10] overflow-hidden rounded-[18px] luxury-shell border border-[#D6B25E]/20 mb-5">
-                                        <SmartImage
-                                            src={timelineImages[index]?.src || "/products/ring-2.jpg"}
-                                            alt={timelineImages[index]?.alt || frame.title}
-                                            fill
-                                            fallbackType="jewelry"
-                                            className="object-cover"
-                                        />
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-                                        {/* Kicker overlaid on image */}
-                                        <p className="absolute bottom-3 left-4 text-[9px] uppercase tracking-[0.34em] text-[#D6B25E] font-semibold">{frame.kicker}</p>
-                                        {/* Admin: edit overlay per mobile scroll scene frame */}
+                <div className="container-custom relative z-10 h-screen py-6 lg:py-16 flex flex-col justify-center">
+                    <div className="grid h-full max-h-[90vh] items-center gap-6 lg:gap-10 grid-cols-1 lg:grid-cols-[1.05fr_0.95fr]">
+                        {/* Image Panel */}
+                        <div ref={productLayerRef} className="relative order-1 lg:order-1 h-[35vh] sm:h-[45vh] lg:h-[70vh] max-h-[760px] will-change-transform w-full">
+                            <div className="absolute inset-0 luxury-shell rounded-[20px] lg:rounded-[28px] border border-[#D6B25E]/20" />
+                            {timelineImages.map((item, index) => (
+                                <div key={`${item.src}-${index}`} className="scene-image absolute inset-1.5 lg:inset-2 rounded-[16px] lg:rounded-[24px] overflow-hidden opacity-0 scale-[0.95] will-change-transform">
+                                    <div className="relative h-full w-full">
+                                        <SmartImage src={item.src} alt={item.alt} fill fallbackType="jewelry" className="object-cover" sizes="(max-width: 1024px) 100vw, 50vw" />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/12 to-transparent" />
+                                        {/* Admin: edit overlay per scroll scene frame */}
                                         {isAdmin && (
                                             <VisualEditButton
                                                 type="homepage"
@@ -262,34 +177,38 @@ export function ScrollScene({ images, nextSectionSelector, customImages = {}, is
                                             />
                                         )}
                                     </div>
-                                    {/* Text */}
-                                    <h2 className="text-[22px] sm:text-[26px] leading-[1.12] text-white mb-3 font-heading">{frame.title}</h2>
-                                    <p className="text-white/65 text-[14px] leading-[1.7] mb-3">{frame.body}</p>
-                                    <div className="inline-flex items-center gap-2">
-                                        <span className="h-1.5 w-1.5 rounded-full bg-[#D6B25E]" />
-                                        <span className="text-[10px] uppercase tracking-[0.2em] text-white/55">{frame.trust}</span>
-                                    </div>
-                                    {/* Separator (except last) */}
-                                    {index < mergedFrames.length - 1 && (
-                                        <div className="mt-10 h-px bg-gradient-to-r from-transparent via-[#D6B25E]/25 to-transparent" />
-                                    )}
                                 </div>
                             ))}
                         </div>
 
-                        {/* CTAs */}
-                        <div className="flex flex-col gap-3 pt-10">
-                            <Link href="/customizer/step-1-diamond" className="inline-flex items-center justify-center px-6 py-4 text-[12px] uppercase tracking-[0.18em] font-semibold bg-[#D6B25E] text-[#0B0B0C] transition-all duration-300 relative group rounded-sm">
-                                <span className="relative z-10">Start Custom Ring</span>
-                                <span className="absolute inset-0 shimmer-gold opacity-0 group-hover:opacity-35 duration-600" />
-                            </Link>
-                            <Link href="/shop" className="inline-flex items-center justify-center px-6 py-4 text-[12px] uppercase tracking-[0.18em] font-semibold border border-white/14 text-white hover:bg-white/6 hover:border-[#D6B25E]/50 transition-all duration-300 relative group rounded-sm">
-                                <span className="relative z-10">Explore Collection</span>
-                                <span className="absolute inset-0 shimmer-gold opacity-0 group-hover:opacity-20 duration-600" />
-                            </Link>
+                        {/* Text Panel */}
+                        <div ref={textLayerRef} className="order-2 lg:order-2 relative will-change-transform">
+                            <div className="w-full max-w-[560px] mx-auto lg:ml-auto">
+                                <div className="mb-4 sm:mb-7 flex items-center justify-between">
+                                    <span className="text-[10px] md:text-[11px] uppercase tracking-[0.34em] text-[#D6B25E]">Scroll Storytelling</span>
+                                    <span className="text-[10px] md:text-[11px] uppercase tracking-[0.28em] text-white/55">Scene Flow</span>
+                                </div>
+
+                                <div className="relative min-h-[220px] sm:min-h-[312px] lg:min-h-[332px]">
+                                    {mergedFrames.map((frame) => (
+                                        <SceneText key={frame.id} frame={frame} />
+                                    ))}
+                                </div>
+
+                                <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row gap-3 sm:gap-4">
+                                    <Link href="/customizer/step-1-diamond" className="inline-flex items-center justify-center px-6 py-3.5 sm:px-8 sm:py-4 text-[11.5px] sm:text-[12px] md:text-[13px] uppercase tracking-[0.18em] font-semibold bg-[#D6B25E] text-[#0B0B0C] btn-gold-hover hover:bg-[#E3C67C] transition-all duration-600 relative group text-center rounded-sm">
+                                        <span className="relative z-10">Start Custom Ring</span>
+                                        <span className="absolute inset-0 shimmer-gold opacity-0 group-hover:opacity-35 duration-600" />
+                                    </Link>
+                                    <Link href="/diamonds" className="inline-flex items-center justify-center px-6 py-3.5 sm:px-8 sm:py-4 text-[11.5px] sm:text-[12px] md:text-[13px] uppercase tracking-[0.18em] font-semibold border border-white/14 text-white premium-hover-lift hover:bg-white/6 hover:border-[#D6B25E]/50 transition-all duration-600 relative group text-center rounded-sm">
+                                        <span className="relative z-10">View Certified Diamonds</span>
+                                        <span className="absolute inset-0 shimmer-gold opacity-0 group-hover:opacity-20 duration-600" />
+                                    </Link>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                )}
+                </div>
             </div>
         </section>
     );

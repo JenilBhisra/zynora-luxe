@@ -5,6 +5,7 @@ import { useState, useMemo } from "react";
 import Image from "next/image";
 import { toast } from "sonner";
 import { Search, Edit2, Trash2, X, ChevronLeft, ChevronRight } from "lucide-react";
+import { compressImage } from "@/lib/image-compression";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -127,8 +128,8 @@ export function DiamondTable({ initialDiamonds }: { initialDiamonds: any[] }) {
                 toast.error("Invalid file type. Only JPG, PNG, and WebP are allowed.");
                 return;
             }
-            if (file.size > 5 * 1024 * 1024) {
-                toast.error("File size exceeds 5MB limit.");
+            if (file.size > 50 * 1024 * 1024) {
+                toast.error("File size exceeds 50MB limit.");
                 return;
             }
             setImageFile(file);
@@ -194,8 +195,9 @@ export function DiamondTable({ initialDiamonds }: { initialDiamonds: any[] }) {
             }
 
             if (imageFile) {
+                const compressedFile = await compressImage(imageFile);
                 const uploadFormData = new FormData();
-                uploadFormData.append("file", imageFile);
+                uploadFormData.append("file", compressedFile);
                 uploadFormData.append("type", "diamonds");
 
                 const uploadRes = await fetch('/api/admin/upload', {

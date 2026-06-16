@@ -2,6 +2,7 @@
 "use client";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
+import { compressImage } from "@/lib/image-compression";
 import Image from "next/image";
 import { Play, X } from "lucide-react";
 
@@ -59,7 +60,7 @@ export function ProductTable({ initialProducts, categories }: { initialProducts:
             const videoTypes = ["video/mp4", "video/webm", "video/quicktime"];
             const imageExt = /\.(jpg|jpeg|png|webp)$/i;
             const videoExt = /\.(mp4|webm|mov)$/i;
-            const maxSize = kind === "image" ? 5 * 1024 * 1024 : 30 * 1024 * 1024;
+            const maxSize = kind === "image" ? 50 * 1024 * 1024 : 30 * 1024 * 1024;
 
             for (const file of files) {
                 const isValidType = kind === "image"
@@ -71,7 +72,7 @@ export function ProductTable({ initialProducts, categories }: { initialProducts:
                     continue;
                 }
                 if (file.size > maxSize) {
-                    toast.error(`File ${file.name} exceeds ${kind === "image" ? "5MB" : "30MB"} limit.`);
+                    toast.error(`File ${file.name} exceeds ${kind === "image" ? "50MB" : "30MB"} limit.`);
                     continue;
                 }
                 validMedia.push({
@@ -108,7 +109,12 @@ export function ProductTable({ initialProducts, categories }: { initialProducts:
 
             for (const media of pendingMedia) {
                 const uploadFormData = new FormData();
-                uploadFormData.append("file", media.file);
+                if (media.kind === "image") {
+                    const compressedFile = await compressImage(media.file);
+                    uploadFormData.append("file", compressedFile);
+                } else {
+                    uploadFormData.append("file", media.file);
+                }
                 uploadFormData.append("type", "products");
                 uploadFormData.append("kind", media.kind);
 

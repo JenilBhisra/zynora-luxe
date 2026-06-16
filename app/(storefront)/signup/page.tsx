@@ -26,7 +26,7 @@ function SignupContent() {
     const [isLoading, setIsLoading] = useState(false);
 
     const finalizeLogin = () => {
-        const destination = consumeRedirectAfterLogin(redirectTo || "/account");
+        const destination = consumeRedirectAfterLogin(redirectTo || "/");
         router.replace(destination);
         router.refresh();
     };

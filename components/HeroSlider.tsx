@@ -223,7 +223,7 @@ export function HeroSlider({ customSlides = {}, customText = {} }: HeroSliderPro
                             initial={{ opacity: 0, y: isMobile ? 12 : 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: prefersReducedMotion ? 0.2 : 0.85, delay: prefersReducedMotion ? 0 : 0.96, ease: [0.22, 1, 0.36, 1] }}
-                            className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center md:justify-start"
+                            className="hidden sm:flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center md:justify-start"
                         >
                             <Link href="/customizer/step-1-diamond" className="inline-flex items-center justify-center w-full sm:w-auto px-7 md:px-8 py-3.5 md:py-4 text-[11px] md:text-[13px] uppercase tracking-[0.16em] md:tracking-[0.18em] bg-[#D6B25E] text-[#0B0B0C] font-semibold btn-gold-hover hover:bg-[#E3C67C] shadow-[0_14px_28px_rgba(214,178,94,0.18)] relative group">
                                 <span className="relative z-10">Begin Custom Design</span>

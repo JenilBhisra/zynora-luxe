@@ -86,3 +86,38 @@ Configure the following environment variables in your Vercel Project Settings:
 | `SANDBOX_API_SECRET` | Sandbox.co.in GST validation API Secret |
 | `SANDBOX_API_VERSION` | Set to `1.0.0` |
 | `SANDBOX_API_BASE_URL` | Set to `https://api.sandbox.co.in` |
+
+---
+
+## ↩️ Rollback Plan (Reverting to SQLite)
+
+If the PostgreSQL migration fails or you encounter unexpected issues, you can roll back to the local SQLite configuration by following these steps:
+
+1. **Restore Prisma Schema**:
+   Revert the datasource block in `prisma/schema.prisma` back to SQLite:
+   ```prisma
+   datasource db {
+     provider = "sqlite"
+     url      = "file:./dev.db"
+   }
+   ```
+   *(Alternatively, copy `prisma/schema.prisma.backup` back to `prisma/schema.prisma`)*
+
+2. **Restore local database file**:
+   Ensure `prisma/dev.db` is active. If needed, restore from local backup:
+   ```bash
+   copy prisma\dev.db.backup prisma\dev.db
+   ```
+
+3. **Regenerate Prisma Client**:
+   Run the Prisma generator to rebuild client libraries for SQLite:
+   ```bash
+   npx prisma generate
+   ```
+
+4. **Start Development Server**:
+   Restart the development server:
+   ```bash
+   npm run dev
+   ```
+   The local application will now safely fall back to the SQLite local database.

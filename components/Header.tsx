@@ -9,6 +9,7 @@ import { useCart } from "./CartProvider";
 import ProfileMenu from "./ProfileMenu";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/components/AuthProvider";
+import { logOut } from "@/lib/auth.client";
 
 const NAV_ITEMS = [
     { label: "Home", href: "/" },
@@ -25,6 +26,18 @@ export function Header() {
     const { cartCount } = useCart();
     const pathname = usePathname();
     const { user } = useAuth();
+
+    const isAdmin = user && user.email?.toLowerCase() === "krishnadiamond404@gmail.com";
+
+    const handleLogout = async () => {
+        try {
+            await logOut();
+        } finally {
+            try { window.localStorage.removeItem("krishna_current_user"); } catch {}
+            setIsMobileMenuOpen(false);
+            window.location.href = "/";
+        }
+    };
 
     // Lock body scroll when mobile menu is open
     useEffect(() => {
@@ -105,7 +118,7 @@ export function Header() {
                         {/* Removed duplicate nav items since they are in the center now */}
 
                         {/* Session Aware Identity Module */}
-                        <div className="relative hidden sm:block">
+                        <div className="relative flex items-center">
                             <ProfileMenu />
                         </div>
 
@@ -197,11 +210,19 @@ export function Header() {
                                                 <p className="text-zinc-400 text-xs truncate">{user.email}</p>
                                             </div>
                                         </div>
-                                        {false && (
-                                            <Link href="/admin" onClick={() => setIsMobileMenuOpen(false)} className="block text-center w-full py-2.5 text-xs uppercase tracking-widest font-bold border border-[#D6B25E]/50 text-[#D6B25E] hover:text-[#0B0B0C] hover:bg-[#C9A24A] hover:border-[#C9A24A] transition-colors rounded-[8px]">
-                                                Admin Dashboard
+                                        <div className="space-y-2.5">
+                                            {isAdmin && (
+                                                <Link href="/admin" onClick={() => setIsMobileMenuOpen(false)} className="block text-center w-full py-2.5 text-xs uppercase tracking-widest font-bold border border-[#D6B25E]/50 text-[#D6B25E] hover:text-[#0B0B0C] hover:bg-[#C9A24A] hover:border-[#C9A24A] transition-colors rounded-[8px]">
+                                                    Admin Dashboard
+                                                </Link>
+                                            )}
+                                            <Link href="/account" onClick={() => setIsMobileMenuOpen(false)} className="block text-center w-full py-2.5 text-xs uppercase tracking-widest font-bold border border-zinc-700 text-zinc-300 hover:text-white hover:bg-zinc-800 transition-colors rounded-[8px]">
+                                                My Account
                                             </Link>
-                                        )}
+                                            <button onClick={handleLogout} className="block text-center w-full py-2.5 text-xs uppercase tracking-widest font-bold border border-red-500/30 text-red-400 hover:text-white hover:bg-red-500/20 transition-colors rounded-[8px] cursor-pointer">
+                                                Sign Out
+                                            </button>
+                                        </div>
                                     </div>
                                 ) : (
                                     <Link href="/login" onClick={() => setIsMobileMenuOpen(false)} className="block text-center w-full py-2.5 text-xs uppercase tracking-widest font-bold border border-[#D6B25E]/50 text-[#D6B25E] hover:text-[#0B0B0C] hover:bg-[#C9A24A] hover:border-[#C9A24A] transition-colors rounded-[8px]">

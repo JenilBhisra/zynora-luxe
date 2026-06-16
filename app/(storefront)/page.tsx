@@ -19,6 +19,8 @@ export const metadata: Metadata = {
     description: "Discover certified diamonds, premium settings, and handcrafted jewelry from Krishna Diamonds.",
 };
 
+export const dynamic = "force-dynamic";
+
 export default async function HomePage() {
     const session = await getServerSession();
     const isAdmin = session?.user?.role === "ADMIN";

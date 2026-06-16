@@ -5,6 +5,8 @@ import { getAdminAuth } from "@/lib/firebase-admin";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { logger } from "@/lib/logger";
 
+export const dynamic = "force-dynamic";
+
 // Base64url decode helper for unverified fallback in development
 function decodeFirebaseToken(idToken: string) {
   try {

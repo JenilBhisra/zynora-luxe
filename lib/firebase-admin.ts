@@ -5,7 +5,7 @@ const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
 const privateKey = process.env.FIREBASE_PRIVATE_KEY;
 
 if (!admin.apps.length) {
-  if (clientEmail && privateKey) {
+  if (clientEmail && privateKey && privateKey.includes("BEGIN PRIVATE KEY") && privateKey.length > 500) {
     try {
       admin.initializeApp({
         credential: admin.credential.cert({
@@ -17,6 +17,8 @@ if (!admin.apps.length) {
     } catch (error) {
       console.error("Firebase admin initialization error", error);
     }
+  } else if (clientEmail || privateKey) {
+    console.warn("Firebase Admin SDK credentials found but appear invalid or placeholders. Session validation will fall back.");
   }
 }
 

@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import Link from "next/link";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { SmartImage } from "./SmartImage";
 
 const HERO_SLIDES = [
@@ -53,6 +54,14 @@ export function HeroSlider({ customSlides = {}, customText = {} }: HeroSliderPro
     const [enableParallax, setEnableParallax] = useState(false);
     const prefersReducedMotion = useReducedMotion();
     const heroRef = useRef<HTMLElement>(null);
+
+    const nextSlide = () => {
+        setCurrentSlide((prev) => (prev + 1) % slides.length);
+    };
+
+    const prevSlide = () => {
+        setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
+    };
 
     const headlineLines = [
         customText["text:hero-headline-1"] || "Crafted for",
@@ -223,7 +232,7 @@ export function HeroSlider({ customSlides = {}, customText = {} }: HeroSliderPro
                             initial={{ opacity: 0, y: isMobile ? 12 : 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: prefersReducedMotion ? 0.2 : 0.85, delay: prefersReducedMotion ? 0 : 0.96, ease: [0.22, 1, 0.36, 1] }}
-                            className="hidden sm:flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center md:justify-start"
+                            className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center md:justify-start"
                         >
                             <Link href="/customizer/step-1-diamond" className="inline-flex items-center justify-center w-full sm:w-auto px-7 md:px-8 py-3.5 md:py-4 text-[11px] md:text-[13px] uppercase tracking-[0.16em] md:tracking-[0.18em] bg-[#D6B25E] text-[#0B0B0C] font-semibold btn-gold-hover hover:bg-[#E3C67C] shadow-[0_14px_28px_rgba(214,178,94,0.18)] relative group">
                                 <span className="relative z-10">Begin Custom Design</span>
@@ -238,8 +247,24 @@ export function HeroSlider({ customSlides = {}, customText = {} }: HeroSliderPro
                 </div>
             </div>
 
-            {/* Slide Indicators */}
-            <div className="absolute bottom-6 md:bottom-8 left-1/2 -translate-x-1/2 z-10 flex gap-3">
+            {/* Left/Right Navigation Arrows */}
+            <button
+                onClick={prevSlide}
+                className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 z-20 w-9 h-9 sm:w-12 sm:h-12 rounded-full border border-white/10 bg-black/20 hover:bg-black/45 backdrop-blur-md flex items-center justify-center text-white/70 hover:text-[#D6B25E] hover:border-[#D6B25E]/60 transition-all duration-300 focus:outline-none"
+                aria-label="Previous slide"
+            >
+                <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
+            </button>
+            <button
+                onClick={nextSlide}
+                className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 z-20 w-9 h-9 sm:w-12 sm:h-12 rounded-full border border-white/10 bg-black/20 hover:bg-black/45 backdrop-blur-md flex items-center justify-center text-white/70 hover:text-[#D6B25E] hover:border-[#D6B25E]/60 transition-all duration-300 focus:outline-none"
+                aria-label="Next slide"
+            >
+                <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
+            </button>
+
+            {/* Slide Indicators - Hidden on Mobile */}
+            <div className="hidden sm:flex absolute bottom-6 md:bottom-8 left-1/2 -translate-x-1/2 z-10 gap-3">
                 {slides.map((_, index) => (
                     <button
                         key={index}

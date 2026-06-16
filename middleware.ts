@@ -152,14 +152,14 @@ export default async function middleware(req: NextRequest) {
   // Strict CSP Directives
   const cspDirectives = [
     "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://apis.google.com https://www.gstatic.com https://checkout.razorpay.com https://challenges.cloudflare.com",
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://apis.google.com https://www.gstatic.com https://accounts.google.com https://checkout.razorpay.com https://challenges.cloudflare.com",
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "img-src 'self' data: https://*.firebaseusercontent.com https://lh3.googleusercontent.com https://firebasestorage.googleapis.com https://*.razorpay.com https://images.unsplash.com https://tse1.mm.bing.net",
-    "connect-src 'self' https://*.googleapis.com https://securetoken.googleapis.com https://identitytoolkit.googleapis.com https://api.razorpay.com https://challenges.cloudflare.com https://api.sandbox.co.in",
-    "frame-src 'self' https://*.firebaseapp.com https://api.razorpay.com https://checkout.razorpay.com https://challenges.cloudflare.com",
+    "connect-src 'self' https://*.googleapis.com https://securetoken.googleapis.com https://identitytoolkit.googleapis.com https://accounts.google.com https://api.razorpay.com https://challenges.cloudflare.com https://api.sandbox.co.in",
+    "frame-src 'self' https://*.firebaseapp.com https://accounts.google.com https://apis.google.com https://api.razorpay.com https://checkout.razorpay.com https://challenges.cloudflare.com",
     "object-src 'none'",
     "base-uri 'self'",
-    "form-action 'self'",
+    "form-action 'self' https://accounts.google.com",
     "frame-ancestors 'none'",
     "upgrade-insecure-requests",
   ].join("; ");
@@ -168,11 +168,11 @@ export default async function middleware(req: NextRequest) {
   response.headers.set("Strict-Transport-Security", "max-age=63072000; includeSubDomains; preload");
   response.headers.set("X-Frame-Options", "DENY");
   response.headers.set("X-Content-Type-Options", "nosniff");
-  response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
-  response.headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=(), interest-cohort=()");
-  response.headers.set("Cross-Origin-Opener-Policy", "same-origin");
-  response.headers.set("Cross-Origin-Resource-Policy", "same-origin");
-  response.headers.set("Cross-Origin-Embedder-Policy", "credentialless");
+  // Cross-Origin headers — carefully tuned to allow Google OAuth popup
+  // COOP must be same-origin-allow-popups (not same-origin) to let Google signInWithPopup work
+  // COEP is intentionally omitted — it breaks Google's auth iframe
+  response.headers.set("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
+  response.headers.set("Cross-Origin-Resource-Policy", "same-site");
 
   return response;
 }

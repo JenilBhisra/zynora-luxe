@@ -116,7 +116,7 @@ export function normalizeImageSrc(value: string | null | undefined): string {
     if (!src) return "";
     if (src === "null" || src === "undefined" || src === "[]") return "";
     if (BROKEN_LOCAL_IMAGES.has(src)) return "";
-    if (src.startsWith("http://") || src.startsWith("https://") || src.startsWith("/")) return src;
+    if (src.startsWith("http://") || src.startsWith("https://") || src.startsWith("/") || src.startsWith("data:")) return src;
     return "";
 }
 

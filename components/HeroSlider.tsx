@@ -244,7 +244,7 @@ export function HeroSlider({ customSlides = {}, customText = {} }: HeroSliderPro
                     <button
                         key={index}
                         onClick={() => setCurrentSlide(index)}
-                        className={`h-1.5 transition-all duration-300 ${
+                        className={`h-1 rounded-full border-none p-0 m-0 outline-none cursor-pointer transition-all duration-300 ${
                             index === currentSlide ? "w-10 bg-[#D6B25E]" : "w-4 bg-white/35 hover:bg-white/60"
                         }`}
                         aria-label={`Go to slide ${index + 1}`}

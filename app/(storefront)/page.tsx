@@ -157,8 +157,19 @@ export default async function HomePage() {
             </AnimatedSection>
 
             {/* Section 2: Product Showcase (Featured Collection) */}
-            <AnimatedSection className="py-24 md:py-28 bg-[#101012] story-section-frame">
-                <div className="container-custom">
+            <AnimatedSection 
+                className="py-24 md:py-28 relative overflow-hidden story-section-frame"
+                style={{ 
+                    backgroundImage: "url('/images/black-silk.jpg')", 
+                    backgroundSize: "cover", 
+                    backgroundPosition: "center", 
+                    backgroundRepeat: "no-repeat" 
+                }}
+            >
+                {/* Dark overlay to enhance depth, luxury feel and text contrast */}
+                <div className="absolute inset-0 bg-black/45 pointer-events-none" />
+                
+                <div className="container-custom relative z-10">
                     <FadeIn className="mb-12 md:mb-16 max-w-2xl reveal-step-1">
                         <span className="block text-[10px] md:text-[11px] uppercase tracking-[0.34em] text-[#D6B25E] mb-4">Featured Collection</span>
                         <h2 className="text-[36px] md:text-[52px] leading-[1.02] text-white reveal-step-2">

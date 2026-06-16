@@ -1,12 +1,10 @@
 import Link from "next/link";
 import { PrismaClient } from "@prisma/client";
-import { SmartImage } from "@/components/SmartImage";
 import { AnimatedSection } from "@/components/AnimatedSection";
-import { FadeIn } from "@/components/FadeIn";
-import { selectCardImage } from "@/lib/image-utils";
 import { notFound } from "next/navigation";
 import { Button } from "@/components/Button";
 import { ChevronLeft } from "lucide-react";
+import { ProductListClient } from "./components/ProductListClient";
 
 const prisma = new PrismaClient();
 
@@ -30,12 +28,24 @@ export default async function CategoryPage(props: { params: Promise<{ category: 
         notFound();
     }
 
-    const products = await prisma.product.findMany({
-        where: { category: { slug: categorySlug } },
-        orderBy: { createdAt: "desc" },
-    });
+    const INITIAL_LIMIT = 8;
 
-    const usedProductImages = new Set<string>();
+    const [products, totalCount] = await Promise.all([
+        prisma.product.findMany({
+            where: { category: { slug: categorySlug } },
+            orderBy: { createdAt: "desc" },
+            take: INITIAL_LIMIT,
+        }),
+        prisma.product.count({
+            where: { category: { slug: categorySlug } }
+        })
+    ]);
+
+    // Serialize decimal/float field price if needed, or pass directly
+    const formattedProducts = products.map(p => ({
+        ...p,
+        price: Number(p.price)
+    }));
 
     return (
         <div className="min-h-screen pb-32 bg-[#0B0B0C] text-white">
@@ -57,15 +67,15 @@ export default async function CategoryPage(props: { params: Promise<{ category: 
                             </h1>
                         </div>
                         <div className="text-[11px] uppercase tracking-widest text-white/50 bg-white/5 px-4 py-2 rounded-full border border-white/10">
-                            {products.length} Items
+                            {totalCount} Items
                         </div>
                     </div>
                 </div>
             </AnimatedSection>
-
+ 
             <div className="container-custom section-pad-lg">
                 <section className="flex-1">
-                    {products.length === 0 ? (
+                    {totalCount === 0 ? (
                         <div className="text-center py-24 luxury-panel rounded-[22px]">
                             <p className="text-white/60 tracking-widest uppercase font-medium text-sm mb-6">
                                 We are currently curating this collection.
@@ -75,50 +85,12 @@ export default async function CategoryPage(props: { params: Promise<{ category: 
                             </Link>
                         </div>
                     ) : (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10">
-                            {products.map((product, i) => {
-                                const image = selectCardImage(product.images, usedProductImages, "jewelry", i, product.id, product.slug || product.name);
-
-                                // Determine display price: show lowest karat price if set
-                                let displayPrice = product.price;
-                                let showFrom = false;
-                                try {
-                                    const kp: Record<string, number> = JSON.parse(product.karatPrices || "{}");
-                                    const values = Object.values(kp).filter((v): v is number => typeof v === "number" && v > 0);
-                                    if (values.length > 0) {
-                                        displayPrice = Math.min(...values);
-                                        showFrom = true;
-                                    }
-                                } catch {}
-
-                                return (
-                                    <FadeIn key={product.id} delay={(i % 8) * 0.05} className="group cursor-pointer">
-                                        <Link href={`/product/${product.slug}`} className="block h-full">
-                                            <div className="h-full flex flex-col luxury-shell premium-hover-lift rounded-[22px] overflow-hidden">
-                                                <div className="relative aspect-[4/5] overflow-hidden bg-[#0F0F11] mb-5">
-                                                    <SmartImage
-                                                        src={image}
-                                                        alt={product.name}
-                                                        fill
-                                                        fallbackType="jewelry"
-                                                        className="object-cover image-zoom-reveal transition-transform duration-700 ease-out group-hover:scale-[1.08]"
-                                                    />
-                                                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent opacity-50" />
-                                                    <span className="absolute top-4 right-4 text-[9px] uppercase tracking-[0.24em] font-bold text-[#D6B25E] opacity-0 group-hover:opacity-100 transition-opacity duration-500">View Details</span>
-                                                </div>
-                                                <div className="text-center pb-5 px-4">
-                                                    <h3 className="text-[16px] md:text-[17px] font-medium text-white mb-2 line-clamp-1 group-hover:text-[#D6B25E] transition-colors duration-500">{product.name}</h3>
-                                                    <p className="text-[14px] text-white/70">
-                                                        {showFrom && <span className="text-[10px] text-white/40 uppercase tracking-widest mr-1">From</span>}
-                                                        ₹{displayPrice.toLocaleString("en-IN")}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </Link>
-                                    </FadeIn>
-                                );
-                            })}
-                        </div>
+                        <ProductListClient
+                            initialProducts={formattedProducts}
+                            totalCount={totalCount}
+                            categorySlug={categorySlug}
+                            limit={INITIAL_LIMIT}
+                        />
                     )}
                 </section>
             </div>

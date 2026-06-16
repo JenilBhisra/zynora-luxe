@@ -12,7 +12,9 @@ export const metadata: Metadata = {
 import { AuthProvider } from "@/components/AuthProvider";
 import { Header } from "@/components/Header";
 import { CartProvider } from "@/components/CartProvider";
-import { AIConcierge } from "@/components/AIConcierge";
+import dynamic from "next/dynamic";
+
+const AIConcierge = dynamic(() => import("@/components/AIConcierge").then(mod => mod.AIConcierge));
 
 export default function RootLayout({
   children,

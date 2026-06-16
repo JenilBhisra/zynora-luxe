@@ -1,6 +1,10 @@
-import { DiamondSearchClient } from "./DiamondSearchClient";
 import { Metadata } from "next";
 import { AnimatedSection } from "@/components/AnimatedSection";
+import dynamic from "next/dynamic";
+
+const DiamondSearchClient = dynamic(() => import("./DiamondSearchClient").then(mod => mod.DiamondSearchClient), {
+    loading: () => <div className="py-24 flex items-center justify-center text-white/40 font-serif tracking-[0.2em] text-xs uppercase animate-pulse">Loading Diamond Search...</div>
+});
 
 export const metadata: Metadata = {
     title: "Premium Certified Diamonds | ZYNORA LUXE",

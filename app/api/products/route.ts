@@ -16,6 +16,11 @@ export async function GET(request: Request) {
     const metalType = searchParams.get('metal'); // e.g. "18K White Gold"
     const sort = searchParams.get('sort'); // "price-asc" | "price-desc" | "newest" | "popular"
 
+    // Pagination
+    const page = searchParams.get('page') ? parseInt(searchParams.get('page')!) : undefined;
+    const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : undefined;
+    const skip = page && limit ? (page - 1) * limit : undefined;
+
     try {
         const whereClause: any = {};
 
@@ -60,25 +65,45 @@ export async function GET(request: Request) {
         if (sort === 'price-desc') orderBy = { price: 'desc' };
         if (sort === 'popular') orderBy = { orders: { _count: 'desc' } };
 
-        const products = await prisma.product.findMany({
-            where: whereClause,
-            include: {
-                category: true,
-                diamond: true,
-                _count: {
-                    select: { reviews: true }
-                }
-            },
-            orderBy
-        });
+        // Transaction for executing fetch and count concurrently
+        const [products, totalCount] = await Promise.all([
+            prisma.product.findMany({
+                where: whereClause,
+                include: {
+                    category: true,
+                    diamond: true,
+                    _count: {
+                        select: { reviews: true }
+                    }
+                },
+                orderBy,
+                take: limit,
+                skip: skip,
+            }),
+            prisma.product.count({ where: whereClause })
+        ]);
 
         // Format to handle image JSON parsing if needed
-        const formattedProducts = products.map(p => ({
-            ...p,
-            images: JSON.parse(p.images)
-        }));
+        const formattedProducts = products.map(p => {
+            let parsedImages = [];
+            try {
+                parsedImages = JSON.parse(p.images);
+            } catch {
+                parsedImages = [];
+            }
+            return {
+                ...p,
+                images: parsedImages
+            };
+        });
 
-        return NextResponse.json({ success: true, products: formattedProducts });
+        return NextResponse.json({ 
+            success: true, 
+            products: formattedProducts,
+            totalCount,
+            page,
+            totalPages: limit ? Math.ceil(totalCount / limit) : 1
+        });
 
     } catch (error) {
         console.error("Error fetching products:", error);

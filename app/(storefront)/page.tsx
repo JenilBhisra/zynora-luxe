@@ -7,10 +7,16 @@ import { AnimatedSection } from "@/components/AnimatedSection";
 import { selectCardImage } from "@/lib/image-utils";
 import { InteractiveCategoryGallery } from "@/components/InteractiveCategoryGallery";
 import { HeroSlider } from "@/components/HeroSlider";
-import { ScrollScene } from "@/components/animation/ScrollScene";
-import { getServerSession } from "@/lib/auth";
-import { AdminStudio } from "@/components/AdminStudio";
+import nextDynamic from "next/dynamic";
+
+const ScrollScene = nextDynamic(() => import("@/components/animation/ScrollScene").then(mod => mod.ScrollScene), {
+    loading: () => <div className="min-h-screen bg-[#0B0B0C] flex items-center justify-center text-white/40 font-serif tracking-[0.2em] text-xs uppercase animate-pulse">Loading Storyline...</div>
+});
+
+const AdminStudio = nextDynamic(() => import("@/components/AdminStudio").then(mod => mod.AdminStudio));
+
 import { VisualEditButton } from "@/components/VisualEditButton";
+import { getServerSession } from "@/lib/auth";
 
 const prisma = new PrismaClient();
 

@@ -4,18 +4,20 @@
  * In development, allows mock validation if TURNSTILE_SECRET_KEY is missing.
  */
 export async function verifyTurnstileToken(token: string | null | undefined, clientIp?: string): Promise<boolean> {
-  const isDev = process.env.NODE_ENV === "development";
   const secretKey = process.env.TURNSTILE_SECRET_KEY;
 
+  // If no secret key is configured, skip bot check entirely
   if (!secretKey) {
-    if (isDev) {
-      console.warn("[TURNSTILE] Missing TURNSTILE_SECRET_KEY in development, bypassing token check.");
-      return true;
-    }
-    console.error("[TURNSTILE] Missing TURNSTILE_SECRET_KEY in production. Request rejected for security.");
-    return false;
+    console.warn("[TURNSTILE] TURNSTILE_SECRET_KEY not set — skipping bot verification.");
+    return true;
   }
 
+  // If secret is the Cloudflare test bypass key, always pass
+  if (secretKey === "1x0000000000000000000000000000000AA") {
+    return true;
+  }
+
+  // If token is missing but key is configured, reject
   if (!token) {
     return false;
   }

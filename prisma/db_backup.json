@@ -1,0 +1,26 @@
+{
+  "user": [
+    {
+      "id": "cmpyit81q0000vfo8dtndu537",
+      "name": "Krishna Diamond",
+      "email": "krishnadiamond404@gmail.com",
+      "password": "$2b$10$F3JCteiX.o/rZkamtTXo9OKZubB6l4oxNQNInHBBHrLuICnADmbm6",
+      "emailVerified": null,
+      "image": null,
+      "role": "ADMIN",
+      "createdAt": "2026-06-03T20:30:15.039Z",
+      "updatedAt": "2026-06-15T13:42:35.570Z"
+    }
+  ],
+  "category": [],
+  "diamond": [],
+  "setting": [],
+  "siteAsset": [],
+  "otpVerification": [],
+  "customizationRequest": [],
+  "product": [],
+  "ringConfiguration": [],
+  "order": [],
+  "orderItem": [],
+  "review": []
+}

@@ -93,44 +93,59 @@ export async function POST(req: NextRequest) {
 
         try {
             await mkdir(uploadDir, { recursive: true });
-        } catch (e) {
-            // Directory might already exist
-        }
-
-        const filePath = path.join(uploadDir, filename);
-        if (!filePath.startsWith(uploadDir)) {
-            return NextResponse.json({ error: "Invalid file path" }, { status: 400 });
-        }
-
-        // Save file locally
-        await writeFile(filePath, buffer);
-
-        // Delete previous file if provided
-        if (previousUrl && previousUrl.startsWith("/uploads/")) {
-            try {
-                // Remove /uploads/ and construct absolute path
-                const relativePath = previousUrl.replace("/uploads/", "");
-                const previousFilePath = path.join(process.cwd(), "public", "uploads", relativePath);
-                
-                // Make sure we only delete files inside public/uploads
-                if (previousFilePath.startsWith(path.join(process.cwd(), "public", "uploads"))) {
-                    await unlink(previousFilePath);
-                }
-            } catch (err) {
-                console.error("Failed to delete previous file:", err);
+            
+            const filePath = path.join(uploadDir, filename);
+            if (!filePath.startsWith(uploadDir)) {
+                return NextResponse.json({ error: "Invalid file path" }, { status: 400 });
             }
+
+            // Save file locally
+            await writeFile(filePath, buffer);
+
+            // Delete previous file if provided
+            if (previousUrl && previousUrl.startsWith("/uploads/")) {
+                try {
+                    // Remove /uploads/ and construct absolute path
+                    const relativePath = previousUrl.replace("/uploads/", "");
+                    const previousFilePath = path.join(process.cwd(), "public", "uploads", relativePath);
+                    
+                    // Make sure we only delete files inside public/uploads
+                    if (previousFilePath.startsWith(path.join(process.cwd(), "public", "uploads"))) {
+                        await unlink(previousFilePath);
+                    }
+                } catch (err) {
+                    console.error("Failed to delete previous file:", err);
+                }
+            }
+
+            // Path to store in DB
+            const publicUrl = kind === "model"
+                ? `/models/${uploadType}/${filename}`
+                : `/uploads/${uploadType}/${filename}`;
+
+            return NextResponse.json({
+                message: "Success",
+                url: publicUrl
+            }, { status: 201 });
+
+        } catch (writeError) {
+            console.warn("Write to local filesystem failed, falling back to Base64 data URL storage:", writeError);
+            
+            // Generate Base64 Data URL
+            const base64Data = buffer.toString("base64");
+            let mimeType = file.type;
+            if (!mimeType) {
+                if (kind === "image") mimeType = "image/jpeg";
+                else if (kind === "video") mimeType = "video/mp4";
+                else mimeType = "application/octet-stream";
+            }
+            const dataUrl = `data:${mimeType};base64,${base64Data}`;
+
+            return NextResponse.json({
+                message: "Success (Base64)",
+                url: dataUrl
+            }, { status: 201 });
         }
-
-        // Path to store in DB
-        const publicUrl = kind === "model"
-            ? `/models/${uploadType}/${filename}`
-            : `/uploads/${uploadType}/${filename}`;
-
-        return NextResponse.json({
-            message: "Success",
-            url: publicUrl
-        }, { status: 201 });
-
     } catch (error) {
         console.error("Upload error:", error);
         return NextResponse.json({ error: "Failed to upload file." }, { status: 500 });

@@ -71,17 +71,18 @@ export function Header() {
                 className={headerClasses}
             >
                 <div className="w-full">
-                    <div className="container-custom flex h-full justify-between items-center transition-[padding] duration-300">
+                    {/* ── DESKTOP layout ── */}
+                    <div className="hidden lg:flex container-custom h-full justify-between items-center transition-[padding] duration-300">
                         {/* Left: Logo */}
-                        <div className="flex-shrink-0 flex items-center pr-3 md:pr-8">
+                        <div className="flex-shrink-0 flex items-center pr-8">
                             <Link href="/" className="logo tracking-wide flex items-center transform transition-transform hover:scale-[1.02] duration-500 group relative">
-                                <Image src="/assets/logo.png" alt="Krishna Diamonds" width={170} height={42} className="object-contain w-[130px] sm:w-[150px] md:w-[170px] relative z-10" priority />
+                                <Image src="/assets/logo.png" alt="Krishna Diamonds" width={170} height={42} className="object-contain w-[170px] relative z-10" priority />
                                 <span className="absolute inset-0 shimmer-gold opacity-0 group-hover:opacity-30 duration-600 rounded-sm" />
                             </Link>
                         </div>
 
                         {/* Center: Desktop Nav */}
-                        <div className="hidden lg:flex flex-1 justify-center items-center gap-5 xl:gap-8">
+                        <div className="flex flex-1 justify-center items-center gap-5 xl:gap-8">
                             {NAV_ITEMS.map((item) => {
                                 const isActive = item.href === "/customizer/step-1-diamond"
                                     ? pathname.startsWith("/customizer")
@@ -101,40 +102,57 @@ export function Header() {
                                 );
                             })}
                         </div>
-                        
-                        {/* Mobile: Hamburger */}
-                        <div className="lg:hidden flex items-center">
+
+                        {/* Right: Actions */}
+                        <div className="flex-shrink-0 flex justify-end gap-6 items-center">
+                            <div className="relative flex items-center">
+                                <ProfileMenu />
+                            </div>
+                            <Link href="/cart" aria-label="Cart" className="text-[#E4E4E7] hover:text-[#D6B25E] transition-colors duration-300 relative p-1">
+                                <ShoppingCart size={18} strokeWidth={1.5} />
+                                {cartCount > 0 && (
+                                    <span className="absolute -top-2 -right-2 bg-[#D6B25E] text-[#0B0B0C] text-[9px] w-4 h-4 flex items-center justify-center rounded-full font-bold">
+                                        {cartCount}
+                                    </span>
+                                )}
+                            </Link>
+                        </div>
+                    </div>
+
+                    {/* ── MOBILE layout: hamburger LEFT · logo CENTER · actions RIGHT ── */}
+                    <div className="lg:hidden flex h-full items-center px-4">
+                        {/* Left: Hamburger */}
+                        <div className="flex-none">
                             <button
                                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                                className="text-[#F4F4F5] hover:text-[#D6B25E] transition-colors p-2"
+                                className="text-[#F4F4F5] hover:text-[#D6B25E] transition-colors p-2 -ml-2"
                                 aria-label="Toggle menu"
                             >
                                 {isMobileMenuOpen ? <XIcon size={24} strokeWidth={1.5} /> : <Menu size={24} strokeWidth={1.5} />}
                             </button>
                         </div>
 
-                        {/* Right: Actions */}
-                        <div className="flex-shrink-0 flex justify-end gap-3 md:gap-6 items-center">
-                        {/* Removed duplicate nav items since they are in the center now */}
-
-                        {/* Session Aware Identity Module */}
-                        <div className="relative flex items-center">
-                            <ProfileMenu />
+                        {/* Center: Logo */}
+                        <div className="flex-1 flex justify-center">
+                            <Link href="/" className="logo tracking-wide flex items-center group relative">
+                                <Image src="/assets/logo.png" alt="Krishna Diamonds" width={130} height={34} className="object-contain relative z-10" priority />
+                            </Link>
                         </div>
 
-                        <Link
-                            href="/cart"
-                            aria-label="Cart"
-                            className="text-[#E4E4E7] hover:text-[#D6B25E] transition-colors duration-300 relative p-1"
-                        >
-                            <ShoppingCart size={18} strokeWidth={1.5} />
-                            {cartCount > 0 && (
-                                <span className="absolute -top-2 -right-2 bg-[#D6B25E] text-[#0B0B0C] text-[9px] w-4 h-4 flex items-center justify-center rounded-full font-bold">
-                                    {cartCount}
-                                </span>
-                            )}
-                        </Link>
-                    </div>
+                        {/* Right: Cart + Profile */}
+                        <div className="flex-none flex items-center gap-3">
+                            <div className="relative flex items-center">
+                                <ProfileMenu />
+                            </div>
+                            <Link href="/cart" aria-label="Cart" className="text-[#E4E4E7] hover:text-[#D6B25E] transition-colors duration-300 relative p-1">
+                                <ShoppingCart size={20} strokeWidth={1.5} />
+                                {cartCount > 0 && (
+                                    <span className="absolute -top-2 -right-2 bg-[#D6B25E] text-[#0B0B0C] text-[9px] w-4 h-4 flex items-center justify-center rounded-full font-bold">
+                                        {cartCount}
+                                    </span>
+                                )}
+                            </Link>
+                        </div>
                     </div>
                 </div>
             </motion.header>

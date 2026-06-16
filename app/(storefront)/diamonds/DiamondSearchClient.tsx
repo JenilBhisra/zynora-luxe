@@ -13,6 +13,7 @@ import { SmartImage } from "@/components/SmartImage";
 import { AnimatedSection } from "@/components/AnimatedSection";
 import { selectCardImage } from "@/lib/image-utils";
 import Link from "next/link";
+import { SlidersHorizontal, X as XIcon } from "lucide-react";
 
 // Formatter for ₹ Currency
 const formatPrice = (value: number) => {
@@ -33,6 +34,7 @@ export function DiamondSearchClient({ customizerMode = false }: { customizerMode
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [page, setPage] = useState<number>(1);
     const [totalPages, setTotalPages] = useState<number>(1);
+    const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
 
     // Filter States
     const [priceRange, setPriceRange] = useState<[number, number]>([10000, 2000000]);
@@ -118,68 +120,134 @@ export function DiamondSearchClient({ customizerMode = false }: { customizerMode
         setPage(1);
     };
 
+    const activeFilterCount = selectedShapes.length + selectedCuts.length + selectedClarities.length + selectedColors.length + selectedCerts.length;
+
+    // --- Shared filter panel content ---
+    const FilterPanelContent = (
+        <div className="luxury-panel p-3 space-y-3 rounded-[14px]">
+            <div className="flex justify-between items-center mb-2">
+                <p style={{fontSize:'9px'}} className="font-bold text-white tracking-[0.22em] uppercase">Filters</p>
+                <button onClick={resetFilters} style={{fontSize:'8px'}} className="font-bold text-white/40 hover:text-[#D6B25E] transition-colors uppercase tracking-widest">
+                    Reset All
+                </button>
+            </div>
+
+            {/* Price Slider */}
+            <div>
+                <p style={{fontSize:'8px'}} className="font-bold uppercase text-white/50 tracking-[0.22em] mb-2 border-t border-white/8 pt-3">Price Range</p>
+                <DualRangeSlider
+                    min={10000}
+                    max={2000000}
+                    step={10000}
+                    value={priceRange}
+                    onValueChange={setPriceRange}
+                    formatValue={formatPrice}
+                />
+            </div>
+
+            {/* Carat Slider */}
+            <div>
+                <p style={{fontSize:'8px'}} className="font-bold uppercase text-white/50 tracking-[0.22em] mb-2 border-t border-white/8 pt-3">Carat</p>
+                <DualRangeSlider
+                    min={0.2}
+                    max={10}
+                    step={0.1}
+                    value={caratRange}
+                    onValueChange={setCaratRange}
+                    formatValue={(v) => `${v.toFixed(2)} CT`}
+                />
+            </div>
+
+            {/* Shape Toggle */}
+            <div className="border-t border-white/8 pt-3">
+                <FilterGroup title="Shape" options={shapes} selected={selectedShapes} onToggle={(val) => toggleFilter(setSelectedShapes, shapes, val)} />
+            </div>
+
+            {/* Cut Toggle */}
+            <div className="border-t border-white/8 pt-3">
+                <FilterGroup title="Cut" options={cuts} selected={selectedCuts} onToggle={(val) => toggleFilter(setSelectedCuts, cuts, val)} />
+            </div>
+
+            {/* Clarity Toggle */}
+            <div className="border-t border-white/8 pt-3">
+                <FilterGroup title="Clarity" options={clarities} selected={selectedClarities} onToggle={(val) => toggleFilter(setSelectedClarities, clarities, val)} />
+            </div>
+
+            {/* Color Toggle */}
+            <div className="border-t border-white/8 pt-3">
+                <FilterGroup title="Color" options={colors} selected={selectedColors} onToggle={(val) => toggleFilter(setSelectedColors, colors, val)} />
+            </div>
+
+            {/* Certification Toggle */}
+            <div className="border-t border-white/8 pt-3">
+                <FilterGroup title="Certification" options={certs} selected={selectedCerts} onToggle={(val) => toggleFilter(setSelectedCerts, certs, val)} />
+            </div>
+        </div>
+    );
+
     return (
         <div className="py-6 lg:py-10 flex flex-col lg:flex-row gap-5 lg:gap-8 text-white">
 
-            <aside className="w-full lg:w-48 flex-shrink-0">
-                <div className="lg:sticky lg:top-28 luxury-panel p-3 space-y-3 lg:h-[calc(100vh-140px)] overflow-y-auto custom-scrollbar rounded-[14px]">
-                    <div className="flex justify-between items-center mb-2">
-                        <p style={{fontSize:'9px'}} className="font-bold text-white tracking-[0.22em] uppercase">Filters</p>
-                        <button onClick={resetFilters} style={{fontSize:'8px'}} className="font-bold text-white/40 hover:text-[#D6B25E] transition-colors uppercase tracking-widest">
-                            Reset All
-                        </button>
-                    </div>
+            {/* ── MOBILE: filter button + drawer ── */}
+            <div className="lg:hidden">
+                <button
+                    onClick={() => setIsMobileFilterOpen(true)}
+                    className="flex items-center gap-2 px-4 py-2.5 border border-[#D6B25E]/40 text-[#D6B25E] rounded-[10px] text-[11px] uppercase tracking-widest font-bold hover:bg-[#D6B25E]/10 transition-colors"
+                >
+                    <SlidersHorizontal size={14} />
+                    Filters
+                    {activeFilterCount > 0 && (
+                        <span className="ml-1 bg-[#D6B25E] text-[#0B0B0C] text-[9px] w-4 h-4 flex items-center justify-center rounded-full font-bold">
+                            {activeFilterCount}
+                        </span>
+                    )}
+                </button>
 
-                    {/* Price Slider */}
-                    <div>
-                        <p style={{fontSize:'8px'}} className="font-bold uppercase text-white/50 tracking-[0.22em] mb-2 border-t border-white/8 pt-3">Price Range</p>
-                        <DualRangeSlider
-                            min={10000}
-                            max={2000000}
-                            step={10000}
-                            value={priceRange}
-                            onValueChange={setPriceRange}
-                            formatValue={formatPrice}
-                        />
-                    </div>
+                {/* Mobile filter drawer */}
+                <AnimatePresence>
+                    {isMobileFilterOpen && (
+                        <>
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                onClick={() => setIsMobileFilterOpen(false)}
+                                className="fixed inset-0 bg-black/70 backdrop-blur-sm z-[200]"
+                            />
+                            <motion.div
+                                initial={{ y: "100%" }}
+                                animate={{ y: 0 }}
+                                exit={{ y: "100%" }}
+                                transition={{ type: "spring", damping: 30, stiffness: 300 }}
+                                className="fixed bottom-0 left-0 right-0 max-h-[85vh] z-[201] bg-[#0B0B0C] rounded-t-[24px] border-t border-[#D6B25E]/20 overflow-y-auto custom-scrollbar"
+                            >
+                                <div className="sticky top-0 z-10 flex items-center justify-between px-5 py-4 bg-[#0B0B0C] border-b border-white/8">
+                                    <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-white">Filters</p>
+                                    <button onClick={() => setIsMobileFilterOpen(false)} className="text-zinc-400 hover:text-[#D6B25E] transition-colors p-1">
+                                        <XIcon size={18} />
+                                    </button>
+                                </div>
+                                <div className="p-4">
+                                    {FilterPanelContent}
+                                </div>
+                                <div className="sticky bottom-0 bg-[#0B0B0C] border-t border-white/8 px-5 py-4">
+                                    <button
+                                        onClick={() => setIsMobileFilterOpen(false)}
+                                        className="w-full py-3 bg-[#D6B25E] text-[#0B0B0C] text-[11px] font-bold uppercase tracking-widest rounded-[10px] hover:bg-[#E3C67C] transition-colors"
+                                    >
+                                        Show {totalCount} Results
+                                    </button>
+                                </div>
+                            </motion.div>
+                        </>
+                    )}
+                </AnimatePresence>
+            </div>
 
-                    {/* Carat Slider */}
-                    <div>
-                        <p style={{fontSize:'8px'}} className="font-bold uppercase text-white/50 tracking-[0.22em] mb-2 border-t border-white/8 pt-3">Carat</p>
-                        <DualRangeSlider
-                            min={0.2}
-                            max={10}
-                            step={0.1}
-                            value={caratRange}
-                            onValueChange={setCaratRange}
-                            formatValue={(v) => `${v.toFixed(2)} CT`}
-                        />
-                    </div>
-
-                    {/* Shape Toggle */}
-                    <div className="border-t border-white/8 pt-3">
-                        <FilterGroup title="Shape" options={shapes} selected={selectedShapes} onToggle={(val) => toggleFilter(setSelectedShapes, shapes, val)} />
-                    </div>
-
-                    {/* Cut Toggle */}
-                    <div className="border-t border-white/8 pt-3">
-                        <FilterGroup title="Cut" options={cuts} selected={selectedCuts} onToggle={(val) => toggleFilter(setSelectedCuts, cuts, val)} />
-                    </div>
-
-                    {/* Clarity Toggle */}
-                    <div className="border-t border-white/8 pt-3">
-                        <FilterGroup title="Clarity" options={clarities} selected={selectedClarities} onToggle={(val) => toggleFilter(setSelectedClarities, clarities, val)} />
-                    </div>
-
-                    {/* Color Toggle */}
-                    <div className="border-t border-white/8 pt-3">
-                        <FilterGroup title="Color" options={colors} selected={selectedColors} onToggle={(val) => toggleFilter(setSelectedColors, colors, val)} />
-                    </div>
-
-                    {/* Certification Toggle */}
-                    <div className="border-t border-white/8 pt-3">
-                        <FilterGroup title="Certification" options={certs} selected={selectedCerts} onToggle={(val) => toggleFilter(setSelectedCerts, certs, val)} />
-                    </div>
+            {/* ── DESKTOP: sticky sidebar ── */}
+            <aside className="hidden lg:block w-48 flex-shrink-0">
+                <div className="sticky top-28 h-[calc(100vh-140px)] overflow-y-auto custom-scrollbar">
+                    {FilterPanelContent}
                 </div>
             </aside>
 

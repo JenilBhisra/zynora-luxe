@@ -236,42 +236,54 @@ export function ScrollScene({ images, nextSectionSelector, customImages = {}, is
                         </div>
                     </div>
                 ) : (
-                    <div className="container-custom relative z-10 space-y-16">
-                        {mergedFrames.map((frame, index) => (
-                            <div key={frame.id} className="mobile-scene grid gap-6">
-                                <div className="relative aspect-[4/5] overflow-hidden rounded-[22px] luxury-shell border border-[#D6B25E]/20">
-                                    <SmartImage
-                                        src={timelineImages[index]?.src || "/products/ring-2.jpg"}
-                                        alt={timelineImages[index]?.alt || frame.title}
-                                        fill
-                                        fallbackType="jewelry"
-                                        className="object-cover"
-                                    />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/10 to-transparent" />
-                                    {/* Admin: edit overlay per mobile scroll scene frame */}
-                                    {isAdmin && (
-                                        <VisualEditButton
-                                            type="homepage"
-                                            assetKey={`scroll-scene-${index + 1}`}
-                                            className="top-3 left-3"
+                    <div className="container-custom relative z-10 pb-12">
+                        {/* Mobile storyline — stacked scene cards */}
+                        <div className="space-y-10">
+                            {mergedFrames.map((frame, index) => (
+                                <div key={frame.id} className="mobile-scene">
+                                    {/* Image */}
+                                    <div className="relative w-full aspect-[16/10] overflow-hidden rounded-[18px] luxury-shell border border-[#D6B25E]/20 mb-5">
+                                        <SmartImage
+                                            src={timelineImages[index]?.src || "/products/ring-2.jpg"}
+                                            alt={timelineImages[index]?.alt || frame.title}
+                                            fill
+                                            fallbackType="jewelry"
+                                            className="object-cover"
                                         />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+                                        {/* Kicker overlaid on image */}
+                                        <p className="absolute bottom-3 left-4 text-[9px] uppercase tracking-[0.34em] text-[#D6B25E] font-semibold">{frame.kicker}</p>
+                                        {/* Admin: edit overlay per mobile scroll scene frame */}
+                                        {isAdmin && (
+                                            <VisualEditButton
+                                                type="homepage"
+                                                assetKey={`scroll-scene-${index + 1}`}
+                                                className="top-3 left-3"
+                                            />
+                                        )}
+                                    </div>
+                                    {/* Text */}
+                                    <h2 className="text-[22px] sm:text-[26px] leading-[1.12] text-white mb-3 font-heading">{frame.title}</h2>
+                                    <p className="text-white/65 text-[14px] leading-[1.7] mb-3">{frame.body}</p>
+                                    <div className="inline-flex items-center gap-2">
+                                        <span className="h-1.5 w-1.5 rounded-full bg-[#D6B25E]" />
+                                        <span className="text-[10px] uppercase tracking-[0.2em] text-white/55">{frame.trust}</span>
+                                    </div>
+                                    {/* Separator (except last) */}
+                                    {index < mergedFrames.length - 1 && (
+                                        <div className="mt-10 h-px bg-gradient-to-r from-transparent via-[#D6B25E]/25 to-transparent" />
                                     )}
                                 </div>
-                                <div>
-                                    <p className="mb-3 text-[10px] uppercase tracking-[0.34em] text-[#D6B25E]">{frame.kicker}</p>
-                                    <h2 className="text-[32px] leading-[1.08] mb-4">{frame.title}</h2>
-                                    <p className="text-white/72 text-[15px] leading-[1.75] mb-5">{frame.body}</p>
-                                    <p className="text-[11px] uppercase tracking-[0.2em] text-white/65">{frame.trust}</p>
-                                </div>
-                            </div>
-                        ))}
+                            ))}
+                        </div>
 
-                        <div className="flex flex-col gap-4 pt-2">
-                            <Link href="/customizer/step-1-diamond" className="inline-flex items-center justify-center px-8 py-4 text-[12px] uppercase tracking-[0.18em] font-semibold bg-[#D6B25E] text-[#0B0B0C] btn-gold-hover hover:bg-[#E3C67C] transition-all duration-600 relative group">
+                        {/* CTAs */}
+                        <div className="flex flex-col gap-3 pt-10">
+                            <Link href="/customizer/step-1-diamond" className="inline-flex items-center justify-center px-6 py-4 text-[12px] uppercase tracking-[0.18em] font-semibold bg-[#D6B25E] text-[#0B0B0C] transition-all duration-300 relative group rounded-sm">
                                 <span className="relative z-10">Start Custom Ring</span>
                                 <span className="absolute inset-0 shimmer-gold opacity-0 group-hover:opacity-35 duration-600" />
                             </Link>
-                            <Link href="/shop" className="inline-flex items-center justify-center px-8 py-4 text-[12px] uppercase tracking-[0.18em] font-semibold border border-white/14 text-white premium-hover-lift hover:bg-white/6 hover:border-[#D6B25E]/50 transition-all duration-600 relative group">
+                            <Link href="/shop" className="inline-flex items-center justify-center px-6 py-4 text-[12px] uppercase tracking-[0.18em] font-semibold border border-white/14 text-white hover:bg-white/6 hover:border-[#D6B25E]/50 transition-all duration-300 relative group rounded-sm">
                                 <span className="relative z-10">Explore Collection</span>
                                 <span className="absolute inset-0 shimmer-gold opacity-0 group-hover:opacity-20 duration-600" />
                             </Link>

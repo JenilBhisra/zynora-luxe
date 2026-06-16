@@ -26,8 +26,7 @@ function LoginContent() {
         const isAdmin = userEmail?.toLowerCase() === "krishnadiamond404@gmail.com";
         const defaultDest = isAdmin ? "/admin" : "/";
         const destination = consumeRedirectAfterLogin(redirectTo || defaultDest);
-        router.replace(destination);
-        router.refresh();
+        window.location.href = destination;
     };
 
     const handleLogin = async (e: React.FormEvent) => {

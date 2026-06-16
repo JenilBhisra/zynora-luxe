@@ -27,8 +27,7 @@ function SignupContent() {
 
     const finalizeLogin = () => {
         const destination = consumeRedirectAfterLogin(redirectTo || "/");
-        router.replace(destination);
-        router.refresh();
+        window.location.href = destination;
     };
 
     // Step 1: Validate form and send OTP

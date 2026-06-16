@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { writeFile, mkdir } from "fs/promises";
+import { writeFile, mkdir, unlink } from "fs/promises";
 import path from "path";
 import { getServerSession } from "@/lib/auth";
 
@@ -40,7 +40,8 @@ export async function POST(req: NextRequest) {
         const videoExtRegex = /\.(mp4|webm|mov)$/i;
         const validVideoMimeTypes = ['video/mp4', 'video/webm', 'video/quicktime'];
         const modelExtRegex = /\.(glb|gltf|obj)$/i;
-        const safeName = file.name.toLowerCase();
+        const fileName = file.name || "uploaded-file.jpg";
+        const safeName = fileName.toLowerCase();
 
         if (kind === "image") {
             const isImageMime = validImageMimeTypes.includes(file.type);
@@ -79,7 +80,7 @@ export async function POST(req: NextRequest) {
         const buffer = Buffer.from(await file.arrayBuffer());
 
         // Sanitize filename & create unique name
-        const originalName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, "");
+        const originalName = fileName.replace(/[^a-zA-Z0-9.\-_]/g, "");
         const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
         const ext = path.extname(originalName);
         const name = path.basename(originalName, ext);
@@ -113,7 +114,6 @@ export async function POST(req: NextRequest) {
                 
                 // Make sure we only delete files inside public/uploads
                 if (previousFilePath.startsWith(path.join(process.cwd(), "public", "uploads"))) {
-                    const { unlink } = require("fs/promises");
                     await unlink(previousFilePath);
                 }
             } catch (err) {

@@ -44,13 +44,9 @@ export default async function HomePage() {
             {/* Header + Hero Slider loads immediately on first paint */}
             <div className="relative">
                 <HeroSlider customSlides={assetsMap} customText={assetsMap} />
-                {/* Admin: edit any of the 3 hero slides */}
+                {/* Admin: edit the single hero slide */}
                 {isAdmin && (
-                    <>
-                        <VisualEditButton type="homepage" assetKey="hero-slide-1" className="top-24 left-6" />
-                        <VisualEditButton type="homepage" assetKey="hero-slide-2" className="top-24 left-20" />
-                        <VisualEditButton type="homepage" assetKey="hero-slide-3" className="top-24 left-36" />
-                    </>
+                    <VisualEditButton type="homepage" assetKey="hero-slide-1" className="top-24 left-6" />
                 )}
             </div>
 

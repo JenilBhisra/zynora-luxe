@@ -9,7 +9,17 @@ export function ProfileMenu() {
 
     if (loading) {
         return (
-            <div className="w-8 h-8 rounded-full bg-[#FAF8F4] border border-[#EAEAEA] flex items-center justify-center animate-pulse"></div>
+            <div 
+                style={{
+                    width: "38px",
+                    height: "38px",
+                    borderRadius: "999px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center"
+                }}
+                className="bg-[#FAF8F4] border border-[#EAEAEA] animate-pulse"
+            ></div>
         );
     }
 
@@ -18,15 +28,35 @@ export function ProfileMenu() {
             <Link
                 href="/account"
                 aria-label="Account Settings"
-                className="w-8 h-8 rounded-full border border-[#EAEAEA] text-[#1A1A1A] bg-[#FAF8F4] hover:border-[#C9A14A] hover:text-[#C9A14A] flex items-center justify-center text-sm font-medium transition-colors"
+                style={{
+                    width: "38px",
+                    height: "38px",
+                    borderRadius: "999px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center"
+                }}
+                className="border border-[#EAEAEA] text-[#1A1A1A] bg-[#FAF8F4] hover:border-[#C9A14A] hover:text-[#C9A14A] transition-colors"
             >
-                {user.displayName?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || 'U'}
+                <User size={18} strokeWidth={1.5} />
             </Link>
         );
     }
 
     return (
-        <Link href="/login" aria-label="Account" className="text-[#1A1A1A] hover:text-[#C9A14A] transition-colors p-1 flex items-center justify-center">
+        <Link 
+            href="/login" 
+            aria-label="Account" 
+            style={{
+                width: "38px",
+                height: "38px",
+                borderRadius: "999px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center"
+            }}
+            className="border border-[#EAEAEA] text-[#1A1A1A] bg-[#FAF8F4] hover:border-[#C9A14A] hover:text-[#C9A14A] transition-colors"
+        >
             <User size={18} strokeWidth={1.5} />
         </Link>
     );

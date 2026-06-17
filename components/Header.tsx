@@ -93,29 +93,73 @@ export function Header() {
                 <div className="w-full flex flex-col justify-center">
                     {/* ── DESKTOP layout ── */}
                     <div className="hidden lg:flex flex-col w-full">
-                        {/* Row 1: Centered Logo + Left Spacer + Right Icons */}
-                        <div className="grid grid-cols-3 items-center w-full px-12 py-3">
-                            {/* Left Side: Empty spacer */}
-                            <div className="flex justify-start"></div>
-
+                        {/* Row 1: Centered Logo + Absolutely Aligned Right Icons */}
+                        <div className="relative flex items-center justify-center w-full px-12 py-3 h-[60px]">
                             {/* Center Logo */}
-                            <div className="flex justify-center">
-                                <Link href="/" className="logo flex items-center">
-                                    <span className="font-serif text-[42px] font-medium tracking-[0.08em] text-[#1A1A1A] uppercase leading-none select-none">
-                                        ZYNORA LUXE
-                                    </span>
-                                </Link>
-                            </div>
+                            <Link href="/" className="logo flex items-center">
+                                <span 
+                                    className="font-serif uppercase leading-none select-none"
+                                    style={{
+                                        fontSize: "26px",
+                                        letterSpacing: "0.08em",
+                                        fontWeight: "500",
+                                        color: "#1A1A1A"
+                                    }}
+                                >
+                                    ZYNORA LUXE
+                                </span>
+                            </Link>
 
-                            {/* Right Icons: Search/Account/Cart */}
-                            <div className="flex justify-end gap-6 items-center">
-                                <div className="relative flex items-center">
+                            {/* Right Icons: Account + Cart aligned absolute right */}
+                            <div 
+                                style={{
+                                    position: "absolute",
+                                    right: "32px",
+                                    top: "50%",
+                                    transform: "translateY(-50%)",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    gap: "18px",
+                                    height: "60px"
+                                }}
+                            >
+                                {/* Account circle */}
+                                <div 
+                                    style={{
+                                        width: "38px",
+                                        height: "38px",
+                                        borderRadius: "999px",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center"
+                                    }}
+                                >
                                     <ProfileMenu />
                                 </div>
-                                <Link href="/cart" aria-label="Cart" className="text-[#1A1A1A] hover:text-[#C9A14A] transition-colors duration-300 relative p-1">
-                                    <ShoppingCart size={18} strokeWidth={1.5} />
+                                {/* Cart icon */}
+                                <Link 
+                                    href="/cart" 
+                                    aria-label="Cart" 
+                                    style={{
+                                        width: "22px",
+                                        height: "22px",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        position: "relative"
+                                    }}
+                                    className="text-[#1A1A1A] hover:text-[#C9A14A] transition-colors duration-300"
+                                >
+                                    <ShoppingCart size={20} strokeWidth={1.5} style={{ width: "22px", height: "22px" }} />
                                     {cartCount > 0 && (
-                                        <span className="absolute -top-2 -right-2 bg-[#C9A14A] text-white text-[9px] w-4 h-4 flex items-center justify-center rounded-full font-bold">
+                                        <span 
+                                            className="absolute bg-[#C9A14A] text-white text-[9px] w-4 h-4 flex items-center justify-center rounded-full font-bold"
+                                            style={{
+                                                top: "-10px",
+                                                right: "-10px"
+                                            }}
+                                        >
                                             {cartCount}
                                         </span>
                                     )}
@@ -161,21 +205,56 @@ export function Header() {
                         {/* Center: Logo */}
                         <div className="w-2/4 flex justify-center">
                             <Link href="/" className="logo flex items-center">
-                                <span className="font-serif text-[20px] sm:text-[22px] font-semibold tracking-[0.08em] text-[#1A1A1A] uppercase leading-none select-none">
+                                <span 
+                                    className="font-serif uppercase leading-none select-none"
+                                    style={{
+                                        fontSize: "20px",
+                                        letterSpacing: "0.08em",
+                                        fontWeight: "500",
+                                        color: "#1A1A1A"
+                                    }}
+                                >
                                     ZYNORA LUXE
                                 </span>
                             </Link>
                         </div>
 
                         {/* Right: Cart + Profile */}
-                        <div className="w-1/4 flex justify-end items-center gap-3">
-                            <div className="relative flex items-center">
+                        <div className="w-1/4 flex justify-end items-center gap-[18px]">
+                            <div 
+                                style={{
+                                    width: "38px",
+                                    height: "38px",
+                                    borderRadius: "999px",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center"
+                                }}
+                            >
                                 <ProfileMenu />
                             </div>
-                            <Link href="/cart" aria-label="Cart" className="text-[#1A1A1A] hover:text-[#C9A14A] transition-colors duration-300 relative p-1">
-                                <ShoppingCart size={20} strokeWidth={1.5} />
+                            <Link 
+                                href="/cart" 
+                                aria-label="Cart" 
+                                style={{
+                                    width: "22px",
+                                    height: "22px",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    position: "relative"
+                                }}
+                                className="text-[#1A1A1A] hover:text-[#C9A14A] transition-colors duration-300"
+                            >
+                                <ShoppingCart size={20} strokeWidth={1.5} style={{ width: "22px", height: "22px" }} />
                                 {cartCount > 0 && (
-                                    <span className="absolute -top-2 -right-2 bg-[#C9A14A] text-white text-[9px] w-4 h-4 flex items-center justify-center rounded-full font-bold">
+                                    <span 
+                                        className="absolute bg-[#C9A14A] text-white text-[9px] w-4 h-4 flex items-center justify-center rounded-full font-bold"
+                                        style={{
+                                            top: "-10px",
+                                            right: "-10px"
+                                        }}
+                                    >
                                         {cartCount}
                                     </span>
                                 )}
@@ -207,7 +286,17 @@ export function Header() {
                         >
                             {/* Mobile Menu Header */}
                             <div className="flex items-center justify-between p-6 border-b border-[#EAEAEA]">
-                                <Image src="/assets/logo.png" alt="Zynora Luxe" width={120} height={40} className="object-contain" />
+                                <span 
+                                    className="font-serif uppercase leading-none select-none"
+                                    style={{
+                                        fontSize: "20px",
+                                        letterSpacing: "0.08em",
+                                        fontWeight: "500",
+                                        color: "#1A1A1A"
+                                    }}
+                                >
+                                    ZYNORA LUXE
+                                </span>
                                 <button onClick={() => setIsMobileMenuOpen(false)} className="text-[#666666] hover:text-[#C9A14A] transition-colors p-1">
                                     <XIcon size={20} />
                                 </button>

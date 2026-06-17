@@ -9,7 +9,7 @@ export function ProfileMenu() {
 
     if (loading) {
         return (
-            <div className="w-8 h-8 rounded-full bg-white/5 border border-[#D6B25E]/30 flex items-center justify-center animate-pulse"></div>
+            <div className="w-8 h-8 rounded-full bg-[#FAF8F4] border border-[#EAEAEA] flex items-center justify-center animate-pulse"></div>
         );
     }
 
@@ -18,7 +18,7 @@ export function ProfileMenu() {
             <Link
                 href="/account"
                 aria-label="Account Settings"
-                className="w-8 h-8 rounded-full border border-[#D6B25E]/40 text-[#E4E4E7] bg-[#0B0B0C] hover:border-[#D6B25E] hover:text-[#D6B25E] flex items-center justify-center text-sm font-semibold transition-colors"
+                className="w-8 h-8 rounded-full border border-[#EAEAEA] text-[#1A1A1A] bg-[#FAF8F4] hover:border-[#C9A14A] hover:text-[#C9A14A] flex items-center justify-center text-sm font-medium transition-colors"
             >
                 {user.displayName?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || 'U'}
             </Link>
@@ -26,8 +26,8 @@ export function ProfileMenu() {
     }
 
     return (
-        <Link href="/login" aria-label="Account" className="text-[#E4E4E7] hover:text-[#D6B25E] transition-colors">
-            <User size={18} />
+        <Link href="/login" aria-label="Account" className="text-[#1A1A1A] hover:text-[#C9A14A] transition-colors p-1 flex items-center justify-center">
+            <User size={18} strokeWidth={1.5} />
         </Link>
     );
 }

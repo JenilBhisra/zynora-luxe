@@ -1,7 +1,10 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { SmartImage } from "./SmartImage";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface HeroSliderProps {
     customSlides?: Record<string, string>;
@@ -9,27 +12,58 @@ interface HeroSliderProps {
 }
 
 export function HeroSlider({ customSlides = {}, customText = {} }: HeroSliderProps) {
-    const heroImage = customSlides["hero-slide-1"] || "/products/ring-2.jpg";
+    const slides = [
+        customSlides["hero-slide-1"] || "/products/ring-2.jpg",
+        customSlides["hero-slide-2"] || "/products/earrings-1.jpg",
+        customSlides["hero-slide-3"] || "/products/loose-diamond.jpg",
+    ];
+
+    const [currentSlide, setCurrentSlide] = useState(0);
+
+    const nextSlide = () => {
+        setCurrentSlide((prev) => (prev + 1) % slides.length);
+    };
+
+    const prevSlide = () => {
+        setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
+    };
+
+    // Auto-advance slides every 6 seconds
+    useEffect(() => {
+        const timer = setInterval(nextSlide, 6000);
+        return () => clearInterval(timer);
+    }, []);
 
     return (
         <section 
             className="relative w-full overflow-hidden bg-white flex items-center"
-            style={{ height: "calc(100vh - var(--header-height, 80px))" }}
+            style={{ height: "calc(100vh - var(--header-height, 120px))" }}
         >
-            {/* Background Image */}
+            {/* Background Images with AnimatePresence */}
             <div className="absolute inset-0 z-0 bg-[#FAF8F4] w-full h-full">
-                <SmartImage 
-                    src={heroImage} 
-                    alt="Zynora Luxe Fine Jewelry"
-                    fill 
-                    fallbackType="jewelry" 
-                    className="object-cover object-center w-full h-full" 
-                    priority
-                    sizes="100vw"
-                    {...({ fetchPriority: "high" } as any)}
-                />
-                {/* Subtle luxury overlay only if needed */}
-                <div className="absolute inset-0 bg-black/15 pointer-events-none" />
+                <AnimatePresence mode="wait">
+                    <motion.div
+                        key={currentSlide}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.8, ease: "easeInOut" }}
+                        className="absolute inset-0 w-full h-full"
+                    >
+                        <SmartImage 
+                            src={slides[currentSlide]} 
+                            alt={`Zynora Luxe Fine Jewelry Slide ${currentSlide + 1}`}
+                            fill 
+                            fallbackType="jewelry" 
+                            className="object-cover object-center w-full h-full" 
+                            priority={currentSlide === 0}
+                            sizes="100vw"
+                            {...({ fetchPriority: currentSlide === 0 ? "high" : "low" } as any)}
+                        />
+                        {/* Subtle luxury overlay only if needed */}
+                        <div className="absolute inset-0 bg-black/15 pointer-events-none" />
+                    </motion.div>
+                </AnimatePresence>
             </div>
 
             {/* Content Overlay */}
@@ -53,6 +87,22 @@ export function HeroSlider({ customSlides = {}, customText = {} }: HeroSliderPro
                     </div>
                 </div>
             </div>
+
+            {/* Navigation Arrows at Left and Right corners */}
+            <button
+                onClick={prevSlide}
+                className="absolute left-4 z-20 w-10 h-10 rounded-full border border-[#EAEAEA] bg-white/60 hover:bg-white text-[#1A1A1A] hover:text-[#C9A14A] backdrop-blur-sm flex items-center justify-center transition-all duration-300 focus:outline-none"
+                aria-label="Previous slide"
+            >
+                <ChevronLeft className="w-5 h-5" />
+            </button>
+            <button
+                onClick={nextSlide}
+                className="absolute right-4 z-20 w-10 h-10 rounded-full border border-[#EAEAEA] bg-white/60 hover:bg-white text-[#1A1A1A] hover:text-[#C9A14A] backdrop-blur-sm flex items-center justify-center transition-all duration-300 focus:outline-none"
+                aria-label="Next slide"
+            >
+                <ChevronRight className="w-5 h-5" />
+            </button>
         </section>
     );
 }

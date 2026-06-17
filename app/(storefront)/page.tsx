@@ -8,6 +8,7 @@ import { selectCardImage } from "@/lib/image-utils";
 import { InteractiveCategoryGallery } from "@/components/InteractiveCategoryGallery";
 import { HeroSlider } from "@/components/HeroSlider";
 import nextDynamic from "next/dynamic";
+import { Suspense } from "react";
 
 const ScrollScene = nextDynamic(() => import("@/components/animation/ScrollScene").then(mod => mod.ScrollScene), {
     loading: () => <div className="min-h-screen bg-white flex items-center justify-center text-[#1A1A1A]/40 font-serif tracking-[0.2em] text-xs uppercase animate-pulse">Loading Storyline...</div>
@@ -31,7 +32,41 @@ export default async function HomePage() {
     const session = await getServerSession();
     const isAdmin = session?.user?.role === "ADMIN";
 
-    const [featuredProducts, featuredDiamonds, featuredSettings, siteAssets] = await Promise.all([
+    // Query site assets immediately (small configuration table, resolves in ~10ms)
+    const siteAssets = await prisma.siteAsset.findMany();
+    const assetsMap = siteAssets.reduce((acc: Record<string, string>, asset) => {
+        acc[asset.key] = asset.url;
+        return acc;
+    }, {});
+
+    return (
+        <div className="bg-white text-[#1A1A1A] relative">
+            {/* Header + Hero Slider loads immediately on first paint */}
+            <div className="relative">
+                <HeroSlider customSlides={assetsMap} customText={assetsMap} />
+                {/* Admin: edit any of the 3 hero slides */}
+                {isAdmin && (
+                    <>
+                        <VisualEditButton type="homepage" assetKey="hero-slide-1" className="top-24 left-6" />
+                        <VisualEditButton type="homepage" assetKey="hero-slide-2" className="top-24 left-20" />
+                        <VisualEditButton type="homepage" assetKey="hero-slide-3" className="top-24 left-36" />
+                    </>
+                )}
+            </div>
+
+            {/* Suspense streaming handles the heavy database calls progressively below-the-fold */}
+            <Suspense fallback={<HomeSkeletonLoader />}>
+                <HomeContent isAdmin={isAdmin} assetsMap={assetsMap} />
+            </Suspense>
+
+            {isAdmin && <AdminStudio isAdmin={isAdmin} />}
+        </div>
+    );
+}
+
+// Child component for query-reliant segments
+async function HomeContent({ isAdmin, assetsMap }: { isAdmin: boolean; assetsMap: Record<string, string> }) {
+    const [featuredProducts, featuredDiamonds, featuredSettings] = await Promise.all([
         prisma.product.findMany({
             where: { isFeatured: true },
             orderBy: { createdAt: "desc" },
@@ -45,14 +80,8 @@ export default async function HomePage() {
         prisma.setting.findMany({
             orderBy: { createdAt: "desc" },
             take: 4,
-        }),
-        prisma.siteAsset.findMany()
+        })
     ]);
-
-    const assetsMap = siteAssets.reduce((acc: Record<string, string>, asset) => {
-        acc[asset.key] = asset.url;
-        return acc;
-    }, {});
 
     const houseMetrics = [
         {
@@ -78,19 +107,7 @@ export default async function HomePage() {
     }));
 
     return (
-        <div className="bg-white text-[#1A1A1A] relative">
-            <div className="relative">
-                <HeroSlider customSlides={assetsMap} customText={assetsMap} />
-                {/* Admin: edit any of the 3 hero slides */}
-                {isAdmin && (
-                    <>
-                        <VisualEditButton type="homepage" assetKey="hero-slide-1" className="top-24 left-6" />
-                        <VisualEditButton type="homepage" assetKey="hero-slide-2" className="top-24 left-20" />
-                        <VisualEditButton type="homepage" assetKey="hero-slide-3" className="top-24 left-36" />
-                    </>
-                )}
-            </div>
-
+        <>
             {/* Section 1: Clear Value Prop + Progressive CTA (Section Banners) */}
             <AnimatedSection id="home-followup-section" className="py-24 md:py-32 bg-white story-section-frame">
                 <div className="container-custom grid gap-14 lg:grid-cols-[1.02fr_0.98fr] items-center">
@@ -164,7 +181,7 @@ export default async function HomePage() {
             {/* Category Gallery (Moved Up) */}
             <InteractiveCategoryGallery customImages={assetsMap} isAdmin={isAdmin} />
 
-            {/* Journey Scroll Scene (Moved Down, targeting Featured Products next) */}
+            {/* Journey Scroll Scene */}
             <ScrollScene images={timelineImages} nextSectionSelector="#featured-products-section" customImages={assetsMap} customText={assetsMap} isAdmin={isAdmin} />
 
             {/* Section 2: Product Showcase (Featured Collection / Featured Products) */}
@@ -343,7 +360,45 @@ export default async function HomePage() {
                     </FadeIn>
                 </div>
             </AnimatedSection>
-            {isAdmin && <AdminStudio isAdmin={isAdmin} />}
+        </>
+    );
+}
+
+// Lightweight local skeletons streaming fallback for under-the-fold content
+function HomeSkeletonLoader() {
+    return (
+        <div className="w-full bg-white text-[#1A1A1A]">
+            {/* Journey Section Skeleton */}
+            <div className="py-24 bg-white animate-pulse">
+                <div className="container-custom grid gap-14 lg:grid-cols-2">
+                    <div className="aspect-[4/5] bg-black/5 rounded-[20px]" />
+                    <div className="flex flex-col justify-center">
+                        <div className="h-4 w-32 bg-black/5 mb-4" />
+                        <div className="h-12 w-full bg-black/5 mb-6" />
+                        <div className="h-6 w-3/4 bg-black/5 mb-8" />
+                        <div className="h-10 w-48 bg-black/5" />
+                    </div>
+                </div>
+            </div>
+
+            {/* Category Gallery Skeleton */}
+            <section className="py-20 bg-white border-t border-[#EAEAEA]">
+                <div className="container-custom">
+                    <div className="flex flex-col items-center mb-12 animate-pulse">
+                        <div className="h-3 w-32 bg-black/5 mb-4" />
+                        <div className="h-8 w-64 bg-black/5" />
+                    </div>
+                    {/* 6 column category skeleton */}
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+                        {Array.from({ length: 6 }).map((_, index) => (
+                            <div key={index} className="flex flex-col gap-3 animate-pulse">
+                                <div className="aspect-square w-full bg-[#FAF8F4]" />
+                                <div className="h-4 w-2/3 bg-black/5 mx-auto mt-1" />
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
         </div>
     );
 }

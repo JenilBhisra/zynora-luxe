@@ -208,7 +208,7 @@ export function Header() {
                                 <span 
                                     className="font-serif uppercase leading-none select-none"
                                     style={{
-                                        fontSize: "30px",
+                                        fontSize: "24px",
                                         letterSpacing: "0.08em",
                                         fontWeight: "500",
                                         color: "#1A1A1A"
@@ -289,7 +289,7 @@ export function Header() {
                                 <span 
                                     className="font-serif uppercase leading-none select-none"
                                     style={{
-                                        fontSize: "30px",
+                                        fontSize: "24px",
                                         letterSpacing: "0.08em",
                                         fontWeight: "500",
                                         color: "#1A1A1A"

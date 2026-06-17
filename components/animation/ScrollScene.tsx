@@ -74,7 +74,7 @@ function SceneText({ frame }: { frame: TimelineFrame }) {
             <p className="mb-3 sm:mb-5 text-[9px] sm:text-[11px] uppercase tracking-[0.34em] text-[#C9A14A] font-semibold">{frame.kicker}</p>
             <h2 className="text-[22px] xs:text-[28px] sm:text-[42px] md:text-[56px] leading-[1.02] text-[#1A1A1A] mb-3 sm:mb-5 font-heading font-semibold">{frame.title}</h2>
             <p className="text-[#666666] text-[13px] sm:text-[15px] md:text-[18px] leading-[1.6] sm:leading-[1.8] max-w-[52ch] mb-4 sm:mb-6">{frame.body}</p>
-            <div className="inline-flex items-center gap-2 sm:gap-3 rounded-full border border-[#EAEAEA] bg-[#EAF5FF] px-3 py-1.5 sm:px-4 sm:py-2">
+            <div className="inline-flex items-center gap-2 sm:gap-3 rounded-full border border-[#EAEAEA] bg-[#FAF8F4] px-3 py-1.5 sm:px-4 sm:py-2">
                 <span className="h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-[#C9A14A]" />
                 <span className="text-[9px] sm:text-[11px] uppercase tracking-[0.2em] text-[#1A1A1A]">{frame.trust}</span>
             </div>
@@ -154,7 +154,7 @@ export function ScrollScene({ images, nextSectionSelector, customImages = {}, is
                     className="absolute inset-0"
                     style={{
                         background:
-                            "radial-gradient(circle at 50% 26%, rgba(201,161,74,0.08) 0%, rgba(201,161,74,0.03) 26%, rgba(234,245,255,0.8) 68%), linear-gradient(180deg, #EAF5FF 0%, #FFFFFF 52%, #EAF5FF 100%)",
+                            "radial-gradient(circle at 50% 26%, rgba(201,161,74,0.08) 0%, rgba(201,161,74,0.03) 26%, rgba(250,248,244,0.8) 68%), linear-gradient(180deg, #FAF8F4 0%, #FFFFFF 52%, #FAF8F4 100%)",
                     }}
                 />
 

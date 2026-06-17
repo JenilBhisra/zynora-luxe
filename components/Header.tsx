@@ -56,30 +56,74 @@ export function Header() {
         return () => window.removeEventListener("scroll", onScroll);
     }, []);
 
+    // Set header height custom property dynamically for hero calculations
+    useEffect(() => {
+        const updateHeaderHeight = () => {
+            const headerElement = document.querySelector("header");
+            if (headerElement) {
+                document.documentElement.style.setProperty(
+                    "--header-height",
+                    `${headerElement.offsetHeight}px`
+                );
+            }
+        };
+        
+        updateHeaderHeight();
+        // Run a second time after a brief delay to ensure layout has settled
+        const timer = setTimeout(updateHeaderHeight, 150);
+        
+        window.addEventListener("resize", updateHeaderHeight);
+        return () => {
+            window.removeEventListener("resize", updateHeaderHeight);
+            clearTimeout(timer);
+        };
+    }, []);
+
     if (pathname?.startsWith("/admin")) {
         return null;
     }
 
-    const headerClasses = `sticky top-0 left-0 w-full z-[99999] [transform:translateZ(0)] h-16 md:h-20 flex items-center transition-all duration-500 bg-white border-b border-[#EAEAEA] shadow-[0_2px_12px_rgba(0,0,0,0.02)]`;
+    const headerClasses = `sticky top-0 left-0 w-full z-[99999] [transform:translateZ(0)] h-16 lg:h-[116px] flex items-center transition-all duration-500 bg-white border-b border-[#EAEAEA] shadow-[0_2px_12px_rgba(0,0,0,0.02)]`;
 
     return (
         <>
             <motion.header 
                 className={headerClasses}
             >
-                <div className="w-full">
+                <div className="w-full flex flex-col justify-center">
                     {/* ── DESKTOP layout ── */}
-                    <div className="hidden lg:flex container-custom h-full justify-between items-center transition-[padding] duration-300">
-                        {/* Left: Logo */}
-                        <div className="flex-shrink-0 flex items-center pr-8">
-                            <Link href="/" className="logo tracking-wide flex items-center transform transition-transform hover:scale-[1.02] duration-500 group relative">
-                                <Image src="/assets/logo.png" alt="Krishna Diamonds" width={170} height={42} className="object-contain w-[170px] relative z-10" priority />
-                                <span className="absolute inset-0 shimmer-gold opacity-0 group-hover:opacity-30 duration-600 rounded-sm" />
-                            </Link>
+                    <div className="hidden lg:flex flex-col w-full">
+                        {/* Row 1: Centered Logo + Left Spacer + Right Icons */}
+                        <div className="grid grid-cols-3 items-center w-full px-12 py-3">
+                            {/* Left Side: Empty spacer */}
+                            <div className="flex justify-start"></div>
+
+                            {/* Center Logo */}
+                            <div className="flex justify-center">
+                                <Link href="/" className="logo tracking-wide flex items-center transform transition-transform hover:scale-[1.01] duration-500 group relative">
+                                    <Image src="/assets/logo.png" alt="Zynora Luxe" width={180} height={42} className="object-contain w-[180px] relative z-10" priority />
+                                    <span className="absolute inset-0 shimmer-gold opacity-0 group-hover:opacity-20 duration-600 rounded-sm" />
+                                </Link>
+                            </div>
+
+                            {/* Right Icons: Search/Account/Cart */}
+                            <div className="flex justify-end gap-6 items-center">
+                                <div className="relative flex items-center">
+                                    <ProfileMenu />
+                                </div>
+                                <Link href="/cart" aria-label="Cart" className="text-[#1A1A1A] hover:text-[#C9A14A] transition-colors duration-300 relative p-1">
+                                    <ShoppingCart size={18} strokeWidth={1.5} />
+                                    {cartCount > 0 && (
+                                        <span className="absolute -top-2 -right-2 bg-[#C9A14A] text-white text-[9px] w-4 h-4 flex items-center justify-center rounded-full font-bold">
+                                            {cartCount}
+                                        </span>
+                                    )}
+                                </Link>
+                            </div>
                         </div>
 
-                        {/* Center: Desktop Nav */}
-                        <div className="flex flex-1 justify-center items-center gap-5 xl:gap-8">
+                        {/* Row 2: Centered Navigation Menu */}
+                        <div className="flex justify-center items-center gap-8 py-3.5 border-t border-[#EAEAEA] w-full">
                             {NAV_ITEMS.map((item) => {
                                 const isActive = item.href === "/customizer/step-1-diamond"
                                     ? pathname.startsWith("/customizer")
@@ -89,40 +133,24 @@ export function Header() {
                                     <Link
                                         key={item.href}
                                         href={item.href}
-                                        className={`text-[12px] uppercase tracking-[0.22em] relative font-medium transition-colors duration-500 after:content-[''] after:absolute after:-bottom-2 after:left-0 after:h-[2px] after:bg-[#C9A14A] after:transition-all after:duration-600 group ${isActive ? "after:w-full text-[#C9A14A]" : "text-[#1A1A1A] hover:text-[#C9A14A] after:w-0 hover:after:w-full"}`}
+                                        className={`text-[13px] uppercase tracking-[0.14em] relative font-medium transition-colors duration-500 after:content-[''] after:absolute after:-bottom-1.5 after:left-0 after:h-[1.5px] after:bg-[#C9A14A] after:transition-all after:duration-600 group ${isActive ? "after:w-full text-[#C9A14A]" : "text-[#1A1A1A] hover:text-[#C9A14A] after:w-0 hover:after:w-full"}`}
                                     >
                                         <span className="relative">
                                             {item.label}
-                                            <span className="absolute inset-0 shimmer-gold opacity-0 group-hover:opacity-20 duration-700 pointer-events-none" />
                                         </span>
                                     </Link>
                                 );
                             })}
                         </div>
-
-                        {/* Right: Actions */}
-                        <div className="flex-shrink-0 flex justify-end gap-6 items-center">
-                            <div className="relative flex items-center">
-                                <ProfileMenu />
-                            </div>
-                            <Link href="/cart" aria-label="Cart" className="text-[#1A1A1A] hover:text-[#C9A14A] transition-colors duration-300 relative p-1">
-                                <ShoppingCart size={18} strokeWidth={1.5} />
-                                {cartCount > 0 && (
-                                    <span className="absolute -top-2 -right-2 bg-[#C9A14A] text-white text-[9px] w-4 h-4 flex items-center justify-center rounded-full font-bold">
-                                        {cartCount}
-                                    </span>
-                                )}
-                            </Link>
-                        </div>
                     </div>
 
                     {/* ── MOBILE layout: hamburger LEFT · logo CENTER · actions RIGHT ── */}
-                    <div className="lg:hidden flex h-full items-center px-4">
+                    <div className="lg:hidden flex h-16 w-full items-center px-4 justify-between bg-white">
                         {/* Left: Hamburger */}
-                        <div className="flex-none">
+                        <div className="w-1/4 flex justify-start">
                             <button
                                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                                className="text-[#1A1A1A] hover:text-[#C9A14A] transition-colors p-2 -ml-2"
+                                className="text-[#1A1A1A] hover:text-[#C9A14A] transition-colors p-2"
                                 aria-label="Toggle menu"
                             >
                                 {isMobileMenuOpen ? <XIcon size={24} strokeWidth={1.5} /> : <Menu size={24} strokeWidth={1.5} />}
@@ -130,14 +158,14 @@ export function Header() {
                         </div>
 
                         {/* Center: Logo */}
-                        <div className="flex-1 flex justify-center">
+                        <div className="w-2/4 flex justify-center">
                             <Link href="/" className="logo tracking-wide flex items-center group relative">
-                                <Image src="/assets/logo.png" alt="Krishna Diamonds" width={130} height={34} className="object-contain relative z-10" priority />
+                                <Image src="/assets/logo.png" alt="Zynora Luxe" width={130} height={34} className="object-contain relative z-10" priority />
                             </Link>
                         </div>
 
                         {/* Right: Cart + Profile */}
-                        <div className="flex-none flex items-center gap-3">
+                        <div className="w-1/4 flex justify-end items-center gap-3">
                             <div className="relative flex items-center">
                                 <ProfileMenu />
                             </div>
@@ -176,7 +204,7 @@ export function Header() {
                         >
                             {/* Mobile Menu Header */}
                             <div className="flex items-center justify-between p-6 border-b border-[#EAEAEA]">
-                                <Image src="/assets/logo.png" alt="Krishna Diamonds" width={120} height={40} className="object-contain" />
+                                <Image src="/assets/logo.png" alt="Zynora Luxe" width={120} height={40} className="object-contain" />
                                 <button onClick={() => setIsMobileMenuOpen(false)} className="text-[#666666] hover:text-[#C9A14A] transition-colors p-1">
                                     <XIcon size={20} />
                                 </button>
@@ -201,7 +229,7 @@ export function Header() {
                                                 onClick={() => setIsMobileMenuOpen(false)}
                                                 className={`block px-8 py-4 text-sm uppercase tracking-[0.2em] font-medium transition-colors ${
                                                     isActive
-                                                        ? "text-[#C9A14A] bg-[#EAF5FF] border-l-2 border-[#C9A14A]"
+                                                        ? "text-[#C9A14A] bg-[#FAF8F4] border-l-2 border-[#C9A14A]"
                                                         : "text-[#1A1A1A] hover:text-[#C9A14A] hover:bg-zinc-50 border-l-2 border-transparent"
                                                 }`}
                                             >

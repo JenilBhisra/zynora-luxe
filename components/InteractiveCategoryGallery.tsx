@@ -80,7 +80,7 @@ export function InteractiveCategoryGallery({ customImages = {}, isAdmin = false 
                             >
                                 <div className="relative bg-white rounded-[16px] overflow-hidden border border-[#EAEAEA] shadow-[0_4px_20px_rgba(0,0,0,0.02)] transition-all duration-500 ease-out group-hover:-translate-y-2 group-hover:shadow-[0_20px_40px_rgba(0,0,0,0.06)] group-hover:border-[#C9A14A]/40">
                                     {/* Image Container with 4:5 Aspect Ratio */}
-                                    <div className="relative aspect-[4/5] overflow-hidden bg-[#EAF5FF]">
+                                    <div className="relative aspect-[4/5] overflow-hidden bg-[#FAF8F4]">
                                         <SmartImage 
                                             src={activeImage} 
                                             alt={cat.title} 
@@ -100,7 +100,7 @@ export function InteractiveCategoryGallery({ customImages = {}, isAdmin = false 
                                 </div>
                                 {/* Title below image */}
                                 <div className="mt-4 text-center">
-                                    <h3 className="text-[14px] md:text-[15px] font-medium text-[#1A1A1A] group-hover:text-[#C9A14A] transition-colors duration-300 font-sans tracking-wide">
+                                    <h3 className="text-[14px] md:text-[16px] font-medium text-[#1A1A1A] group-hover:text-[#C9A14A] transition-colors duration-300 font-sans tracking-wide">
                                         {cat.title}
                                     </h3>
                                 </div>
@@ -121,7 +121,7 @@ export function InteractiveCategoryGallery({ customImages = {}, isAdmin = false 
                             >
                                 <div className="relative bg-white rounded-[12px] overflow-hidden border border-[#EAEAEA] shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
                                     {/* Image Container with 4:5 Aspect Ratio */}
-                                    <div className="relative aspect-[4/5] overflow-hidden bg-[#EAF5FF]">
+                                    <div className="relative aspect-[4/5] overflow-hidden bg-[#FAF8F4]">
                                         <SmartImage 
                                             src={activeImage} 
                                             alt={cat.title} 
@@ -136,9 +136,9 @@ export function InteractiveCategoryGallery({ customImages = {}, isAdmin = false 
                                         )}
                                     </div>
                                 </div>
-                                {/* Title below image */}
+                                {/* Title below image: 14px size, 1.25 line height, 500 font weight */}
                                 <div className="mt-3 text-center">
-                                    <h3 className="text-[13px] font-medium text-[#1A1A1A] font-sans tracking-wide">
+                                    <h3 className="text-[14px] leading-[1.25] font-medium text-[#1A1A1A] font-sans tracking-wide">
                                         {cat.title}
                                     </h3>
                                 </div>

@@ -4,16 +4,16 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-bg-dark: #FFFFFF;
-  --color-bg-light: #EAF5FF;
+  --color-bg-light: #FAF8F4;
   --color-text-primary: #1A1A1A;
   --color-text-inverse: #FFFFFF;
   --color-accent-gold: #C9A14A;
   --color-muted: #666666;
 
   --color-primary: #C9A14A;
-  --color-secondary: #EAF5FF;
+  --color-secondary: #FAF8F4;
   --color-luxury-black: #1A1A1A;
-  --color-soft-cream: #EAF5FF;
+  --color-soft-cream: #FAF8F4;
   --color-gold: #C9A14A;
   --color-gold-hover: #B58F3B;
   --color-text-dark: #1A1A1A;
@@ -37,7 +37,7 @@
 
   --brand-black: #1A1A1A;
   --brand-gold: #C9A14A;
-  --brand-ivory: #EAF5FF;
+  --brand-ivory: #FAF8F4;
   --brand-charcoal: #666666;
 
   --space-4: 0.25rem;
@@ -1546,10 +1546,10 @@ html {
   background-color: #FFFFFF !important;
 }
 
-/* Let's make some sections soft blue #EAF5FF for luxury contrast */
+/* Let's make some sections soft blue #FAF8F4 for luxury contrast */
 .bg-soft-blue,
 .story-section-frame:nth-of-type(even) {
-  background-color: #EAF5FF !important;
+  background-color: #FAF8F4 !important;
 }
 
 /* Update text white to primary text color */

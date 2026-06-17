@@ -139,7 +139,7 @@ export default async function HomePage() {
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
                             {houseMetrics.map((metric, idx) => (
                                 <FadeIn key={metric.label} delay={idx * 0.12}>
-                                    <div className="bg-[#EAF5FF] border border-[#EAEAEA] rounded-[14px] p-5 shadow-[0_4px_12px_rgba(0,0,0,0.01)]">
+                                    <div className="bg-[#FAF8F4] border border-[#EAEAEA] rounded-[14px] p-5 shadow-[0_4px_12px_rgba(0,0,0,0.01)]">
                                         <div className="text-[28px] md:text-[32px] font-serif text-[#1A1A1A] mb-2">{metric.value}</div>
                                         <div className="text-[10px] uppercase tracking-[0.28em] text-[#666666] mb-2">{metric.label}</div>
                                         <div className="text-[13px] leading-relaxed text-[#666666]">{metric.detail}</div>
@@ -170,9 +170,23 @@ export default async function HomePage() {
             {/* Section 2: Product Showcase (Featured Collection / Featured Products) */}
             <AnimatedSection 
                 id="featured-products-section"
-                className="py-24 md:py-28 relative overflow-hidden story-section-frame bg-[#EAF5FF]"
+                className="py-24 md:py-28 relative overflow-hidden story-section-frame"
+                style={{
+                    backgroundImage: `url('${assetsMap["featured-collection-bg"] || "/images/about2.jpg"}')`,
+                    backgroundSize: "cover",
+                    backgroundPosition: "center",
+                    backgroundRepeat: "no-repeat"
+                }}
             >
-                <div className="container-custom relative z-10">
+                {/* Creamy white readable overlay for text contrast */}
+                <div className="absolute inset-0 bg-white/85 pointer-events-none z-0" />
+
+                <div className="container-custom relative z-10 animate-fade-in">
+                    {isAdmin && (
+                        <div className="absolute -top-12 left-4 z-20">
+                            <VisualEditButton type="homepage" assetKey="featured-collection-bg" />
+                        </div>
+                    )}
                     <FadeIn className="mb-12 md:mb-16 max-w-2xl reveal-step-1">
                         <span className="block text-[10px] md:text-[11px] uppercase tracking-[0.34em] text-[#C9A14A] mb-4">Featured Collection</span>
                         <h2 className="text-[36px] md:text-[52px] leading-[1.02] text-[#1A1A1A] reveal-step-2">
@@ -188,7 +202,7 @@ export default async function HomePage() {
                                 <FadeIn key={product.id} delay={index * 0.08} className={`reveal-step-${Math.min(index + 1, 4)}`}>
                                     <Link href={`/product/${product.slug}`} className="group block h-full">
                                         <div className="bg-white border border-[#EAEAEA] shadow-[0_4px_20px_rgba(0,0,0,0.02)] transition-all duration-500 ease-out hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(0,0,0,0.06)] hover:border-[#C9A14A]/40 rounded-[20px] h-full overflow-hidden">
-                                            <div className="relative aspect-[4/5] overflow-hidden bg-[#EAF5FF] image-progressive-reveal">
+                                            <div className="relative aspect-[4/5] overflow-hidden bg-[#FAF8F4] image-progressive-reveal">
                                                 <SmartImage
                                                     src={image}
                                                     alt={product.name}
@@ -218,7 +232,7 @@ export default async function HomePage() {
             {/* Section 3: Trust + Brand Authority */}
             <AnimatedSection className="py-24 md:py-28 bg-white story-section-frame">
                 <div className="container-custom grid gap-8 lg:grid-cols-2 items-stretch">
-                    <FadeIn className="bg-[#EAF5FF] border border-[#EAEAEA] rounded-[22px] p-8 md:p-10 reveal-step-1">
+                    <FadeIn className="bg-[#FAF8F4] border border-[#EAEAEA] rounded-[22px] p-8 md:p-10 reveal-step-1">
                         <span className="block text-[10px] md:text-[11px] uppercase tracking-[0.34em] text-[#C9A14A] mb-4">Why Choose Us</span>
                         <h2 className="text-[34px] md:text-[46px] leading-[1.05] text-[#1A1A1A] mb-6 reveal-step-2">
                             {assetsMap["text:trust-heading"] || "Designed with certainty, delivered with care"}
@@ -242,7 +256,7 @@ export default async function HomePage() {
                         </div>
                     </FadeIn>
 
-                    <FadeIn className="bg-[#EAF5FF] border border-[#EAEAEA] rounded-[22px] p-8 md:p-10 flex flex-col justify-between">
+                    <FadeIn className="bg-[#FAF8F4] border border-[#EAEAEA] rounded-[22px] p-8 md:p-10 flex flex-col justify-between">
                         <div>
                             <span className="block text-[10px] md:text-[11px] uppercase tracking-[0.34em] text-[#C9A14A] mb-4">Testimonial</span>
                             <p className="text-[24px] md:text-[32px] leading-[1.35] text-[#1A1A1A] font-serif mb-8 max-w-xl font-light italic">
@@ -303,7 +317,7 @@ export default async function HomePage() {
                         ].map((item, idx) => (
                             <FadeIn key={item.step} delay={idx * 0.15} className={`reveal-step-${Math.min(idx + 1, 4)}`}>
                                 <Link href={item.href}>
-                                    <div className="bg-[#EAF5FF] border border-[#EAEAEA] hover:border-[#C9A14A]/40 rounded-[22px] p-8 h-full flex flex-col justify-between cursor-pointer premium-hover-lift">
+                                    <div className="bg-[#FAF8F4] border border-[#EAEAEA] hover:border-[#C9A14A]/40 rounded-[22px] p-8 h-full flex flex-col justify-between cursor-pointer premium-hover-lift">
                                         <div>
                                             <div className="text-[48px] font-serif text-[#C9A14A] mb-4 font-light">{item.step}</div>
                                             <h3 className="text-[22px] font-medium text-[#1A1A1A] mb-3">{item.title}</h3>

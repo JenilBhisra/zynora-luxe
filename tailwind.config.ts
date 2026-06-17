@@ -12,7 +12,7 @@ const config: Config = {
                 background: "var(--background)",
                 foreground: "var(--foreground)",
                 primary: "#FFFFFF",
-                secondary: "#EAF5FF",
+                secondary: "#FAF8F4",
                 gold: {
                     DEFAULT: "#C9A14A",
                     hover: "#B58F3B",
@@ -31,7 +31,7 @@ const config: Config = {
                     text: "#1A1A1A",
                 },
                 emerald: {
-                    bg: "#EAF5FF",
+                    bg: "#FAF8F4",
                     accent: "#C9A14A",
                     text: "#1A1A1A",
                 },

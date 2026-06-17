@@ -109,42 +109,56 @@ export function InteractiveCategoryGallery({ customImages = {}, isAdmin = false 
                     })}
                 </div>
 
-                {/* Mobile Category Grid: 2-column grid, no horizontal scroll */}
-                <div className="md:hidden grid grid-cols-2 gap-[12px] p-[16px] bg-[#FFFFFF]">
-                    {CATEGORIES.map((cat) => {
-                        const activeImage = customImages[cat.assetKey] || cat.defaultImage;
-                        return (
-                            <Link 
-                                href={cat.href} 
-                                key={cat.id} 
-                                className="group block relative"
-                            >
-                                <div className="relative bg-white rounded-[12px] overflow-hidden border border-[#EAEAEA] shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
-                                    {/* Image Container with 4:5 Aspect Ratio */}
-                                    <div className="relative aspect-[4/5] overflow-hidden bg-[#FAF8F4]">
-                                        <SmartImage 
-                                            src={activeImage} 
-                                            alt={cat.title} 
-                                            fill 
-                                            fallbackType="jewelry" 
-                                            className="object-cover"
-                                        />
-                                        {isAdmin && (
-                                            <div className="absolute top-2 left-2 z-20">
-                                                <VisualEditButton type="homepage" assetKey={cat.assetKey} />
+                {/* Mobile Category Slider: horizontal swipe-scroll */}
+                <div className="md:hidden -mx-6 px-6">
+                    <div
+                        className="overflow-x-auto pb-4"
+                        style={{
+                            scrollbarWidth: "none",
+                            msOverflowStyle: "none",
+                            WebkitOverflowScrolling: "touch",
+                        }}
+                    >
+                        <style>{`.cat-slider::-webkit-scrollbar{display:none}`}</style>
+                        <div
+                            className="cat-slider flex gap-4"
+                            style={{ width: "max-content", paddingRight: "24px" }}
+                        >
+                            {CATEGORIES.map((cat) => {
+                                const activeImage = customImages[cat.assetKey] || cat.defaultImage;
+                                return (
+                                    <Link
+                                        href={cat.href}
+                                        key={cat.id}
+                                        className="group block flex-shrink-0"
+                                        style={{ width: "140px" }}
+                                    >
+                                        <div className="relative bg-white rounded-[12px] overflow-hidden border border-[#EAEAEA] shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
+                                            <div className="relative overflow-hidden bg-[#FAF8F4]" style={{ aspectRatio: "4/5" }}>
+                                                <SmartImage
+                                                    src={activeImage}
+                                                    alt={cat.title}
+                                                    fill
+                                                    fallbackType="jewelry"
+                                                    className="object-cover"
+                                                />
+                                                {isAdmin && (
+                                                    <div className="absolute top-2 left-2 z-20">
+                                                        <VisualEditButton type="homepage" assetKey={cat.assetKey} />
+                                                    </div>
+                                                )}
                                             </div>
-                                        )}
-                                    </div>
-                                </div>
-                                {/* Title below image: 14px size, 1.25 line height, 500 font weight */}
-                                <div className="mt-3 text-center">
-                                    <h3 className="text-[14px] leading-[1.25] font-medium text-[#1A1A1A] font-sans tracking-wide">
-                                        {cat.title}
-                                    </h3>
-                                </div>
-                            </Link>
-                        );
-                    })}
+                                        </div>
+                                        <div className="mt-3 text-center">
+                                            <h3 className="text-[13px] leading-[1.25] font-medium text-[#1A1A1A] font-sans tracking-wide group-hover:text-[#C9A14A] transition-colors duration-300">
+                                                {cat.title}
+                                            </h3>
+                                        </div>
+                                    </Link>
+                                );
+                            })}
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>

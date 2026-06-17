@@ -159,7 +159,7 @@ function LoginContent() {
                             <button
                                 type="submit"
                                 disabled={isLoading}
-                                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm font-semibold text-white bg-[#111111] hover:bg-black focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-black transition-colors disabled:opacity-70 disabled:cursor-not-allowed uppercase tracking-wider text-sm"
+                                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm font-semibold text-[#1A1A1A] bg-[#C9A14A] hover:bg-[#B58F3B] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#C9A14A] transition-colors disabled:opacity-70 disabled:cursor-not-allowed uppercase tracking-wider text-sm"
                             >
                                 {isLoading ? (
                                     <Loader2 className="w-5 h-5 animate-spin" />

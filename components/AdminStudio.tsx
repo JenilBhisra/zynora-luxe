@@ -394,32 +394,54 @@ export function AdminStudio({ isAdmin }: AdminStudioProps) {
     }, [settingsList, settingSearch]);
 
     const homepageKeys = [
-        // â”€â”€ Hero Slider â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-        { key: "hero-slide-1", label: "Hero Slider – Desktop Image", defaultUrl: "/products/ring-2.jpg", group: "Hero Slider" },
-        { key: "hero-slide-1-mobile", label: "Hero Slider – Mobile Image", defaultUrl: "/products/ring-2.jpg", group: "Hero Slider" },
-        { key: "hero-slide-2", label: "Hero Slider – Image 2 (Legacy)", defaultUrl: "/products/earrings-1.jpg", group: "Hero Slider" },
-        { key: "hero-slide-3", label: "Hero Slider – Image 3 (Legacy)", defaultUrl: "/uploads/diamonds/diamond-1774253879693-464841660.webp", group: "Hero Slider" },
-        // â”€â”€ Section Banners â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-        { key: "journey-image", label: "Value Prop Main Image", defaultUrl: "/products/ring-2.jpg", group: "Section Banners" },
-        { key: "journey-image-2", label: "Value Prop Detail Image", defaultUrl: "/products/earrings-1.jpg", group: "Section Banners" },
+        // Hero Slider
+        { key: "hero-slide-1",        label: "Hero Image \u2013 Desktop (Laptop View)",  defaultUrl: "/products/ring-2.jpg",         group: "Hero Slider" },
+        { key: "hero-slide-1-mobile", label: "Hero Image \u2013 Mobile (Phone View)",    defaultUrl: "/products/ring-2.jpg",         group: "Hero Slider" },
+        // Section Banners
+        { key: "journey-image",   label: "Value Prop Main Image",      defaultUrl: "/products/ring-2.jpg",         group: "Section Banners" },
+        { key: "journey-image-2", label: "Value Prop Detail Image",    defaultUrl: "/products/earrings-1.jpg",     group: "Section Banners" },
         { key: "journey-image-3", label: "Value Prop Secondary Image", defaultUrl: "/products/loose-diamond.jpg", group: "Section Banners" },
-        // â”€â”€ Journey Scroll Scene â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-        { key: "scroll-scene-1", label: "Scroll Scene â€“ Frame 1 (Hero Scene)", defaultUrl: "/products/ring-2.jpg", group: "Journey Scroll Scene" },
-        { key: "scroll-scene-2", label: "Scroll Scene â€“ Frame 2 (Product Reveal)", defaultUrl: "/products/ring-2.jpg", group: "Journey Scroll Scene" },
-        { key: "scroll-scene-3", label: "Scroll Scene â€“ Frame 3 (Feature Highlight)", defaultUrl: "/products/ring-2.jpg", group: "Journey Scroll Scene" },
-        { key: "scroll-scene-4", label: "Scroll Scene â€“ Frame 4 (Detail Zoom)", defaultUrl: "/products/ring-2.jpg", group: "Journey Scroll Scene" },
-        { key: "scroll-scene-5", label: "Scroll Scene â€“ Frame 5 (Action Scene)", defaultUrl: "/products/ring-2.jpg", group: "Journey Scroll Scene" },
-        // â”€â”€ Category Gallery â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-        { key: "category-rings", label: "Category Panel â€“ Rings", defaultUrl: "https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=1600&q=80", group: "Category Gallery" },
-        { key: "category-earrings", label: "Category Panel â€“ Earrings", defaultUrl: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=1600&q=80", group: "Category Gallery" },
-        { key: "category-necklaces", label: "Category Panel â€“ Necklaces", defaultUrl: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=1600&q=80", group: "Category Gallery" },
-        { key: "category-diamonds", label: "Category Panel â€“ Diamonds", defaultUrl: "/products/loose-diamond.jpg", group: "Category Gallery" },
-        // â”€â”€ Featured Product Cards â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-        { key: "featured-product-1", label: "Featured Product Card 1", defaultUrl: "/products/ring-2.jpg", group: "Featured Products" },
-        { key: "featured-product-2", label: "Featured Product Card 2", defaultUrl: "/products/ring-2.jpg", group: "Featured Products" },
-        { key: "featured-product-3", label: "Featured Product Card 3", defaultUrl: "/products/ring-2.jpg", group: "Featured Products" },
-        { key: "featured-product-4", label: "Featured Product Card 4", defaultUrl: "/products/ring-2.jpg", group: "Featured Products" },
-        { key: "featured-collection-bg", label: "Featured Collection Background Image", defaultUrl: "/images/about2.jpg", group: "Featured Products" },
+        // Journey Scroll Scene
+        { key: "scroll-scene-1", label: "Scroll Scene \u2013 Frame 1", defaultUrl: "/products/ring-2.jpg", group: "Journey Scroll Scene" },
+        { key: "scroll-scene-2", label: "Scroll Scene \u2013 Frame 2", defaultUrl: "/products/ring-2.jpg", group: "Journey Scroll Scene" },
+        { key: "scroll-scene-3", label: "Scroll Scene \u2013 Frame 3", defaultUrl: "/products/ring-2.jpg", group: "Journey Scroll Scene" },
+        { key: "scroll-scene-4", label: "Scroll Scene \u2013 Frame 4", defaultUrl: "/products/ring-2.jpg", group: "Journey Scroll Scene" },
+        { key: "scroll-scene-5", label: "Scroll Scene \u2013 Frame 5", defaultUrl: "/products/ring-2.jpg", group: "Journey Scroll Scene" },
+        // Category Gallery
+        { key: "category-engagement-rings",     label: "Category \u2013 Engagement Rings",      defaultUrl: "https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=600&q=80", group: "Category Gallery" },
+        { key: "category-womens-wedding-rings", label: "Category \u2013 Women's Wedding Rings",  defaultUrl: "https://images.unsplash.com/photo-1543294001-f7cd5d7fb516?auto=format&fit=crop&w=600&q=80", group: "Category Gallery" },
+        { key: "category-mens-wedding-rings",   label: "Category \u2013 Men's Wedding Rings",   defaultUrl: "https://images.unsplash.com/photo-1606760227091-3dd870d97f1d?auto=format&fit=crop&w=600&q=80", group: "Category Gallery" },
+        { key: "category-gemstone-rings",       label: "Category \u2013 Gemstone Rings",        defaultUrl: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=600&q=80", group: "Category Gallery" },
+        { key: "category-earrings",             label: "Category \u2013 Earrings",              defaultUrl: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=600&q=80", group: "Category Gallery" },
+        { key: "category-necklaces",            label: "Category \u2013 Necklaces",             defaultUrl: "https://images.unsplash.com/photo-1599643477877-530eb83abc8e?auto=format&fit=crop&w=600&q=80", group: "Category Gallery" },
+        // Diamond Shape Section
+        { key: "diamond-shape-main-image",              label: "Diamond Shape Section \u2013 Default Main Image",            defaultUrl: "/products/ring-2.jpg",        group: "Diamond Shape Section" },
+        { key: "diamond-shape-hover-oval",              label: "Diamond Shape Section \u2013 Oval Hover Image",              defaultUrl: "/products/loose-diamond.jpg", group: "Diamond Shape Section" },
+        { key: "diamond-shape-hover-round",             label: "Diamond Shape Section \u2013 Round Hover Image",             defaultUrl: "/products/loose-diamond.jpg", group: "Diamond Shape Section" },
+        { key: "diamond-shape-hover-emerald",           label: "Diamond Shape Section \u2013 Emerald Hover Image",           defaultUrl: "/products/loose-diamond.jpg", group: "Diamond Shape Section" },
+        { key: "diamond-shape-hover-marquise",          label: "Diamond Shape Section \u2013 Marquise Hover Image",          defaultUrl: "/products/loose-diamond.jpg", group: "Diamond Shape Section" },
+        { key: "diamond-shape-hover-radiant",           label: "Diamond Shape Section \u2013 Radiant Hover Image",           defaultUrl: "/products/loose-diamond.jpg", group: "Diamond Shape Section" },
+        { key: "diamond-shape-hover-pear",              label: "Diamond Shape Section \u2013 Pear Hover Image",              defaultUrl: "/products/loose-diamond.jpg", group: "Diamond Shape Section" },
+        { key: "diamond-shape-hover-elongated-cushion", label: "Diamond Shape Section \u2013 Elongated Cushion Hover Image", defaultUrl: "/products/loose-diamond.jpg", group: "Diamond Shape Section" },
+        { key: "diamond-shape-hover-cushion",           label: "Diamond Shape Section \u2013 Cushion Hover Image",           defaultUrl: "/products/loose-diamond.jpg", group: "Diamond Shape Section" },
+        { key: "diamond-shape-hover-princess",          label: "Diamond Shape Section \u2013 Princess Hover Image",          defaultUrl: "/products/loose-diamond.jpg", group: "Diamond Shape Section" },
+        { key: "diamond-shape-hover-asscher",           label: "Diamond Shape Section \u2013 Asscher Hover Image",           defaultUrl: "/products/loose-diamond.jpg", group: "Diamond Shape Section" },
+        { key: "diamond-shape-icon-oval",               label: "Diamond Shape Section \u2013 Oval Shape Icon",               defaultUrl: "/products/loose-diamond.jpg", group: "Diamond Shape Section" },
+        { key: "diamond-shape-icon-round",              label: "Diamond Shape Section \u2013 Round Shape Icon",              defaultUrl: "/products/loose-diamond.jpg", group: "Diamond Shape Section" },
+        { key: "diamond-shape-icon-emerald",            label: "Diamond Shape Section \u2013 Emerald Shape Icon",            defaultUrl: "/products/loose-diamond.jpg", group: "Diamond Shape Section" },
+        { key: "diamond-shape-icon-marquise",           label: "Diamond Shape Section \u2013 Marquise Shape Icon",           defaultUrl: "/products/loose-diamond.jpg", group: "Diamond Shape Section" },
+        { key: "diamond-shape-icon-radiant",            label: "Diamond Shape Section \u2013 Radiant Shape Icon",            defaultUrl: "/products/loose-diamond.jpg", group: "Diamond Shape Section" },
+        { key: "diamond-shape-icon-pear",               label: "Diamond Shape Section \u2013 Pear Shape Icon",               defaultUrl: "/products/loose-diamond.jpg", group: "Diamond Shape Section" },
+        { key: "diamond-shape-icon-elongated-cushion",  label: "Diamond Shape Section \u2013 Elongated Cushion Shape Icon",  defaultUrl: "/products/loose-diamond.jpg", group: "Diamond Shape Section" },
+        { key: "diamond-shape-icon-cushion",            label: "Diamond Shape Section \u2013 Cushion Shape Icon",            defaultUrl: "/products/loose-diamond.jpg", group: "Diamond Shape Section" },
+        { key: "diamond-shape-icon-princess",           label: "Diamond Shape Section \u2013 Princess Shape Icon",           defaultUrl: "/products/loose-diamond.jpg", group: "Diamond Shape Section" },
+        { key: "diamond-shape-icon-asscher",            label: "Diamond Shape Section \u2013 Asscher Shape Icon",            defaultUrl: "/products/loose-diamond.jpg", group: "Diamond Shape Section" },
+        // Featured Product Cards
+        { key: "featured-product-1",     label: "Featured Product Card 1",              defaultUrl: "/products/ring-2.jpg", group: "Featured Products" },
+        { key: "featured-product-2",     label: "Featured Product Card 2",              defaultUrl: "/products/ring-2.jpg", group: "Featured Products" },
+        { key: "featured-product-3",     label: "Featured Product Card 3",              defaultUrl: "/products/ring-2.jpg", group: "Featured Products" },
+        { key: "featured-product-4",     label: "Featured Product Card 4",              defaultUrl: "/products/ring-2.jpg", group: "Featured Products" },
+        { key: "featured-collection-bg", label: "Featured Collection Background Image", defaultUrl: "/images/about2.jpg",   group: "Featured Products" },
     ];
 
     const currentHomepageOverride = homepageAssets[selectedHomepageKey] || "";

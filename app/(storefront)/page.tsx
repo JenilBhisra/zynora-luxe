@@ -6,6 +6,7 @@ import { SmartImage } from "@/components/SmartImage";
 import { AnimatedSection } from "@/components/AnimatedSection";
 import { selectCardImage } from "@/lib/image-utils";
 import { InteractiveCategoryGallery } from "@/components/InteractiveCategoryGallery";
+import { DiamondShapeSection } from "@/components/DiamondShapeSection";
 import { HeroSlider } from "@/components/HeroSlider";
 import nextDynamic from "next/dynamic";
 import { Suspense } from "react";
@@ -107,7 +108,13 @@ async function HomeContent({ isAdmin, assetsMap }: { isAdmin: boolean; assetsMap
 
     return (
         <>
-            {/* Section 1: Clear Value Prop + Progressive CTA (Section Banners) */}
+            {/* Section 1: Category Gallery — directly after Hero */}
+            <InteractiveCategoryGallery customImages={assetsMap} isAdmin={isAdmin} />
+
+            {/* Section 2: Shop Diamonds by Shape */}
+            <DiamondShapeSection customImages={assetsMap} isAdmin={isAdmin} />
+
+            {/* Section 3: Custom Journey / Section Banners */}
             <AnimatedSection id="home-followup-section" className="py-24 md:py-32 bg-white story-section-frame">
                 <div className="container-custom grid gap-14 lg:grid-cols-[1.02fr_0.98fr] items-center">
                     <FadeIn className="relative aspect-[4/5] sm:aspect-square lg:aspect-[4/5] w-full">
@@ -178,9 +185,6 @@ async function HomeContent({ isAdmin, assetsMap }: { isAdmin: boolean; assetsMap
                     </FadeIn>
                 </div>
             </AnimatedSection>
-
-            {/* Category Gallery (Moved Up) */}
-            <InteractiveCategoryGallery customImages={assetsMap} isAdmin={isAdmin} />
 
             {/* Journey Scroll Scene */}
             <ScrollScene images={timelineImages} nextSectionSelector="#featured-products-section" customImages={assetsMap} customText={assetsMap} isAdmin={isAdmin} />

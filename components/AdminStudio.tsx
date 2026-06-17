@@ -395,9 +395,10 @@ export function AdminStudio({ isAdmin }: AdminStudioProps) {
 
     const homepageKeys = [
         // â”€â”€ Hero Slider â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-        { key: "hero-slide-1", label: "Hero Slider â€“ Image 1", defaultUrl: "/products/ring-2.jpg", group: "Hero Slider" },
-        { key: "hero-slide-2", label: "Hero Slider â€“ Image 2", defaultUrl: "/products/earrings-1.jpg", group: "Hero Slider" },
-        { key: "hero-slide-3", label: "Hero Slider â€“ Image 3", defaultUrl: "/uploads/diamonds/diamond-1774253879693-464841660.webp", group: "Hero Slider" },
+        { key: "hero-slide-1", label: "Hero Slider – Desktop Image", defaultUrl: "/products/ring-2.jpg", group: "Hero Slider" },
+        { key: "hero-slide-1-mobile", label: "Hero Slider – Mobile Image", defaultUrl: "/products/ring-2.jpg", group: "Hero Slider" },
+        { key: "hero-slide-2", label: "Hero Slider – Image 2 (Legacy)", defaultUrl: "/products/earrings-1.jpg", group: "Hero Slider" },
+        { key: "hero-slide-3", label: "Hero Slider – Image 3 (Legacy)", defaultUrl: "/uploads/diamonds/diamond-1774253879693-464841660.webp", group: "Hero Slider" },
         // â”€â”€ Section Banners â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         { key: "journey-image", label: "Value Prop Main Image", defaultUrl: "/products/ring-2.jpg", group: "Section Banners" },
         { key: "journey-image-2", label: "Value Prop Detail Image", defaultUrl: "/products/earrings-1.jpg", group: "Section Banners" },

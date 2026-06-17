@@ -10,16 +10,33 @@ interface HeroSliderProps {
 
 export function HeroSlider({ customSlides = {}, customText = {} }: HeroSliderProps) {
     const heroImage = customSlides["hero-slide-1"] || "/products/ring-2.jpg";
+    const heroImageMobile = customSlides["hero-slide-1-mobile"] || heroImage;
 
     return (
         <section 
             className="relative w-full overflow-hidden bg-white flex items-center"
             style={{ height: "calc(100vh - var(--header-height, 120px))" }}
         >
-            {/* Background Image */}
-            <div className="absolute inset-0 z-0 bg-[#FAF8F4] w-full h-full">
+            {/* Background Image - Desktop */}
+            <div className="absolute inset-0 z-0 bg-[#FAF8F4] w-full h-full hidden md:block">
                 <SmartImage 
                     src={heroImage} 
+                    alt="Zynora Luxe Fine Jewelry"
+                    fill 
+                    fallbackType="jewelry" 
+                    className="object-cover object-center w-full h-full" 
+                    priority
+                    sizes="100vw"
+                    {...({ fetchPriority: "high" } as any)}
+                />
+                {/* Subtle luxury overlay only if needed */}
+                <div className="absolute inset-0 bg-black/15 pointer-events-none" />
+            </div>
+
+            {/* Background Image - Mobile */}
+            <div className="absolute inset-0 z-0 bg-[#FAF8F4] w-full h-full block md:hidden">
+                <SmartImage 
+                    src={heroImageMobile} 
                     alt="Zynora Luxe Fine Jewelry"
                     fill 
                     fallbackType="jewelry" 

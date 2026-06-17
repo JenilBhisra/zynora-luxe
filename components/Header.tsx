@@ -83,7 +83,7 @@ export function Header() {
         return null;
     }
 
-    const headerClasses = `sticky top-0 left-0 w-full z-[99999] [transform:translateZ(0)] h-16 lg:h-[116px] flex items-center transition-all duration-500 bg-white border-b border-[#EAEAEA] shadow-[0_2px_12px_rgba(0,0,0,0.02)]`;
+    const headerClasses = `sticky top-0 left-0 w-full z-[99999] [transform:translateZ(0)] h-16 lg:h-[120px] flex items-center transition-all duration-500 bg-white border-b border-[#EAEAEA] shadow-[0_2px_12px_rgba(0,0,0,0.02)]`;
 
     return (
         <>
@@ -100,9 +100,10 @@ export function Header() {
 
                             {/* Center Logo */}
                             <div className="flex justify-center">
-                                <Link href="/" className="logo tracking-wide flex items-center transform transition-transform hover:scale-[1.01] duration-500 group relative">
-                                    <Image src="/assets/logo.png" alt="Zynora Luxe" width={180} height={42} className="object-contain w-[180px] relative z-10" priority />
-                                    <span className="absolute inset-0 shimmer-gold opacity-0 group-hover:opacity-20 duration-600 rounded-sm" />
+                                <Link href="/" className="logo flex items-center">
+                                    <span className="font-serif text-[42px] font-medium tracking-[0.08em] text-[#1A1A1A] uppercase leading-none select-none">
+                                        ZYNORA LUXE
+                                    </span>
                                 </Link>
                             </div>
 
@@ -159,8 +160,10 @@ export function Header() {
 
                         {/* Center: Logo */}
                         <div className="w-2/4 flex justify-center">
-                            <Link href="/" className="logo tracking-wide flex items-center group relative">
-                                <Image src="/assets/logo.png" alt="Zynora Luxe" width={130} height={34} className="object-contain relative z-10" priority />
+                            <Link href="/" className="logo flex items-center">
+                                <span className="font-serif text-[20px] sm:text-[22px] font-semibold tracking-[0.08em] text-[#1A1A1A] uppercase leading-none select-none">
+                                    ZYNORA LUXE
+                                </span>
                             </Link>
                         </div>
 

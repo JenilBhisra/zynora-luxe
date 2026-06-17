@@ -25,6 +25,8 @@ export function HeroSlider({ customSlides = {}, customText = {} }: HeroSliderPro
                     fallbackType="jewelry" 
                     className="object-cover object-center w-full h-full" 
                     priority
+                    sizes="100vw"
+                    {...({ fetchPriority: "high" } as any)}
                 />
                 {/* Subtle luxury overlay only if needed */}
                 <div className="absolute inset-0 bg-black/15 pointer-events-none" />

@@ -16,7 +16,7 @@ const categoriesList = [
     { name: "Wedding Bands", slug: "wedding-bands", fallback: "wedding-band.jpg" }
 ];
 
-export const revalidate = 60; // Revalidate cache every 60 seconds
+export const dynamic = "force-dynamic";
 
 export default async function ShopCategoryPage() {
     // We want to fetch one latest product for each category to act as its poster image

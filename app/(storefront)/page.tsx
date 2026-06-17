@@ -21,8 +21,8 @@ import { getServerSession } from "@/lib/auth";
 const prisma = new PrismaClient();
 
 export const metadata: Metadata = {
-    title: "Krishna Diamonds | Fine Jewelry",
-    description: "Discover certified diamonds, premium settings, and handcrafted jewelry from Krishna Diamonds.",
+    title: "ZYNORA LUXE | Lab Grown Diamond Jewelry",
+    description: "Discover certified diamonds, premium settings, and handcrafted jewelry from ZYNORA LUXE.",
 };
 
 export const dynamic = "force-dynamic";

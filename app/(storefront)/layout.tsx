@@ -1,16 +1,15 @@
 import { Footer } from "@/components/Footer";
-import { LuxuryIntro } from "@/components/LuxuryIntro";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-    metadataBase: new URL("https://krishnadiamonds.com"),
+    metadataBase: new URL("https://zynoraluxe.com"),
     title: {
-        default: "Krishna Diamonds | Certified Diamonds and Custom Rings",
-        template: "%s | Krishna Diamonds",
+        default: "ZYNORA LUXE | Lab Grown Diamond Jewelry",
+        template: "%s | ZYNORA LUXE",
     },
     description: "Certified diamonds, handcrafted settings, and custom ring creation for modern luxury buyers.",
     keywords: [
-        "Krishna Diamonds",
+        "ZYNORA LUXE",
         "diamond jewelry",
         "engagement rings",
         "custom ring design",
@@ -19,14 +18,14 @@ export const metadata: Metadata = {
         "fine jewelry",
     ],
     openGraph: {
-        title: "Krishna Diamonds | Certified Diamonds and Custom Rings",
-        description: "Discover premium diamonds and ring customization at Krishna Diamonds.",
+        title: "ZYNORA LUXE | Lab Grown Diamond Jewelry",
+        description: "Discover premium diamonds and ring customization at ZYNORA LUXE.",
         type: "website",
         images: ["https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=1200&q=80"],
     },
     twitter: {
         card: "summary_large_image",
-        title: "Krishna Diamonds",
+        title: "ZYNORA LUXE",
         description: "Certified diamonds and bespoke ring craftsmanship.",
         images: ["https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=1200&q=80"],
     },
@@ -35,8 +34,7 @@ export const metadata: Metadata = {
 export default function StorefrontLayout({ children }: { children: React.ReactNode }) {
     return (
         <>
-            <LuxuryIntro />
-            <main className="min-h-screen bg-[#0B0B0C] text-white">{children}</main>
+            <main className="min-h-screen bg-white text-[#1A1A1A]">{children}</main>
             <Footer />
         </>
     );

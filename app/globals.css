@@ -32,6 +32,7 @@
 }
 
 :root {
+  --header-height: 64px;
   --font-inter: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
   --font-playfair: "Times New Roman", Times, Georgia, serif;
 
@@ -52,6 +53,12 @@
 
   --background: #FFFFFF;
   --foreground: #1A1A1A;
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --header-height: 120px;
+  }
 }
 
 @media (prefers-color-scheme: dark) {

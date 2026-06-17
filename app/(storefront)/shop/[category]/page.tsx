@@ -17,7 +17,7 @@ const categoriesList = [
     { name: "Wedding Bands", slug: "wedding-bands" }
 ];
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
 
 export default async function CategoryPage(props: { params: Promise<{ category: string }> }) {
     const params = await props.params;

@@ -13,7 +13,9 @@ export function Footer() {
                     {/* Brand Column */}
                     <div>
                         <Link href="/" className="block mb-6">
-                            <Image src="/assets/logo.png" alt="Krishna Diamonds" width={140} height={50} className="object-contain" />
+                            <span className="font-serif text-2xl font-semibold tracking-[0.08em] text-[#1A1A1A] uppercase leading-none select-none">
+                                ZYNORA LUXE
+                            </span>
                         </Link>
                         <p className="text-[#666666] text-sm leading-relaxed mb-6">
                             Certified diamonds, handcrafted settings, and custom rings built for your modern jewelry journey.
@@ -49,42 +51,28 @@ export function Footer() {
                         <h4 className="font-heading text-sm uppercase tracking-[0.22em] font-semibold mb-6 text-[#C9A14A]">Support</h4>
                         <ul className="space-y-3">
                             <li><Link href="/customer-care" className="text-[#666666] text-sm hover:text-[#C9A14A] transition-colors duration-500">Contact Us</Link></li>
-                            <li><Link href="/b2b" className="text-[#C9A14A] text-sm hover:text-[#1A1A1A] transition-colors duration-500 font-medium">B2B Wholesale Program</Link></li>
-                            <li><Link href="#" className="text-[#666666] text-sm hover:text-[#C9A14A] transition-colors duration-500">Returns & Exchanges</Link></li>
-                            <li><Link href="#" className="text-[#666666] text-sm hover:text-[#C9A14A] transition-colors duration-500">Shipping Information</Link></li>
-                            <li><Link href="#" className="text-[#666666] text-sm hover:text-[#C9A14A] transition-colors duration-500">Jewelry Care</Link></li>
-                            <li><Link href="#" className="text-[#666666] text-sm hover:text-[#C9A14A] transition-colors duration-500">Ring Size Guide</Link></li>
+                            <li><Link href="/customer-care" className="text-[#666666] text-sm hover:text-[#C9A14A] transition-colors duration-500">FAQs</Link></li>
+                            <li><Link href="/delivery-tracking" className="text-[#666666] text-sm hover:text-[#C9A14A] transition-colors duration-500">Track Order</Link></li>
+                            <li><Link href="/customer-care" className="text-[#666666] text-sm hover:text-[#C9A14A] transition-colors duration-500">Shipping & Returns</Link></li>
+                            <li><Link href="/customer-care" className="text-[#666666] text-sm hover:text-[#C9A14A] transition-colors duration-500">Lifetime Warranty</Link></li>
                         </ul>
                     </div>
 
                     {/* Contact Column */}
                     <div>
-                        <h4 className="font-heading text-sm uppercase tracking-[0.22em] font-semibold mb-6 text-[#C9A14A]">Get In Touch</h4>
+                        <h4 className="font-heading text-sm uppercase tracking-[0.22em] font-semibold mb-6 text-[#C9A14A]">Showroom</h4>
                         <ul className="space-y-4">
-                            <li className="flex items-start gap-4">
-                                <MapPin size={18} className="text-[#C9A14A] mt-1 flex-shrink-0" />
-                                <span className="text-[#666666] text-sm leading-relaxed">
-                                    Zynora Luxe Studio,<br />
-                                    Surat Diamond District,<br />
-                                    Gujarat, India
-                                </span>
+                            <li className="flex gap-3 text-sm text-[#666666] leading-relaxed">
+                                <MapPin size={18} strokeWidth={1.5} className="shrink-0 text-[#C9A14A]" />
+                                <span>123 Couture Boulevard,<br />Luxury District, Mumbai</span>
                             </li>
-                            <li className="flex items-start gap-4">
-                                <Phone size={18} className="text-[#C9A14A] flex-shrink-0 mt-1" />
-                                <div className="flex flex-col gap-1">
-                                    <a href="tel:+919724627122" className="text-[#666666] text-sm hover:text-[#C9A14A] transition-colors duration-500">
-                                        +91 97246 27122
-                                    </a>
-                                    <a href="tel:+919427143105" className="text-[#666666] text-sm hover:text-[#C9A14A] transition-colors duration-500">
-                                        +91 94271 43105
-                                    </a>
-                                </div>
+                            <li className="flex gap-3 text-sm text-[#666666] items-center">
+                                <Phone size={16} strokeWidth={1.5} className="shrink-0 text-[#C9A14A]" />
+                                <span>+91 98765 43210</span>
                             </li>
-                            <li className="flex items-center gap-4">
-                                <Mail size={18} className="text-[#C9A14A] flex-shrink-0" />
-                                <a href="mailto:luxezynora@gmail.com" className="text-[#666666] text-sm hover:text-[#C9A14A] transition-colors duration-500">
-                                    luxezynora@gmail.com
-                                </a>
+                            <li className="flex gap-3 text-sm text-[#666666] items-center">
+                                <Mail size={16} strokeWidth={1.5} className="shrink-0 text-[#C9A14A]" />
+                                <a href="mailto:concierge@zynoraluxe.com" className="hover:text-[#C9A14A] transition-colors">concierge@zynoraluxe.com</a>
                             </li>
                         </ul>
                     </div>
@@ -95,7 +83,7 @@ export function Footer() {
             <div className="container-custom py-6">
                 <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                     <p className="text-[#666666] text-xs">
-                        &copy; {currentYear} Krishna Diamonds. All rights reserved.
+                        &copy; {currentYear} ZYNORA LUXE. All rights reserved.
                     </p>
                     <div className="flex gap-6 text-xs text-[#666666]">
                         <Link href="#" className="hover:text-[#C9A14A] transition-colors duration-500">Privacy Policy</Link>

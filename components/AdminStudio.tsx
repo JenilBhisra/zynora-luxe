@@ -430,10 +430,10 @@ export function AdminStudio({ isAdmin }: AdminStudioProps) {
             <div className="fixed bottom-6 left-6 z-[9999] flex items-center gap-3">
                 <button
                     onClick={toggleEditMode}
-                    className="flex items-center gap-2.5 px-6 py-4 rounded-full font-bold uppercase tracking-[0.16em] text-[11px] bg-[#C9A14A] text-[#1A1A1A] hover:bg-[#B58F3B] transition-all duration-500 shadow-2xl relative overflow-hidden group border border-[#C9A14A]/20"
+                    className="flex items-center gap-2.5 px-6 py-4 rounded-full font-bold uppercase tracking-[0.16em] text-[11px] bg-[#C9A14A] text-[#1A1A1A] hover:bg-[#B58F3B] transition-all duration-500 shadow-2xl relative overflow-hidden group border border-[#C9A14A]"
                 >
                     <Edit3 size={14} color="#1A1A1A" className={isEditMode ? "animate-pulse" : ""} />
-                    <span>{isEditMode ? "Edit Mode Enabled" : "Enable Edit Mode"}</span>
+                    <span className="text-[#1A1A1A]">{isEditMode ? "Edit Mode Enabled" : "Enable Edit Mode"}</span>
                     <span className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 duration-500" />
                 </button>
 
@@ -443,7 +443,7 @@ export function AdminStudio({ isAdmin }: AdminStudioProps) {
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.8 }}
                         onClick={() => setIsOpen(true)}
-                        className="flex items-center justify-center w-12 h-12 rounded-full bg-[#C9A14A] text-[#1A1A1A] hover:bg-[#B58F3B] border border-[#C9A14A]/20 transition-colors shadow-2xl"
+                        className="flex items-center justify-center w-12 h-12 rounded-full bg-[#C9A14A] text-[#1A1A1A] hover:bg-[#B58F3B] border border-[#C9A14A] transition-colors shadow-2xl"
                         title="Open Design Studio Panel"
                     >
                         <Settings size={18} color="#1A1A1A" className="animate-spin" style={{ animationDuration: "12s" }} />

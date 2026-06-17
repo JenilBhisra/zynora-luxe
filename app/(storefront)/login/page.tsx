@@ -7,7 +7,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Loader2 } from "lucide-react";
 import { logInWithEmail, logInWithGoogle } from "@/lib/auth.client";
-import { consumeRedirectAfterLogin } from "@/lib/auth-flow";
+import { consumeRedirectAfterLogin, saveCurrentUser } from "@/lib/auth-flow";
 
 function LoginContent() {
     const router = useRouter();
@@ -36,6 +36,23 @@ function LoginContent() {
 
         try {
             const user = await logInWithEmail(email, password);
+            
+            // Sync session with Next.js backend and local storage first to prevent SSR redirect loops/Access Denied
+            const idToken = await user.getIdToken();
+            await fetch("/api/auth/session", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ idToken }),
+            });
+
+            const isAdmin = user.email?.toLowerCase() === "krishnadiamond404@gmail.com";
+            saveCurrentUser({
+                id: user.uid,
+                name: user.displayName || user.email?.split("@")[0] || "User",
+                email: user.email || "",
+                role: isAdmin ? "ADMIN" : "USER"
+            });
+
             finalizeLogin(user?.email);
         } catch (err: any) {
             console.error("Login error:", err);
@@ -49,6 +66,23 @@ function LoginContent() {
         setError("");
         try {
             const user = await logInWithGoogle();
+
+            // Sync session with Next.js backend and local storage first
+            const idToken = await user.getIdToken();
+            await fetch("/api/auth/session", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ idToken }),
+            });
+
+            const isAdmin = user.email?.toLowerCase() === "krishnadiamond404@gmail.com";
+            saveCurrentUser({
+                id: user.uid,
+                name: user.displayName || user.email?.split("@")[0] || "User",
+                email: user.email || "",
+                role: isAdmin ? "ADMIN" : "USER"
+            });
+
             finalizeLogin(user?.email);
         } catch (err: any) {
             console.error("Google Login error:", err);

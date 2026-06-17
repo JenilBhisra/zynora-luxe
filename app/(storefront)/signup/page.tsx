@@ -7,7 +7,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Loader2, ArrowLeft, Mail, Shield } from "lucide-react";
 import { signUpWithEmail, logInWithGoogle } from "@/lib/auth.client";
-import { consumeRedirectAfterLogin } from "@/lib/auth-flow";
+import { consumeRedirectAfterLogin, saveCurrentUser } from "@/lib/auth-flow";
 
 function SignupContent() {
     const router = useRouter();
@@ -96,7 +96,22 @@ function SignupContent() {
             const { updateProfile } = await import("firebase/auth");
             await updateProfile(user, { displayName: name });
 
-            // AuthProvider's onAuthStateChange will sync the session cookie
+            // Sync session with Next.js backend and local storage first to prevent race conditions during SSR/middleware checks
+            const idToken = await user.getIdToken();
+            await fetch("/api/auth/session", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ idToken }),
+            });
+
+            const isAdmin = user.email?.toLowerCase() === "krishnadiamond404@gmail.com";
+            saveCurrentUser({
+                id: user.uid,
+                name: name || user.email?.split("@")[0] || "User",
+                email: user.email || "",
+                role: isAdmin ? "ADMIN" : "USER"
+            });
+
             setStep("success");
             setTimeout(() => {
                 finalizeLogin();
@@ -119,7 +134,24 @@ function SignupContent() {
         setIsLoading(true);
         setError("");
         try {
-            await logInWithGoogle();
+            const user = await logInWithGoogle();
+
+            // Sync session with Next.js backend and local storage first
+            const idToken = await user.getIdToken();
+            await fetch("/api/auth/session", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ idToken }),
+            });
+
+            const isAdmin = user.email?.toLowerCase() === "krishnadiamond404@gmail.com";
+            saveCurrentUser({
+                id: user.uid,
+                name: user.displayName || user.email?.split("@")[0] || "User",
+                email: user.email || "",
+                role: isAdmin ? "ADMIN" : "USER"
+            });
+
             finalizeLogin();
         } catch (err: any) {
             setError(err.message || "Failed to sign in with Google.");

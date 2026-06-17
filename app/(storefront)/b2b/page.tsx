@@ -246,23 +246,23 @@ export default function B2BPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0B0B0C] text-zinc-100 py-16 md:py-24 relative overflow-hidden">
+    <div className="min-h-screen bg-[#FAF8F4] text-[#1A1A1A] py-16 md:py-24 relative overflow-hidden">
       {/* Background design elements */}
-      <div className="absolute top-0 left-0 w-[45vw] h-[45vw] bg-gradient-to-tr from-[#D6B25E]/5 to-transparent rounded-full blur-[140px] pointer-events-none" />
-      <div className="absolute bottom-10 right-0 w-[40vw] h-[40vw] bg-gradient-to-bl from-[#D6B25E]/4 to-transparent rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute top-0 left-0 w-[45vw] h-[45vw] bg-gradient-to-tr from-[#C9A14A]/3 to-transparent rounded-full blur-[140px] pointer-events-none" />
+      <div className="absolute bottom-10 right-0 w-[40vw] h-[40vw] bg-gradient-to-bl from-[#C9A14A]/3 to-transparent rounded-full blur-[120px] pointer-events-none" />
 
       {/* Language Selector Sticky/Top Floating Tab */}
       <div className="absolute top-6 right-6 md:right-12 z-[50]">
-        <div className="bg-zinc-900/80 border border-[#D6B25E]/20 backdrop-blur-md rounded-full p-1.5 flex items-center gap-1 shadow-lg">
-          <div className="text-[#D6B25E] pl-2 pr-1.5">
+        <div className="bg-white border border-[#EAEAEA] backdrop-blur-md rounded-full p-1.5 flex items-center gap-1 shadow-lg">
+          <div className="text-[#C9A14A] pl-2 pr-1.5">
             <Languages size={14} />
           </div>
           <button
             onClick={() => setLang("en")}
             className={`px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider transition-all ${
               lang === "en"
-                ? "bg-[#D6B25E] text-[#0B0B0C] shadow-md"
-                : "text-zinc-400 hover:text-white"
+                ? "bg-[#C9A14A] text-white shadow-md"
+                : "text-[#666666] hover:text-[#1A1A1A]"
             }`}
           >
             English
@@ -271,8 +271,8 @@ export default function B2BPage() {
             onClick={() => setLang("gu")}
             className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${
               lang === "gu"
-                ? "bg-[#D6B25E] text-[#0B0B0C] shadow-md"
-                : "text-zinc-400 hover:text-white"
+                ? "bg-[#C9A14A] text-white shadow-md"
+                : "text-[#666666] hover:text-[#1A1A1A]"
             }`}
           >
             ગુજરાતી (Gujarati)
@@ -289,13 +289,13 @@ export default function B2BPage() {
           transition={{ duration: 0.8 }}
           className="text-center max-w-4xl mx-auto mb-16 md:mb-24"
         >
-          <span className="text-[10px] uppercase tracking-[0.35em] text-[#D6B25E] font-bold bg-[#D6B25E]/10 px-3 py-1 rounded-full">
+          <span className="text-[10px] uppercase tracking-[0.35em] text-[#C9A14A] font-bold bg-[#C9A14A]/10 px-3 py-1 rounded-full">
             {t.heroTag}
           </span>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-heading font-light tracking-wide mt-6 mb-6 text-white leading-tight">
-            {t.heroTitle}<span className="font-serif italic text-[#D6B25E]">{t.heroTitleItalic}</span>
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-heading font-light tracking-wide mt-6 mb-6 text-[#1A1A1A] leading-tight">
+            {t.heroTitle}<span className="font-serif italic text-[#C9A14A]">{t.heroTitleItalic}</span>
           </h1>
-          <p className="text-zinc-400 text-sm md:text-base leading-relaxed max-w-3xl mx-auto">
+          <p className="text-[#666666] text-sm md:text-base leading-relaxed max-w-3xl mx-auto">
             {t.heroSub}
           </p>
         </motion.div>
@@ -305,14 +305,14 @@ export default function B2BPage() {
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6 }}
-          className="bg-gradient-to-r from-[#D6B25E]/10 to-transparent border border-[#D6B25E]/20 rounded-3xl p-6 md:p-8 max-w-4xl mx-auto mb-16 flex flex-col md:flex-row gap-6 items-center"
+          className="bg-gradient-to-r from-[#C9A14A]/5 to-transparent border border-[#C9A14A]/20 rounded-3xl p-6 md:p-8 max-w-4xl mx-auto mb-16 flex flex-col md:flex-row gap-6 items-center"
         >
-          <div className="bg-[#D6B25E]/10 p-4 rounded-full text-[#D6B25E] flex-shrink-0">
+          <div className="bg-[#C9A14A]/10 p-4 rounded-full text-[#C9A14A] flex-shrink-0">
             <TrendingUp size={28} strokeWidth={1.5} />
           </div>
           <div className="text-center md:text-left">
-            <h3 className="text-white font-heading text-lg font-semibold mb-2">{t.noticeTitle}</h3>
-            <p className="text-zinc-400 text-xs md:text-sm leading-relaxed">
+            <h3 className="text-[#1A1A1A] font-heading text-lg font-semibold mb-2">{t.noticeTitle}</h3>
+            <p className="text-[#666666] text-xs md:text-sm leading-relaxed">
               {t.noticeDesc}
             </p>
           </div>
@@ -331,13 +331,13 @@ export default function B2BPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 * index }}
-              className="bg-zinc-900/30 border border-zinc-800/60 rounded-2xl p-6 text-center hover:border-[#D6B25E]/30 transition-all duration-500 group"
+              className="bg-white border border-[#EAEAEA] rounded-2xl p-6 text-center hover:border-[#C9A14A]/30 transition-all duration-500 group shadow-[0_4px_20px_rgba(0,0,0,0.02)]"
             >
-              <div className="bg-[#D6B25E]/10 p-3.5 rounded-full text-[#D6B25E] w-fit mx-auto mb-4 group-hover:scale-110 transition-transform duration-500">
+              <div className="bg-[#C9A14A]/10 p-3.5 rounded-full text-[#C9A14A] w-fit mx-auto mb-4 group-hover:scale-110 transition-transform duration-500">
                 <item.icon size={22} strokeWidth={1.5} />
               </div>
-              <h3 className="text-white font-semibold text-sm mb-2">{item.title}</h3>
-              <p className="text-zinc-400 text-xs leading-relaxed">{item.desc}</p>
+              <h3 className="text-[#1A1A1A] font-semibold text-sm mb-2">{item.title}</h3>
+              <p className="text-[#666666] text-xs leading-relaxed">{item.desc}</p>
             </motion.div>
           ))}
         </div>
@@ -352,23 +352,23 @@ export default function B2BPage() {
             transition={{ duration: 0.8 }}
             className="lg:col-span-5 space-y-6"
           >
-            <div className="bg-zinc-900/30 border border-zinc-800/60 rounded-3xl p-8 backdrop-blur-md">
-              <h2 className="text-2xl font-heading text-white tracking-wide mb-6">{t.conciergeTitle}</h2>
+            <div className="bg-white border border-[#EAEAEA] rounded-3xl p-8 shadow-[0_4px_24px_rgba(0,0,0,0.02)]">
+              <h2 className="text-2xl font-heading text-[#1A1A1A] tracking-wide mb-6">{t.conciergeTitle}</h2>
               
               <div className="space-y-6">
                 {/* Phone */}
                 <div className="flex gap-4 items-start">
-                  <div className="bg-[#D6B25E]/10 p-3 rounded-xl text-[#D6B25E] mt-1">
+                  <div className="bg-[#C9A14A]/10 p-3 rounded-xl text-[#C9A14A] mt-1">
                     <Phone size={18} strokeWidth={1.5} />
                   </div>
                   <div>
-                    <h4 className="text-[10px] uppercase tracking-widest text-[#D6B25E] font-semibold mb-1">{t.conciergeHotline}</h4>
-                    <p className="text-zinc-400 text-xs mb-2">{t.conciergeHotlineDesc}</p>
+                    <h4 className="text-[10px] uppercase tracking-widest text-[#C9A14A] font-semibold mb-1">{t.conciergeHotline}</h4>
+                    <p className="text-[#666666] text-xs mb-2">{t.conciergeHotlineDesc}</p>
                     <div className="flex flex-col gap-1">
-                      <a href="tel:+919724627122" className="text-white text-base font-semibold hover:text-[#D6B25E] transition-colors">
+                      <a href="tel:+919724627122" className="text-[#1A1A1A] text-base font-semibold hover:text-[#C9A14A] transition-colors">
                         +91 97246 27122
                       </a>
-                      <a href="tel:+919427143105" className="text-white text-base font-semibold hover:text-[#D6B25E] transition-colors">
+                      <a href="tel:+919427143105" className="text-[#1A1A1A] text-base font-semibold hover:text-[#C9A14A] transition-colors">
                         +91 94271 43105
                       </a>
                     </div>
@@ -376,21 +376,21 @@ export default function B2BPage() {
                 </div>
 
                 {/* Email */}
-                <div className="flex gap-4 items-start border-t border-zinc-800/60 pt-6">
-                  <div className="bg-[#D6B25E]/10 p-3 rounded-xl text-[#D6B25E] mt-1">
+                <div className="flex gap-4 items-start border-t border-[#EAEAEA] pt-6">
+                  <div className="bg-[#C9A14A]/10 p-3 rounded-xl text-[#C9A14A] mt-1">
                     <Mail size={18} strokeWidth={1.5} />
                   </div>
                   <div>
-                    <h4 className="text-[10px] uppercase tracking-widest text-[#D6B25E] font-semibold mb-1">{t.conciergeEmail}</h4>
-                    <p className="text-zinc-400 text-xs mb-2">{t.conciergeEmailDesc}</p>
-                    <a href="mailto:luxezynora@gmail.com" className="text-white text-base font-semibold hover:text-[#D6B25E] transition-colors">
+                    <h4 className="text-[10px] uppercase tracking-widest text-[#C9A14A] font-semibold mb-1">{t.conciergeEmail}</h4>
+                    <p className="text-[#666666] text-xs mb-2">{t.conciergeEmailDesc}</p>
+                    <a href="mailto:luxezynora@gmail.com" className="text-[#1A1A1A] text-base font-semibold hover:text-[#C9A14A] transition-colors">
                       luxezynora@gmail.com
                     </a>
                   </div>
                 </div>
 
                 {/* WhatsApp */}
-                <div className="pt-4 border-t border-zinc-800/60">
+                <div className="pt-4 border-t border-[#EAEAEA]">
                   <a
                     href="https://wa.me/919724627122?text=Hello%20Zynora%20Wholesale,%20we%20want%20to%20inquire%20about%20bulk%20diamond%20pricing."
                     target="_blank"
@@ -404,7 +404,7 @@ export default function B2BPage() {
               </div>
             </div>
 
-            <div className="bg-zinc-900/20 border border-zinc-800/60 p-6 rounded-2xl text-xs text-zinc-500 leading-relaxed">
+            <div className="bg-white border border-[#EAEAEA] p-6 rounded-2xl text-xs text-[#666666] leading-relaxed shadow-[0_4px_12px_rgba(0,0,0,0.01)]">
               {t.conciergeNotice}
             </div>
           </motion.div>
@@ -414,22 +414,22 @@ export default function B2BPage() {
             initial={{ opacity: 0, x: 30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
-            className="lg:col-span-7 bg-zinc-900/20 border border-zinc-800/60 rounded-3xl p-8 backdrop-blur-md"
+            className="lg:col-span-7 bg-white border border-[#EAEAEA] rounded-3xl p-8 shadow-[0_4px_24px_rgba(0,0,0,0.02)]"
           >
-            <h2 className="text-2xl font-heading text-white tracking-wide mb-2">{t.formTitle}</h2>
-            <p className="text-zinc-400 text-xs mb-8">{t.formSub}</p>
+            <h2 className="text-2xl font-heading text-[#1A1A1A] tracking-wide mb-2">{t.formTitle}</h2>
+            <p className="text-[#666666] text-xs mb-8">{t.formSub}</p>
 
             <form onSubmit={handleSubmit} className="space-y-6">
               {submitStatus === "success" && (
                 <motion.div
                   initial={{ scale: 0.95, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
-                  className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 p-4 rounded-xl flex gap-3 items-center text-sm"
+                  className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 p-4 rounded-xl flex gap-3 items-center text-sm"
                 >
-                  <CheckCircle2 className="flex-shrink-0" size={18} />
+                  <CheckCircle2 className="flex-shrink-0 text-emerald-600" size={18} />
                   <div>
-                    <p className="font-semibold">{t.formSuccessTitle}</p>
-                    <p className="text-xs text-zinc-400">{t.formSuccessDesc}</p>
+                    <p className="font-semibold">Inquiry Submitted Successfully!</p>
+                    <p className="text-xs text-zinc-500">{t.formSuccessDesc}</p>
                   </div>
                 </motion.div>
               )}
@@ -438,16 +438,16 @@ export default function B2BPage() {
                 <motion.div
                   initial={{ scale: 0.95, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
-                  className="bg-red-500/10 border border-red-500/30 text-red-400 p-4 rounded-xl text-sm"
+                  className="bg-red-500/10 border border-red-500/30 text-red-500 p-4 rounded-xl text-sm"
                 >
-                  <p className="font-semibold">{t.formErrorTitle}</p>
-                  <p className="text-xs text-zinc-400">{errorMsg}</p>
+                  <p className="font-semibold">Submission Failed</p>
+                  <p className="text-xs text-red-700">{errorMsg}</p>
                 </motion.div>
               )}
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-[10px] uppercase tracking-widest text-[#D6B25E] font-semibold mb-2">{t.labelContactName}</label>
+                  <label className="block text-[10px] uppercase tracking-widest text-[#C9A14A] font-semibold mb-2">{t.labelContactName}</label>
                   <input
                     type="text"
                     name="name"
@@ -455,11 +455,11 @@ export default function B2BPage() {
                     value={formData.name}
                     onChange={handleInputChange}
                     placeholder={t.phContactName}
-                    className="w-full bg-zinc-950 border border-zinc-800 focus:border-[#D6B25E] focus:outline-none text-sm text-white px-4 py-3 rounded-xl transition-colors placeholder-zinc-700"
+                    className="w-full bg-white border border-[#EAEAEA] focus:border-[#C9A14A] focus:outline-none text-sm text-[#1A1A1A] px-4 py-3 rounded-xl transition-colors placeholder-zinc-400"
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] uppercase tracking-widest text-[#D6B25E] font-semibold mb-2">{t.labelCompanyName}</label>
+                  <label className="block text-[10px] uppercase tracking-widest text-[#C9A14A] font-semibold mb-2">{t.labelCompanyName}</label>
                   <input
                     type="text"
                     name="companyName"
@@ -467,14 +467,14 @@ export default function B2BPage() {
                     value={formData.companyName}
                     onChange={handleInputChange}
                     placeholder={t.phCompanyName}
-                    className="w-full bg-zinc-950 border border-zinc-800 focus:border-[#D6B25E] focus:outline-none text-sm text-white px-4 py-3 rounded-xl transition-colors placeholder-zinc-700"
+                    className="w-full bg-white border border-[#EAEAEA] focus:border-[#C9A14A] focus:outline-none text-sm text-[#1A1A1A] px-4 py-3 rounded-xl transition-colors placeholder-zinc-400"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-[10px] uppercase tracking-widest text-[#D6B25E] font-semibold mb-2">{t.labelGst}</label>
+                  <label className="block text-[10px] uppercase tracking-widest text-[#C9A14A] font-semibold mb-2">{t.labelGst}</label>
                   <input
                     type="text"
                     name="registrationNumber"
@@ -482,16 +482,16 @@ export default function B2BPage() {
                     value={formData.registrationNumber}
                     onChange={handleInputChange}
                     placeholder={t.phGst}
-                    className="w-full bg-zinc-950 border border-zinc-800 focus:border-[#D6B25E] focus:outline-none text-sm text-white px-4 py-3 rounded-xl transition-colors placeholder-zinc-700"
+                    className="w-full bg-white border border-[#EAEAEA] focus:border-[#C9A14A] focus:outline-none text-sm text-[#1A1A1A] px-4 py-3 rounded-xl transition-colors placeholder-zinc-400"
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] uppercase tracking-widest text-[#D6B25E] font-semibold mb-2">{t.labelVolume}</label>
+                  <label className="block text-[10px] uppercase tracking-widest text-[#C9A14A] font-semibold mb-2">{t.labelVolume}</label>
                   <select
                     name="volume"
                     value={formData.volume}
                     onChange={handleInputChange}
-                    className="w-full bg-zinc-950 border border-zinc-800 focus:border-[#D6B25E] focus:outline-none text-sm text-white px-4 py-3 rounded-xl transition-colors"
+                    className="w-full bg-white border border-[#EAEAEA] focus:border-[#C9A14A] focus:outline-none text-sm text-[#1A1A1A] px-4 py-3 rounded-xl transition-colors"
                   >
                     <option value={t.volOpt1}>{t.volOpt1}</option>
                     <option value={t.volOpt2}>{t.volOpt2}</option>
@@ -503,7 +503,7 @@ export default function B2BPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-[10px] uppercase tracking-widest text-[#D6B25E] font-semibold mb-2">{t.labelEmail}</label>
+                  <label className="block text-[10px] uppercase tracking-widest text-[#C9A14A] font-semibold mb-2">{t.labelEmail}</label>
                   <input
                     type="email"
                     name="email"
@@ -511,11 +511,11 @@ export default function B2BPage() {
                     value={formData.email}
                     onChange={handleInputChange}
                     placeholder={t.phEmail}
-                    className="w-full bg-zinc-950 border border-zinc-800 focus:border-[#D6B25E] focus:outline-none text-sm text-white px-4 py-3 rounded-xl transition-colors placeholder-zinc-700"
+                    className="w-full bg-white border border-[#EAEAEA] focus:border-[#C9A14A] focus:outline-none text-sm text-[#1A1A1A] px-4 py-3 rounded-xl transition-colors placeholder-zinc-400"
                   />
                 </div>
                 <div>
-                  <label className="block text-[10px] uppercase tracking-widest text-[#D6B25E] font-semibold mb-2">{t.labelPhone}</label>
+                  <label className="block text-[10px] uppercase tracking-widest text-[#C9A14A] font-semibold mb-2">{t.labelPhone}</label>
                   <input
                     type="tel"
                     name="phone"
@@ -523,13 +523,13 @@ export default function B2BPage() {
                     value={formData.phone}
                     onChange={handleInputChange}
                     placeholder={t.phPhone}
-                    className="w-full bg-zinc-950 border border-zinc-800 focus:border-[#D6B25E] focus:outline-none text-sm text-white px-4 py-3 rounded-xl transition-colors placeholder-zinc-700"
+                    className="w-full bg-white border border-[#EAEAEA] focus:border-[#C9A14A] focus:outline-none text-sm text-[#1A1A1A] px-4 py-3 rounded-xl transition-colors placeholder-zinc-400"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-[10px] uppercase tracking-widest text-[#D6B25E] font-semibold mb-2">{t.labelSpecs}</label>
+                <label className="block text-[10px] uppercase tracking-widest text-[#C9A14A] font-semibold mb-2">{t.labelSpecs}</label>
                 <textarea
                   name="details"
                   required
@@ -537,17 +537,17 @@ export default function B2BPage() {
                   value={formData.details}
                   onChange={handleInputChange}
                   placeholder={t.phSpecs}
-                  className="w-full bg-zinc-950 border border-zinc-800 focus:border-[#D6B25E] focus:outline-none text-sm text-white px-4 py-3 rounded-xl transition-colors placeholder-zinc-700 resize-none"
+                  className="w-full bg-white border border-[#EAEAEA] focus:border-[#C9A14A] focus:outline-none text-[#1A1A1A] text-sm px-4 py-3 rounded-xl transition-colors placeholder-zinc-400 resize-none"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full flex justify-center items-center gap-2 py-4 bg-gradient-to-r from-[#D6B25E] to-[#C9A24A] hover:from-[#E8C26E] hover:to-[#D6B25E] text-[#0B0B0C] font-semibold rounded-xl transition-all duration-500 tracking-wider text-xs uppercase disabled:opacity-50"
+                className="w-full flex justify-center items-center gap-2 py-4 bg-gradient-to-r from-[#C9A14A] to-[#B58F3B] hover:from-[#B58F3B] hover:to-[#C9A14A] text-white font-semibold rounded-xl transition-all duration-500 tracking-wider text-xs uppercase disabled:opacity-50"
               >
                 {isSubmitting ? (
-                  <span className="w-5 h-5 border-2 border-[#0B0B0C] border-t-transparent rounded-full animate-spin" />
+                  <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                 ) : (
                   <>
                     <Send size={14} />

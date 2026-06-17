@@ -149,13 +149,15 @@ async function HomeContent({ isAdmin, assetsMap }: { isAdmin: boolean; assetsMap
                         <p className="text-[#666666] text-[16px] md:text-[18px] leading-[1.9] mb-10 max-w-[540px] reveal-step-3">
                             {assetsMap["text:journey-body"] || "Design with certified stones, refined settings, and precious metals. Every step is deliberate, calm, and built for an effortless experience."}
                         </p>
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
+                        <div className="grid grid-cols-3 gap-3 mb-10">
                             {houseMetrics.map((metric, idx) => (
-                                <FadeIn key={metric.label} delay={idx * 0.12}>
-                                    <div className="bg-[#FAF8F4] border border-[#EAEAEA] rounded-[14px] p-5 shadow-[0_4px_12px_rgba(0,0,0,0.01)]">
-                                        <div className="text-[28px] md:text-[32px] font-serif text-[#1A1A1A] mb-2">{metric.value}</div>
-                                        <div className="text-[10px] uppercase tracking-[0.28em] text-[#666666] mb-2">{metric.label}</div>
-                                        <div className="text-[13px] leading-relaxed text-[#666666]">{metric.detail}</div>
+                                <FadeIn key={metric.label} delay={idx * 0.12} className="h-full">
+                                    <div className="bg-[#FAF8F4] border border-[#EAEAEA] rounded-[14px] p-3 md:p-5 shadow-[0_4px_12px_rgba(0,0,0,0.01)] h-full flex flex-col justify-between">
+                                        <div>
+                                            <div className="text-[20px] sm:text-[28px] md:text-[32px] font-serif text-[#1A1A1A] mb-1 leading-none font-medium">{metric.value}</div>
+                                            <div className="text-[8px] sm:text-[10px] uppercase tracking-[0.08em] sm:tracking-[0.28em] text-[#666666] mb-2 font-medium">{metric.label}</div>
+                                        </div>
+                                        <div className="text-[11px] sm:text-[13px] leading-snug sm:leading-relaxed text-[#666666]">{metric.detail}</div>
                                     </div>
                                 </FadeIn>
                             ))}

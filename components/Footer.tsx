@@ -14,7 +14,7 @@ export function Footer() {
                     <div>
                         <Link href="/" className="block mb-6">
                             <span className="font-serif text-2xl font-semibold tracking-[0.08em] text-[#1A1A1A] uppercase leading-none select-none">
-                                ZYNORA LUXE
+                                ZYNORALUXE
                             </span>
                         </Link>
                         <p className="text-[#666666] text-sm leading-relaxed mb-6">
@@ -83,7 +83,7 @@ export function Footer() {
             <div className="container-custom py-6">
                 <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                     <p className="text-[#666666] text-xs">
-                        &copy; {currentYear} ZYNORA LUXE. All rights reserved.
+                        &copy; {currentYear} ZYNORALUXE. All rights reserved.
                     </p>
                     <div className="flex gap-6 text-xs text-[#666666]">
                         <Link href="#" className="hover:text-[#C9A14A] transition-colors duration-500">Privacy Policy</Link>

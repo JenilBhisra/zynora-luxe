@@ -100,13 +100,13 @@ export function Header() {
                                 <span 
                                     className="font-serif uppercase leading-none select-none"
                                     style={{
-                                        fontSize: "26px",
+                                        fontSize: "40px",
                                         letterSpacing: "0.08em",
                                         fontWeight: "500",
                                         color: "#1A1A1A"
                                     }}
                                 >
-                                    ZYNORA LUXE
+                                    ZYNORALUXE
                                 </span>
                             </Link>
 
@@ -208,13 +208,13 @@ export function Header() {
                                 <span 
                                     className="font-serif uppercase leading-none select-none"
                                     style={{
-                                        fontSize: "20px",
+                                        fontSize: "30px",
                                         letterSpacing: "0.08em",
                                         fontWeight: "500",
                                         color: "#1A1A1A"
                                     }}
                                 >
-                                    ZYNORA LUXE
+                                    ZYNORALUXE
                                 </span>
                             </Link>
                         </div>
@@ -289,13 +289,13 @@ export function Header() {
                                 <span 
                                     className="font-serif uppercase leading-none select-none"
                                     style={{
-                                        fontSize: "20px",
+                                        fontSize: "30px",
                                         letterSpacing: "0.08em",
                                         fontWeight: "500",
                                         color: "#1A1A1A"
                                     }}
                                 >
-                                    ZYNORA LUXE
+                                    ZYNORALUXE
                                 </span>
                                 <button onClick={() => setIsMobileMenuOpen(false)} className="text-[#666666] hover:text-[#C9A14A] transition-colors p-1">
                                     <XIcon size={20} />

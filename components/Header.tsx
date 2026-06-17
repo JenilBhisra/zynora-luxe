@@ -60,10 +60,7 @@ export function Header() {
         return null;
     }
 
-    const isHomePage = pathname === "/";
-    const headerClasses = isHomePage
-        ? `fixed top-0 left-0 w-full z-[99999] [transform:translateZ(0)] h-16 md:h-20 flex items-center transition-all duration-500 ${isScrolled ? "bg-[#0B0B0C]/96 border-b border-[#D6B25E]/22 backdrop-blur-xl" : "bg-transparent border-b border-transparent shadow-none"}`
-        : `sticky top-0 left-0 w-full z-[99999] [transform:translateZ(0)] h-16 md:h-20 flex items-center transition-all duration-500 ${isScrolled ? "bg-[#0B0B0C]/96 border-b border-[#D6B25E]/22 backdrop-blur-xl" : "bg-[#0B0B0C]/92 border-b border-[#D6B25E]/18 backdrop-blur-lg shadow-[0_12px_24px_rgba(0,0,0,0.22)]"}`;
+    const headerClasses = `sticky top-0 left-0 w-full z-[99999] [transform:translateZ(0)] h-16 md:h-20 flex items-center transition-all duration-500 bg-white border-b border-[#EAEAEA] shadow-[0_2px_12px_rgba(0,0,0,0.02)]`;
 
     return (
         <>
@@ -92,7 +89,7 @@ export function Header() {
                                     <Link
                                         key={item.href}
                                         href={item.href}
-                                        className={`text-[12px] uppercase tracking-[0.22em] relative font-medium transition-colors duration-500 after:content-[''] after:absolute after:-bottom-2 after:left-0 after:h-[2px] after:bg-[#D6B25E] after:transition-all after:duration-600 group ${isActive ? "after:w-full text-[#D6B25E]" : "text-[#E4E4E7] hover:text-[#D6B25E] after:w-0 hover:after:w-full"}`}
+                                        className={`text-[12px] uppercase tracking-[0.22em] relative font-medium transition-colors duration-500 after:content-[''] after:absolute after:-bottom-2 after:left-0 after:h-[2px] after:bg-[#C9A14A] after:transition-all after:duration-600 group ${isActive ? "after:w-full text-[#C9A14A]" : "text-[#1A1A1A] hover:text-[#C9A14A] after:w-0 hover:after:w-full"}`}
                                     >
                                         <span className="relative">
                                             {item.label}
@@ -108,10 +105,10 @@ export function Header() {
                             <div className="relative flex items-center">
                                 <ProfileMenu />
                             </div>
-                            <Link href="/cart" aria-label="Cart" className="text-[#E4E4E7] hover:text-[#D6B25E] transition-colors duration-300 relative p-1">
+                            <Link href="/cart" aria-label="Cart" className="text-[#1A1A1A] hover:text-[#C9A14A] transition-colors duration-300 relative p-1">
                                 <ShoppingCart size={18} strokeWidth={1.5} />
                                 {cartCount > 0 && (
-                                    <span className="absolute -top-2 -right-2 bg-[#D6B25E] text-[#0B0B0C] text-[9px] w-4 h-4 flex items-center justify-center rounded-full font-bold">
+                                    <span className="absolute -top-2 -right-2 bg-[#C9A14A] text-white text-[9px] w-4 h-4 flex items-center justify-center rounded-full font-bold">
                                         {cartCount}
                                     </span>
                                 )}
@@ -125,7 +122,7 @@ export function Header() {
                         <div className="flex-none">
                             <button
                                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                                className="text-[#F4F4F5] hover:text-[#D6B25E] transition-colors p-2 -ml-2"
+                                className="text-[#1A1A1A] hover:text-[#C9A14A] transition-colors p-2 -ml-2"
                                 aria-label="Toggle menu"
                             >
                                 {isMobileMenuOpen ? <XIcon size={24} strokeWidth={1.5} /> : <Menu size={24} strokeWidth={1.5} />}
@@ -144,10 +141,10 @@ export function Header() {
                             <div className="relative flex items-center">
                                 <ProfileMenu />
                             </div>
-                            <Link href="/cart" aria-label="Cart" className="text-[#E4E4E7] hover:text-[#D6B25E] transition-colors duration-300 relative p-1">
+                            <Link href="/cart" aria-label="Cart" className="text-[#1A1A1A] hover:text-[#C9A14A] transition-colors duration-300 relative p-1">
                                 <ShoppingCart size={20} strokeWidth={1.5} />
                                 {cartCount > 0 && (
-                                    <span className="absolute -top-2 -right-2 bg-[#D6B25E] text-[#0B0B0C] text-[9px] w-4 h-4 flex items-center justify-center rounded-full font-bold">
+                                    <span className="absolute -top-2 -right-2 bg-[#C9A14A] text-white text-[9px] w-4 h-4 flex items-center justify-center rounded-full font-bold">
                                         {cartCount}
                                     </span>
                                 )}
@@ -167,7 +164,7 @@ export function Header() {
                             exit={{ opacity: 0 }}
                             transition={{ duration: 0.3 }}
                             onClick={() => setIsMobileMenuOpen(false)}
-                            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-45"
+                            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-45"
                             style={{ zIndex: 45 }}
                         />
                         <motion.nav
@@ -175,12 +172,12 @@ export function Header() {
                             animate={{ x: 0 }}
                             exit={{ x: "-100%" }}
                             transition={{ type: "spring", damping: 30, stiffness: 300 }}
-                            className="fixed top-0 left-0 bottom-0 w-[min(86vw,340px)] bg-[#0B0B0C] z-50 flex flex-col shadow-2xl border-r border-[#D6B25E]/20"
+                            className="fixed top-0 left-0 bottom-0 w-[min(86vw,340px)] bg-white z-50 flex flex-col shadow-2xl border-r border-[#EAEAEA]"
                         >
                             {/* Mobile Menu Header */}
-                            <div className="flex items-center justify-between p-6 border-b border-[#D6B25E]/20">
+                            <div className="flex items-center justify-between p-6 border-b border-[#EAEAEA]">
                                 <Image src="/assets/logo.png" alt="Krishna Diamonds" width={120} height={40} className="object-contain" />
-                                <button onClick={() => setIsMobileMenuOpen(false)} className="text-zinc-400 hover:text-[#D6B25E] transition-colors p-1">
+                                <button onClick={() => setIsMobileMenuOpen(false)} className="text-[#666666] hover:text-[#C9A14A] transition-colors p-1">
                                     <XIcon size={20} />
                                 </button>
                             </div>
@@ -204,8 +201,8 @@ export function Header() {
                                                 onClick={() => setIsMobileMenuOpen(false)}
                                                 className={`block px-8 py-4 text-sm uppercase tracking-[0.2em] font-medium transition-colors ${
                                                     isActive
-                                                        ? "text-[#D6B25E] bg-[#D6B25E]/10 border-l-2 border-[#D6B25E]"
-                                                        : "text-zinc-300 hover:text-[#D6B25E] hover:bg-white/5 border-l-2 border-transparent"
+                                                        ? "text-[#C9A14A] bg-[#EAF5FF] border-l-2 border-[#C9A14A]"
+                                                        : "text-[#1A1A1A] hover:text-[#C9A14A] hover:bg-zinc-50 border-l-2 border-transparent"
                                                 }`}
                                             >
                                                 {item.label}
@@ -216,34 +213,34 @@ export function Header() {
                             </div>
 
                             {/* Mobile Menu Footer */}
-                            <div className="p-6 border-t border-[#D6B25E]/20 space-y-3">
+                            <div className="p-6 border-t border-[#EAEAEA] space-y-3">
                                 {user ? (
-                                    <div className="border-t border-zinc-800 pt-6">
+                                    <div className="border-t border-[#EAEAEA] pt-6">
                                         <div className="flex items-center gap-3 mb-6">
-                                            <div className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center text-white font-medium">
+                                            <div className="w-10 h-10 rounded-full bg-zinc-100 flex items-center justify-center text-[#1A1A1A] font-medium border border-[#EAEAEA]">
                                                 {user.displayName?.[0]?.toUpperCase() || 'U'}
                                             </div>
                                             <div>
-                                                <p className="text-white text-sm font-medium truncate">{user.displayName}</p>
-                                                <p className="text-zinc-400 text-xs truncate">{user.email}</p>
+                                                <p className="text-[#1A1A1A] text-sm font-medium truncate">{user.displayName}</p>
+                                                <p className="text-[#666666] text-xs truncate">{user.email}</p>
                                             </div>
                                         </div>
                                         <div className="space-y-2.5">
                                             {isAdmin && (
-                                                <Link href="/admin" onClick={() => setIsMobileMenuOpen(false)} className="block text-center w-full py-2.5 text-xs uppercase tracking-widest font-bold border border-[#D6B25E]/50 text-[#D6B25E] hover:text-[#0B0B0C] hover:bg-[#C9A24A] hover:border-[#C9A24A] transition-colors rounded-[8px]">
+                                                <Link href="/admin" onClick={() => setIsMobileMenuOpen(false)} className="block text-center w-full py-2.5 text-xs uppercase tracking-widest font-bold border border-[#C9A14A]/50 text-[#C9A14A] hover:text-white hover:bg-[#C9A14A] hover:border-[#C9A14A] transition-colors rounded-[8px]">
                                                     Admin Dashboard
                                                 </Link>
                                             )}
-                                            <Link href="/account" onClick={() => setIsMobileMenuOpen(false)} className="block text-center w-full py-2.5 text-xs uppercase tracking-widest font-bold border border-zinc-700 text-zinc-300 hover:text-white hover:bg-zinc-800 transition-colors rounded-[8px]">
+                                            <Link href="/account" onClick={() => setIsMobileMenuOpen(false)} className="block text-center w-full py-2.5 text-xs uppercase tracking-widest font-bold border border-[#EAEAEA] text-[#1A1A1A] hover:bg-zinc-50 transition-colors rounded-[8px]">
                                                 My Account
                                             </Link>
-                                            <button onClick={handleLogout} className="block text-center w-full py-2.5 text-xs uppercase tracking-widest font-bold border border-red-500/30 text-red-400 hover:text-white hover:bg-red-500/20 transition-colors rounded-[8px] cursor-pointer">
+                                            <button onClick={handleLogout} className="block text-center w-full py-2.5 text-xs uppercase tracking-widest font-bold border border-red-500/20 text-red-500 hover:text-white hover:bg-red-500/10 transition-colors rounded-[8px] cursor-pointer">
                                                 Sign Out
                                             </button>
                                         </div>
                                     </div>
                                 ) : (
-                                    <Link href="/login" onClick={() => setIsMobileMenuOpen(false)} className="block text-center w-full py-2.5 text-xs uppercase tracking-widest font-bold border border-[#D6B25E]/50 text-[#D6B25E] hover:text-[#0B0B0C] hover:bg-[#C9A24A] hover:border-[#C9A24A] transition-colors rounded-[8px]">
+                                    <Link href="/login" onClick={() => setIsMobileMenuOpen(false)} className="block text-center w-full py-2.5 text-xs uppercase tracking-widest font-bold border border-[#C9A14A]/50 text-[#C9A14A] hover:text-white hover:bg-[#C9A14A] hover:border-[#C9A14A] transition-colors rounded-[8px]">
                                         Sign In
                                     </Link>
                                 )}

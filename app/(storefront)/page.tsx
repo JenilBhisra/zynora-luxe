@@ -10,7 +10,7 @@ import { HeroSlider } from "@/components/HeroSlider";
 import nextDynamic from "next/dynamic";
 
 const ScrollScene = nextDynamic(() => import("@/components/animation/ScrollScene").then(mod => mod.ScrollScene), {
-    loading: () => <div className="min-h-screen bg-[#0B0B0C] flex items-center justify-center text-white/40 font-serif tracking-[0.2em] text-xs uppercase animate-pulse">Loading Storyline...</div>
+    loading: () => <div className="min-h-screen bg-white flex items-center justify-center text-[#1A1A1A]/40 font-serif tracking-[0.2em] text-xs uppercase animate-pulse">Loading Storyline...</div>
 });
 
 const AdminStudio = nextDynamic(() => import("@/components/AdminStudio").then(mod => mod.AdminStudio));
@@ -78,7 +78,7 @@ export default async function HomePage() {
     }));
 
     return (
-        <div className="bg-[#0B0B0C] text-white relative">
+        <div className="bg-white text-[#1A1A1A] relative">
             <div className="relative">
                 <HeroSlider customSlides={assetsMap} customText={assetsMap} />
                 {/* Admin: edit any of the 3 hero slides */}
@@ -90,10 +90,9 @@ export default async function HomePage() {
                     </>
                 )}
             </div>
-            <ScrollScene images={timelineImages} nextSectionSelector="#home-followup-section" customImages={assetsMap} customText={assetsMap} isAdmin={isAdmin} />
 
-            {/* Section 1: Clear Value Prop + Progressive CTA */}
-            <AnimatedSection id="home-followup-section" className="py-24 md:py-32 bg-[#0B0B0C] story-section-frame">
+            {/* Section 1: Clear Value Prop + Progressive CTA (Section Banners) */}
+            <AnimatedSection id="home-followup-section" className="py-24 md:py-32 bg-white story-section-frame">
                 <div className="container-custom grid gap-14 lg:grid-cols-[1.02fr_0.98fr] items-center">
                     <FadeIn className="relative aspect-[4/5] sm:aspect-square lg:aspect-[4/5] w-full">
                         <div className="absolute top-0 right-0 w-[75%] h-[75%] luxury-shell overflow-hidden rounded-[20px] shadow-2xl z-20">
@@ -106,7 +105,7 @@ export default async function HomePage() {
                             />
                             {isAdmin && <VisualEditButton type="homepage" assetKey="journey-image" />}
                         </div>
-                        <div className="absolute bottom-10 left-0 w-[55%] h-[50%] luxury-shell overflow-hidden rounded-[16px] shadow-xl z-30 ring-1 ring-white/10">
+                        <div className="absolute bottom-10 left-0 w-[55%] h-[50%] luxury-shell overflow-hidden rounded-[16px] shadow-xl z-30 ring-1 ring-black/5">
                             <SmartImage
                                 src={assetsMap["journey-image-2"] || "/products/earrings-1.jpg"}
                                 alt="Detail shot"
@@ -116,7 +115,7 @@ export default async function HomePage() {
                             />
                             {isAdmin && <VisualEditButton type="homepage" assetKey="journey-image-2" />}
                         </div>
-                        <div className="absolute top-[10%] left-[5%] w-[40%] h-[40%] luxury-shell overflow-hidden rounded-[12px] shadow-md z-10 opacity-80 ring-1 ring-[#D6B25E]/20 blur-[1px] hover:blur-none transition-all duration-500">
+                        <div className="absolute top-[10%] left-[5%] w-[40%] h-[40%] luxury-shell overflow-hidden rounded-[12px] shadow-md z-10 opacity-80 ring-1 ring-[#C9A14A]/20 blur-[1px] hover:blur-none transition-all duration-500">
                             <SmartImage
                                 src={assetsMap["journey-image-3"] || "/products/loose-diamond.jpg"}
                                 alt="Diamond close-up"
@@ -128,32 +127,32 @@ export default async function HomePage() {
                         </div>
                     </FadeIn>
                     <FadeIn className="max-w-[640px]">
-                        <span className="block text-[10px] md:text-[11px] uppercase tracking-[0.34em] text-[#D6B25E] mb-5 reveal-step-1">
+                        <span className="block text-[10px] md:text-[11px] uppercase tracking-[0.34em] text-[#C9A14A] mb-5 reveal-step-1">
                             {assetsMap["text:journey-kicker"] || "The Custom Journey"}
                         </span>
-                        <h2 className="text-[42px] md:text-[58px] leading-[1] mb-6 text-white reveal-step-2">
+                        <h2 className="text-[42px] md:text-[58px] leading-[1] mb-6 text-[#1A1A1A] reveal-step-2">
                             {assetsMap["text:journey-headline"] || "Create a ring as rare as the moment it marks"}
                         </h2>
-                        <p className="text-white/72 text-[16px] md:text-[18px] leading-[1.9] mb-10 max-w-[540px] reveal-step-3">
+                        <p className="text-[#666666] text-[16px] md:text-[18px] leading-[1.9] mb-10 max-w-[540px] reveal-step-3">
                             {assetsMap["text:journey-body"] || "Design with certified stones, refined settings, and precious metals. Every step is deliberate, calm, and built for an effortless experience."}
                         </p>
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
                             {houseMetrics.map((metric, idx) => (
                                 <FadeIn key={metric.label} delay={idx * 0.12}>
-                                    <div className="luxury-panel premium-hover-lift rounded-[14px] p-5">
-                                        <div className="text-[28px] md:text-[32px] font-serif text-white mb-2">{metric.value}</div>
-                                        <div className="text-[10px] uppercase tracking-[0.28em] text-white/65 mb-2">{metric.label}</div>
-                                        <div className="text-[13px] leading-relaxed text-white/68">{metric.detail}</div>
+                                    <div className="bg-[#EAF5FF] border border-[#EAEAEA] rounded-[14px] p-5 shadow-[0_4px_12px_rgba(0,0,0,0.01)]">
+                                        <div className="text-[28px] md:text-[32px] font-serif text-[#1A1A1A] mb-2">{metric.value}</div>
+                                        <div className="text-[10px] uppercase tracking-[0.28em] text-[#666666] mb-2">{metric.label}</div>
+                                        <div className="text-[13px] leading-relaxed text-[#666666]">{metric.detail}</div>
                                     </div>
                                 </FadeIn>
                             ))}
                         </div>
                         <div className="flex flex-col sm:flex-row gap-4">
-                            <Link href="/customizer/step-1-diamond" className="inline-flex items-center justify-center px-8 py-4 text-[12px] md:text-[13px] uppercase tracking-[0.18em] font-semibold bg-[#D6B25E] text-[#0B0B0C] btn-gold-hover hover:bg-[#E3C67C] transition-all duration-600 relative group cta-emerge cta-emerge-delay-1">
-                                <span className="relative z-10">Begin Custom Design</span>
+                            <Link href="/customizer/step-1-diamond" className="inline-flex items-center justify-center px-8 py-4 text-[12px] md:text-[13px] uppercase tracking-[0.18em] font-semibold bg-[#C9A14A] text-white btn-gold-hover hover:bg-[#B58F3B] transition-all duration-600 relative group cta-emerge cta-emerge-delay-1">
+                                <span className="relative z-10 text-white-force">Begin Custom Design</span>
                                 <span className="absolute inset-0 shimmer-gold opacity-0 group-hover:opacity-40 duration-600" />
                             </Link>
-                            <Link href="/shop" className="inline-flex items-center justify-center px-8 py-4 text-[12px] md:text-[13px] uppercase tracking-[0.18em] font-semibold border border-white/14 text-white premium-hover-lift hover:bg-white/6 hover:border-[#D6B25E]/50 transition-all duration-600 relative group cta-emerge cta-emerge-delay-2">
+                            <Link href="/shop" className="inline-flex items-center justify-center px-8 py-4 text-[12px] md:text-[13px] uppercase tracking-[0.18em] font-semibold border border-[#C9A14A] text-[#C9A14A] hover:bg-[#C9A14A] hover:text-white transition-all duration-600 relative group cta-emerge cta-emerge-delay-2">
                                 <span className="relative z-10">Explore Collection</span>
                                 <span className="absolute inset-0 shimmer-gold opacity-0 group-hover:opacity-20 duration-600" />
                             </Link>
@@ -162,37 +161,34 @@ export default async function HomePage() {
                 </div>
             </AnimatedSection>
 
-            {/* Section 2: Product Showcase (Featured Collection) */}
+            {/* Category Gallery (Moved Up) */}
+            <InteractiveCategoryGallery customImages={assetsMap} isAdmin={isAdmin} />
+
+            {/* Journey Scroll Scene (Moved Down, targeting Featured Products next) */}
+            <ScrollScene images={timelineImages} nextSectionSelector="#featured-products-section" customImages={assetsMap} customText={assetsMap} isAdmin={isAdmin} />
+
+            {/* Section 2: Product Showcase (Featured Collection / Featured Products) */}
             <AnimatedSection 
-                className="py-24 md:py-28 relative overflow-hidden story-section-frame"
-                style={{ 
-                    backgroundImage: "url('/images/black-silk.jpg')", 
-                    backgroundSize: "cover", 
-                    backgroundPosition: "center", 
-                    backgroundRepeat: "no-repeat" 
-                }}
+                id="featured-products-section"
+                className="py-24 md:py-28 relative overflow-hidden story-section-frame bg-[#EAF5FF]"
             >
-                {/* Dark overlay to enhance depth, luxury feel and text contrast */}
-                <div className="absolute inset-0 bg-black/45 pointer-events-none" />
-                
                 <div className="container-custom relative z-10">
                     <FadeIn className="mb-12 md:mb-16 max-w-2xl reveal-step-1">
-                        <span className="block text-[10px] md:text-[11px] uppercase tracking-[0.34em] text-[#D6B25E] mb-4">Featured Collection</span>
-                        <h2 className="text-[36px] md:text-[52px] leading-[1.02] text-white reveal-step-2">
+                        <span className="block text-[10px] md:text-[11px] uppercase tracking-[0.34em] text-[#C9A14A] mb-4">Featured Collection</span>
+                        <h2 className="text-[36px] md:text-[52px] leading-[1.02] text-[#1A1A1A] reveal-step-2">
                             {assetsMap["text:featured-heading"] || "Signature pieces, hand-selected"}
                         </h2>
                     </FadeIn>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
                         {featuredProducts.slice(0, 4).map((product, index) => {
-                            // Use DB override image if admin set one, otherwise fall back to product images
                             const cardAssetKey = `featured-product-${index + 1}`;
                             const image = assetsMap[cardAssetKey] || selectCardImage(product.images, new Set(), "jewelry", index, product.id, product.name);
                             return (
                                 <FadeIn key={product.id} delay={index * 0.08} className={`reveal-step-${Math.min(index + 1, 4)}`}>
                                     <Link href={`/product/${product.slug}`} className="group block h-full">
-                                        <div className="luxury-shell premium-hover-lift overflow-hidden rounded-[20px] h-full">
-                                            <div className="relative aspect-[4/5] overflow-hidden bg-[#0B0B0C] image-progressive-reveal">
+                                        <div className="bg-white border border-[#EAEAEA] shadow-[0_4px_20px_rgba(0,0,0,0.02)] transition-all duration-500 ease-out hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(0,0,0,0.06)] hover:border-[#C9A14A]/40 rounded-[20px] h-full overflow-hidden">
+                                            <div className="relative aspect-[4/5] overflow-hidden bg-[#EAF5FF] image-progressive-reveal">
                                                 <SmartImage
                                                     src={image}
                                                     alt={product.name}
@@ -200,16 +196,14 @@ export default async function HomePage() {
                                                     fallbackType="jewelry"
                                                     className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.08]"
                                                 />
-                                                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/18 to-transparent" />
-                                                <span className="absolute top-4 right-4 text-[10px] uppercase tracking-[0.24em] font-bold text-[#D6B25E] opacity-0 group-hover:opacity-100 transition-opacity duration-500">View</span>
-                                                {/* Admin: visual edit overlay for each product card */}
+                                                <span className="absolute top-4 right-4 text-[10px] uppercase tracking-[0.24em] font-bold text-[#C9A14A] opacity-0 group-hover:opacity-100 transition-opacity duration-500">View</span>
                                                 {isAdmin && <VisualEditButton type="homepage" assetKey={cardAssetKey} />}
                                             </div>
-                                            <div className="p-5 md:p-6">
-                                                <h3 className="text-[16px] md:text-[18px] font-medium text-white line-clamp-1 mb-2 group-hover:text-[#D6B25E] transition-colors duration-500">{product.name}</h3>
+                                            <div className="p-5 md:p-6 bg-white">
+                                                <h3 className="text-[16px] md:text-[18px] font-medium text-[#1A1A1A] line-clamp-1 mb-2 group-hover:text-[#C9A14A] transition-colors duration-500">{product.name}</h3>
                                                 <div className="flex items-center justify-between gap-4">
-                                                    <p className="text-[14px] text-white/66">Rs {Number(product.price).toLocaleString("en-IN")}</p>
-                                                    <span className="text-[10px] uppercase tracking-[0.24em] text-[#D6B25E]">View</span>
+                                                    <p className="text-[14px] text-[#666666]">Rs {Number(product.price).toLocaleString("en-IN")}</p>
+                                                    <span className="text-[10px] uppercase tracking-[0.24em] text-[#C9A14A]">View</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -221,17 +215,15 @@ export default async function HomePage() {
                 </div>
             </AnimatedSection>
 
-            <InteractiveCategoryGallery customImages={assetsMap} isAdmin={isAdmin} />
-
             {/* Section 3: Trust + Brand Authority */}
-            <AnimatedSection className="py-24 md:py-28 bg-[#0B0B0C] story-section-frame">
+            <AnimatedSection className="py-24 md:py-28 bg-white story-section-frame">
                 <div className="container-custom grid gap-8 lg:grid-cols-2 items-stretch">
-                    <FadeIn className="luxury-panel premium-hover-lift rounded-[22px] p-8 md:p-10 reveal-step-1">
-                        <span className="block text-[10px] md:text-[11px] uppercase tracking-[0.34em] text-[#D6B25E] mb-4 trust-badge-slide">Why Choose Us</span>
-                        <h2 className="text-[34px] md:text-[46px] leading-[1.05] text-white mb-6 reveal-step-2">
+                    <FadeIn className="bg-[#EAF5FF] border border-[#EAEAEA] rounded-[22px] p-8 md:p-10 reveal-step-1">
+                        <span className="block text-[10px] md:text-[11px] uppercase tracking-[0.34em] text-[#C9A14A] mb-4">Why Choose Us</span>
+                        <h2 className="text-[34px] md:text-[46px] leading-[1.05] text-[#1A1A1A] mb-6 reveal-step-2">
                             {assetsMap["text:trust-heading"] || "Designed with certainty, delivered with care"}
                         </h2>
-                        <p className="text-white/70 leading-[1.9] text-[16px] md:text-[17px] max-w-xl mb-8 reveal-step-3">
+                        <p className="text-[#666666] leading-[1.9] text-[16px] md:text-[17px] max-w-xl mb-8 reveal-step-3">
                             {assetsMap["text:trust-body"] || "Premium jewelry deserves a presentation that feels equally assured. Certified sourcing, insured delivery, and personal assistance guide every order."}
                         </p>
                         <div className="grid sm:grid-cols-3 gap-4">
@@ -241,29 +233,29 @@ export default async function HomePage() {
                                 { label: "Support", value: "Personal" },
                             ].map((item, idx) => (
                                 <FadeIn key={item.label} delay={idx * 0.1} className={`reveal-step-${Math.min(idx + 3, 5)}`}>
-                                    <div className="rounded-[16px] border border-white/10 bg-white/4 p-4 premium-hover-lift cursor-pointer">
-                                        <div className="text-[10px] uppercase tracking-[0.28em] text-white/55 mb-2">{item.label}</div>
-                                        <div className="text-[18px] text-white">{item.value}</div>
+                                    <div className="rounded-[16px] border border-[#EAEAEA] bg-white p-4 premium-hover-lift cursor-pointer">
+                                        <div className="text-[10px] uppercase tracking-[0.28em] text-[#666666] mb-2">{item.label}</div>
+                                        <div className="text-[18px] text-[#1A1A1A] font-semibold">{item.value}</div>
                                     </div>
                                 </FadeIn>
                             ))}
                         </div>
                     </FadeIn>
 
-                    <FadeIn className="luxury-panel rounded-[22px] p-8 md:p-10 flex flex-col justify-between">
+                    <FadeIn className="bg-[#EAF5FF] border border-[#EAEAEA] rounded-[22px] p-8 md:p-10 flex flex-col justify-between">
                         <div>
-                            <span className="block text-[10px] md:text-[11px] uppercase tracking-[0.34em] text-[#D6B25E] mb-4">Testimonial</span>
-                            <p className="text-[24px] md:text-[32px] leading-[1.35] text-white font-serif mb-8 max-w-xl">
+                            <span className="block text-[10px] md:text-[11px] uppercase tracking-[0.34em] text-[#C9A14A] mb-4">Testimonial</span>
+                            <p className="text-[24px] md:text-[32px] leading-[1.35] text-[#1A1A1A] font-serif mb-8 max-w-xl font-light italic">
                                 “The presentation, the quiet confidence, and the craftsmanship felt closer to a private atelier than an online store.”
                             </p>
                         </div>
-                        <div className="pt-8 border-t border-white/10 flex items-center justify-between gap-4">
+                        <div className="pt-8 border-t border-[#EAEAEA] flex items-center justify-between gap-4">
                             <div>
-                                <div className="text-white text-[14px] uppercase tracking-[0.26em] mb-1">Client note</div>
-                                <div className="text-white/58 text-[13px]">Luxury buyer feedback</div>
+                                <div className="text-[#1A1A1A] text-[14px] uppercase tracking-[0.26em] mb-1 font-semibold">Client note</div>
+                                <div className="text-[#666666] text-[13px]">Luxury buyer feedback</div>
                             </div>
-                            <Link href="/shop" className="inline-flex items-center justify-center px-6 py-3 text-[11px] uppercase tracking-[0.2em] font-semibold bg-white text-[#0B0B0C] hover:bg-[#D6B25E] btn-gold-hover transition-all duration-600 relative group">
-                                <span className="relative z-10">Discover More</span>
+                            <Link href="/shop" className="inline-flex items-center justify-center px-6 py-3 text-[11px] uppercase tracking-[0.2em] font-semibold bg-[#C9A14A] text-white hover:bg-[#B58F3B] btn-gold-hover transition-all duration-600 relative group">
+                                <span className="relative z-10 text-white-force">Discover More</span>
                                 <span className="absolute inset-0 shimmer-gold opacity-0 group-hover:opacity-30 duration-600" />
                             </Link>
                         </div>
@@ -272,14 +264,14 @@ export default async function HomePage() {
             </AnimatedSection>
 
             {/* Section 4: Clear Call-to-Action Funnel */}
-            <AnimatedSection className="py-24 md:py-32 bg-[#111113] story-section-frame">
+            <AnimatedSection className="py-24 md:py-32 bg-white story-section-frame">
                 <div className="container-custom text-center max-w-4xl mx-auto">
                     <FadeIn className="reveal-step-1">
-                        <span className="block text-[10px] md:text-[11px] uppercase tracking-[0.34em] text-[#D6B25E] mb-5 reveal-step-1">Your Journey Starts Here</span>
-                        <h2 className="text-[38px] md:text-[60px] leading-[1.02] text-white mb-6 reveal-step-2">
+                        <span className="block text-[10px] md:text-[11px] uppercase tracking-[0.34em] text-[#C9A14A] mb-5">Your Journey Starts Here</span>
+                        <h2 className="text-[38px] md:text-[60px] leading-[1.02] text-[#1A1A1A] mb-6 reveal-step-2">
                             {assetsMap["text:cta-heading"] || "Three ways to find your perfect piece"}
                         </h2>
-                        <p className="text-white/70 text-[16px] md:text-[18px] leading-[1.9] max-w-2xl mx-auto mb-12 reveal-step-3">
+                        <p className="text-[#666666] text-[16px] md:text-[18px] leading-[1.9] max-w-2xl mx-auto mb-12 reveal-step-3">
                             {assetsMap["text:cta-body"] || "Whether you're creating a custom ring, exploring certified diamonds, or browsing signature pieces, we've designed a calm, intentional journey for you."}
                         </p>
                     </FadeIn>
@@ -311,14 +303,14 @@ export default async function HomePage() {
                         ].map((item, idx) => (
                             <FadeIn key={item.step} delay={idx * 0.15} className={`reveal-step-${Math.min(idx + 1, 4)}`}>
                                 <Link href={item.href}>
-                                    <div className="luxury-panel premium-hover-lift rounded-[22px] p-8 h-full flex flex-col justify-between cursor-pointer">
+                                    <div className="bg-[#EAF5FF] border border-[#EAEAEA] hover:border-[#C9A14A]/40 rounded-[22px] p-8 h-full flex flex-col justify-between cursor-pointer premium-hover-lift">
                                         <div>
-                                            <div className="text-[48px] font-serif text-[#D6B25E] mb-4 font-light">{item.step}</div>
-                                            <h3 className="text-[22px] font-medium text-white mb-3">{item.title}</h3>
-                                            <p className="text-white/70 text-[15px] leading-relaxed">{item.description}</p>
+                                            <div className="text-[48px] font-serif text-[#C9A14A] mb-4 font-light">{item.step}</div>
+                                            <h3 className="text-[22px] font-medium text-[#1A1A1A] mb-3">{item.title}</h3>
+                                            <p className="text-[#666666] text-[15px] leading-relaxed">{item.description}</p>
                                         </div>
-                                        <div className="mt-8 pt-6 border-t border-white/10">
-                                            <span className="inline-block text-[12px] uppercase tracking-[0.2em] font-semibold text-[#D6B25E] group-hover:translate-x-1 transition-transform duration-300">
+                                        <div className="mt-8 pt-6 border-t border-[#EAEAEA]">
+                                            <span className="inline-block text-[12px] uppercase tracking-[0.2em] font-semibold text-[#C9A14A] group-hover:translate-x-1 transition-transform duration-300">
                                                 {item.cta} →
                                             </span>
                                         </div>
@@ -330,8 +322,8 @@ export default async function HomePage() {
 
                     {/* Primary CTA */}
                     <FadeIn delay={0.6} className="cta-emerge cta-emerge-delay-2">
-                        <Link href="/customizer/step-1-diamond" className="inline-flex items-center justify-center px-10 md:px-12 py-5 text-[13px] md:text-[14px] uppercase tracking-[0.2em] font-semibold bg-[#D6B25E] text-[#0B0B0C] btn-gold-hover hover:bg-[#E3C67C] transition-all duration-600 relative group shadow-[0_20px_48px_rgba(214,178,94,0.25)]">
-                            <span className="relative z-10">Start Your Custom Ring</span>
+                        <Link href="/customizer/step-1-diamond" className="inline-flex items-center justify-center px-10 md:px-12 py-5 text-[13px] md:text-[14px] uppercase tracking-[0.2em] font-semibold bg-[#C9A14A] text-white btn-gold-hover hover:bg-[#B58F3B] transition-all duration-600 relative group shadow-[0_20px_48px_rgba(201,161,74,0.2)]">
+                            <span className="relative z-10 text-white-force">Start Your Custom Ring</span>
                             <span className="absolute inset-0 shimmer-gold opacity-0 group-hover:opacity-40 duration-600 rounded" />
                         </Link>
                     </FadeIn>

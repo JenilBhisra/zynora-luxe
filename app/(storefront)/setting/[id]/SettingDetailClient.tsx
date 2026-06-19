@@ -316,10 +316,10 @@ export default function SettingDetailClient({ setting }: { setting: any }) {
                     {/* ── Col 3: Details Panel ──────────────────────── */}
                     <div className="flex flex-col gap-6 lg:sticky lg:top-24">
                         <div>
-                            <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-[#C9A14A] mb-1.5 flex items-center gap-1.5">
+                            <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-[#C9A14A] mb-1 flex items-center gap-1.5">
                                 <Sparkles size={11} /> Handcrafted setting
                             </p>
-                            <h1 className="text-3xl font-serif font-medium text-zinc-900 tracking-wide mb-2">
+                            <h1 className="text-xl md:text-2xl font-serif font-medium text-zinc-900 tracking-wide mb-1.5">
                                 {setting.name}
                             </h1>
                             <p className="text-xs text-zinc-500 font-medium tracking-wide uppercase">
@@ -327,12 +327,12 @@ export default function SettingDetailClient({ setting }: { setting: any }) {
                             </p>
                         </div>
 
-                        <div className="py-5 border-t border-b border-zinc-100">
+                        <div className="py-4 border-t border-b border-zinc-100">
                             <div className="flex items-baseline gap-2">
-                                <span className="text-3xl font-bold text-zinc-900 tracking-tight">
+                                <span className="text-xl md:text-2xl font-bold text-zinc-900 tracking-tight">
                                     {fmt(displayPrice + currentMetalOption.priceAdjustment)}
                                 </span>
-                                <span className="text-[10px] text-zinc-400 font-semibold uppercase tracking-wider">
+                                <span className="text-[9px] text-zinc-400 font-semibold uppercase tracking-wider">
                                     (Setting Only)
                                 </span>
                             </div>
@@ -378,7 +378,7 @@ export default function SettingDetailClient({ setting }: { setting: any }) {
                                             onClick={() => handleKaratChange(k)}
                                             className={`py-2 px-1 text-center text-[10px] font-bold uppercase tracking-wider transition-all duration-200 border rounded-md ${
                                                 selectedKarat === k
-                                                    ? "bg-[#C9A14A] text-white border-[#C9A14A]"
+                                                    ? "bg-zinc-900 text-white border-zinc-900"
                                                     : "bg-white text-zinc-600 border-zinc-200 hover:border-[#C9A14A]/40"
                                             }`}
                                         >
@@ -479,8 +479,8 @@ export default function SettingDetailClient({ setting }: { setting: any }) {
                 </div>
 
                 {/* ── Below Fold Content Sections ───────────────── */}
-                <div className="mt-16 lg:mt-24 max-w-4xl border-t border-zinc-100 pt-10 lg:pt-16">
-                    <h2 className="text-2xl font-serif text-zinc-900 tracking-wide mb-8">Premium Setting Specifications &amp; Assurances</h2>
+                <div className="mt-16 lg:mt-24 max-w-4xl border-t border-zinc-100 pt-10 lg:pt-12">
+                    <h2 className="text-lg md:text-xl font-serif text-zinc-900 tracking-wide mb-6 font-medium">Premium Setting Specifications &amp; Assurances</h2>
 
                     <div className="flex flex-col border border-zinc-100 rounded-xl overflow-hidden bg-white shadow-sm">
                         
@@ -636,9 +636,9 @@ export default function SettingDetailClient({ setting }: { setting: any }) {
                 </div>
 
                 {/* ── Related Education Content ───────────────── */}
-                <div className="mt-16 lg:mt-24 border-t border-zinc-100 pt-12 lg:pt-16">
-                    <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-[#C9A14A] block mb-2">Education Guides</span>
-                    <h2 className="text-2xl font-serif text-zinc-900 tracking-wide mb-8">Zynora Luxe Ring Education</h2>
+                <div className="mt-16 lg:mt-24 border-t border-zinc-100 pt-10 lg:pt-12">
+                    <span className="text-[9px] font-bold uppercase tracking-[0.25em] text-[#C9A14A] block mb-1.5">Education Guides</span>
+                    <h2 className="text-lg md:text-xl font-serif text-zinc-900 tracking-wide mb-6 font-medium">Zynora Luxe Ring Education</h2>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         {ZYNORA_EDUCATION.map((edu, idx) => (
                             <Link key={idx} href={edu.link} className="group bg-zinc-50 p-6 rounded-xl border border-zinc-100 flex flex-col justify-between hover:bg-white hover:shadow-md hover:border-[#C9A14A]/25 transition-all duration-300">

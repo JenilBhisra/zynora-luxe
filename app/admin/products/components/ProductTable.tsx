@@ -177,7 +177,7 @@ export function ProductTable({ initialProducts, categories }: { initialProducts:
                 <button onClick={() => {
                     setIsAdding(!isAdding);
                     clearPendingMedia();
-                }} className="bg-[#111111] text-white border border-transparent px-6 py-3 rounded-none font-bold text-xs uppercase tracking-widest transition-all shadow-md hover:shadow-lg hover:-translate-y-1 hover:bg-gold/10">
+                }} className="bg-[#111111] text-white border border-transparent px-6 py-3 rounded-none font-bold text-xs uppercase tracking-widest transition-all shadow-md hover:shadow-lg hover:-translate-y-1 hover:bg-[#C9A14A] hover:text-white">
                     {isAdding ? "Cancel" : "+ Add Product"}
                 </button>
             </div>
@@ -308,7 +308,7 @@ export function ProductTable({ initialProducts, categories }: { initialProducts:
                     </div>
 
                     <div className="md:col-span-3 flex justify-end">
-                        <button type="submit" disabled={isUploading} className="bg-[#111111] text-white border border-transparent px-8 py-3 rounded-none font-bold uppercase tracking-widest text-xs disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg transition-all hover:bg-gold/10">
+                        <button type="submit" disabled={isUploading} className="bg-[#111111] text-white border border-transparent px-8 py-3 rounded-none font-bold uppercase tracking-widest text-xs disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg transition-all hover:bg-[#C9A14A] hover:text-white">
                             {isUploading ? "Uploading..." : "Save Product"}
                         </button>
                     </div>
@@ -326,7 +326,7 @@ export function ProductTable({ initialProducts, categories }: { initialProducts:
                             <th className="p-5 font-bold text-right">Actions</th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-white/5 text-[0.95rem]">
+                    <tbody className="divide-y divide-gray-100 text-[0.95rem]">
                         {products.length === 0 ? (
                             <tr><td colSpan={5} className="p-10 text-center text-gray-400 text-xs uppercase tracking-widest font-bold">No products found.</td></tr>
                         ) : products.map((product) => {
@@ -338,10 +338,10 @@ export function ProductTable({ initialProducts, categories }: { initialProducts:
                             const firstImage = parsedImages.find((src: string) => typeof src === "string" && !VIDEO_EXT_REGEX.test(src));
 
                             return (
-                                <tr key={product.id} className="hover:bg-gray-100 transition-colors">
+                                <tr key={product.id} className="hover:bg-gray-100/50 transition-colors">
                                     <td className="p-5">
                                         <div className="flex items-center gap-5">
-                                            <div className="w-14 h-14 bg-gray-50 rounded-none overflow-hidden flex items-center justify-center border border-gray-200 shrink-0 shadow-[0_4px_10px_rgba(0,0,0,0.2)]">
+                                            <div className="w-14 h-14 bg-gray-50 rounded-none overflow-hidden flex items-center justify-center border border-gray-200 shrink-0 shadow-[0_4px_10px_rgba(0,0,0,0.05)]">
                                                 {firstImage ? (
                                                     <Image src={firstImage} alt={product.name} width={56} height={56} className="w-full h-full object-cover" />
                                                 ) : parsedImages.length > 0 ? (
@@ -360,9 +360,9 @@ export function ProductTable({ initialProducts, categories }: { initialProducts:
                                         <span className="text-xs font-bold uppercase tracking-widest bg-gray-50 border border-gray-200 px-3 py-1.5 rounded-md text-gray-700">{product.category.name}</span>
                                     </td>
                                     <td className="p-5 font-bold font-body text-[#111111] tracking-wide">₹{product.price.toLocaleString("en-IN")}</td>
-                                    <td className="p-5 text-sm">{product.stockCount > 0 ? <span className="text-[#111111] font-bold uppercase tracking-widest text-[10px] bg-soft-cream/5 border border-soft-cream/10 px-3 py-1.5 rounded-full">{product.stockCount} In Stock</span> : <span className="text-gray-400 font-bold uppercase tracking-widest text-[10px] bg-gray-50 border border-gray-200 px-3 py-1.5 rounded-full">Out of Stock</span>}</td>
+                                    <td className="p-5 text-sm">{product.stockCount > 0 ? <span className="text-[#111111] font-bold uppercase tracking-widest text-[10px] bg-amber-50 border border-amber-100 px-3 py-1.5 rounded-full">{product.stockCount} In Stock</span> : <span className="text-gray-400 font-bold uppercase tracking-widest text-[10px] bg-gray-50 border border-gray-200 px-3 py-1.5 rounded-full">Out of Stock</span>}</td>
                                     <td className="p-5 text-right">
-                                        <button onClick={() => handleDelete(product.id)} className="text-[10px] uppercase font-bold tracking-widest text-gray-500 hover:text-white transition-colors bg-gray-50 hover:bg-gray-200 px-4 py-2 rounded-md border border-gray-200">Delete</button>
+                                        <button onClick={() => handleDelete(product.id)} className="text-[10px] uppercase font-bold tracking-widest text-gray-500 hover:text-red-600 hover:bg-red-50 hover:border-red-200 transition-colors bg-gray-50 px-4 py-2 rounded-md border border-gray-200">Delete</button>
                                     </td>
                                 </tr>
                             )

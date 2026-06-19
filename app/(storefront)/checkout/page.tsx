@@ -340,17 +340,17 @@ export default function CheckoutPage() {
 
     if (isCheckingAuth) {
         return (
-            <div className="min-h-[80vh] flex items-center justify-center bg-[#0B0B0C] text-white">
+            <div className="min-h-[80vh] flex items-center justify-center bg-white text-zinc-900">
                 <div className="text-center">
-                    <Loader2 className="mx-auto mb-4 h-10 w-10 animate-spin text-[#D6B25E]" />
-                    <p className="text-[10px] uppercase tracking-[0.28em] text-white/45">Loading checkout...</p>
+                    <Loader2 className="mx-auto mb-4 h-10 w-10 animate-spin text-[#C9A14A]" />
+                    <p className="text-[10px] uppercase tracking-[0.28em] text-zinc-400">Loading checkout...</p>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-[80vh] bg-[#0B0B0C] pb-24 pt-10 font-body text-white">
+        <div className="min-h-[80vh] bg-white pb-24 pt-10 font-body text-zinc-900">
             <Script
                 src="https://checkout.razorpay.com/v1/checkout.js"
                 strategy="lazyOnload"
@@ -361,20 +361,20 @@ export default function CheckoutPage() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-50 flex items-center justify-center bg-[#050505]/85 backdrop-blur-md"
+                        className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md"
                     >
                         <motion.div
                             initial={{ scale: 0.85, y: 18 }}
                             animate={{ scale: 1, y: 0 }}
-                            className="luxury-panel max-w-md rounded-[24px] border border-white/10 p-8 text-center shadow-2xl"
+                            className="luxury-panel max-w-md rounded-[24px] border border-zinc-200 bg-white p-8 text-center shadow-2xl"
                         >
-                            <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-full border border-[#D6B25E]/30 bg-[#D6B25E]/10">
-                                <PackageCheck className="h-10 w-10 text-[#D6B25E]" />
+                            <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-full border border-[#C9A14A]/30 bg-amber-50">
+                                <PackageCheck className="h-10 w-10 text-[#C9A14A]" />
                             </div>
-                            <h2 className="mb-3 text-2xl font-medium text-white">Order confirmed</h2>
-                            <p className="text-sm text-white/60">Your order is secured and being prepared now.</p>
+                            <h2 className="mb-3 text-2xl font-medium text-zinc-900">Order confirmed</h2>
+                            <p className="text-sm text-zinc-500">Your order is secured and being prepared now.</p>
                             {placedOrderId && (
-                                <p className="mt-5 text-[10px] uppercase tracking-[0.28em] text-white/40">
+                                <p className="mt-5 text-[10px] uppercase tracking-[0.28em] text-zinc-400">
                                     {placedOrderId}
                                 </p>
                             )}
@@ -385,21 +385,21 @@ export default function CheckoutPage() {
 
             <div className="container-custom">
                 <FadeIn>
-                    <span className="mb-4 block text-[10px] font-medium uppercase tracking-[0.34em] text-[#D6B25E] md:text-[11px]">
+                    <span className="mb-4 block text-[10px] font-medium uppercase tracking-[0.34em] text-[#C9A14A] md:text-[11px]">
                         Checkout
                     </span>
-                    <h1 className="mb-4 max-w-[760px] text-[40px] font-medium leading-[1.1] tracking-tight text-white md:text-[56px]">
+                    <h1 className="mb-4 max-w-[760px] text-[40px] font-medium leading-[1.1] tracking-tight text-zinc-900 md:text-[56px]">
                         Secure your jewelry purchase.
                     </h1>
-                    <p className="max-w-2xl text-sm text-white/55">
+                    <p className="max-w-2xl text-sm text-zinc-500">
                         Complete your details once. Your order, success page, and delivery tracking stay connected.
                     </p>
                 </FadeIn>
 
                 {items.length === 0 ? (
                     <FadeIn className="luxury-shell rounded-[24px] py-24 text-center">
-                        <h2 className="mb-4 text-3xl font-medium text-white">Your cart is empty</h2>
-                        <p className="mb-8 text-[15px] text-white/60">Add a piece to continue to checkout.</p>
+                        <h2 className="mb-4 text-3xl font-medium text-zinc-900">Your cart is empty</h2>
+                        <p className="mb-8 text-[15px] text-zinc-500">Add a piece to continue to checkout.</p>
                         <Link href="/shop">
                             <Button className="px-8 py-4 text-[14px] font-medium uppercase tracking-[0.1em]">
                                 Continue Shopping
@@ -410,7 +410,7 @@ export default function CheckoutPage() {
                     <div className="section-pad flex flex-col gap-12 lg:flex-row">
                         <div className="flex-[1.5]">
                             <FadeIn className="mb-10">
-                                <h3 className="mb-6 border-b border-white/10 pb-3 text-[18px] font-medium text-white">
+                                <h3 className="mb-6 border-b border-zinc-200 pb-3 text-[18px] font-medium text-zinc-900">
                                     1. Contact Details
                                 </h3>
                                 <div className="grid gap-5">
@@ -420,9 +420,9 @@ export default function CheckoutPage() {
                                             onChange={(event) => updateField("name", event.target.value)}
                                             type="text"
                                             placeholder="Full Name"
-                                            className="w-full border border-white/10 bg-white/5 p-4 text-[15px] text-white placeholder:text-white/35 focus:border-[#D6B25E] focus:outline-none"
+                                            className="w-full border border-zinc-200 bg-white p-4 text-[15px] text-zinc-900 placeholder:text-zinc-400 focus:border-[#C9A14A] focus:outline-none"
                                         />
-                                        {errors.name && <p className="mt-2 text-xs text-red-300">{errors.name}</p>}
+                                        {errors.name && <p className="mt-2 text-xs text-red-650">{errors.name}</p>}
                                     </div>
                                     <div>
                                         <input
@@ -430,9 +430,9 @@ export default function CheckoutPage() {
                                             onChange={(event) => updateField("email", event.target.value)}
                                             type="email"
                                             placeholder="Email Address"
-                                            className="w-full border border-white/10 bg-white/5 p-4 text-[15px] text-white placeholder:text-white/35 focus:border-[#D6B25E] focus:outline-none"
+                                            className="w-full border border-zinc-200 bg-white p-4 text-[15px] text-zinc-900 placeholder:text-zinc-400 focus:border-[#C9A14A] focus:outline-none"
                                         />
-                                        {errors.email && <p className="mt-2 text-xs text-red-300">{errors.email}</p>}
+                                        {errors.email && <p className="mt-2 text-xs text-red-650">{errors.email}</p>}
                                     </div>
                                     <div>
                                         <input
@@ -440,15 +440,15 @@ export default function CheckoutPage() {
                                             onChange={(event) => updateField("phone", event.target.value)}
                                             type="tel"
                                             placeholder="Phone Number"
-                                            className="w-full border border-white/10 bg-white/5 p-4 text-[15px] text-white placeholder:text-white/35 focus:border-[#D6B25E] focus:outline-none"
+                                            className="w-full border border-zinc-200 bg-white p-4 text-[15px] text-zinc-900 placeholder:text-zinc-400 focus:border-[#C9A14A] focus:outline-none"
                                         />
-                                        {errors.phone && <p className="mt-2 text-xs text-red-300">{errors.phone}</p>}
+                                        {errors.phone && <p className="mt-2 text-xs text-red-650">{errors.phone}</p>}
                                     </div>
                                 </div>
                             </FadeIn>
 
                             <FadeIn delay={0.1} className="mb-10">
-                                <h3 className="mb-6 border-b border-white/10 pb-3 text-[18px] font-medium text-white">
+                                <h3 className="mb-6 border-b border-zinc-200 pb-3 text-[18px] font-medium text-zinc-900">
                                     2. Shipping Address
                                 </h3>
                                 <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
@@ -458,9 +458,9 @@ export default function CheckoutPage() {
                                             onChange={(event) => updateField("address", event.target.value)}
                                             type="text"
                                             placeholder="Street Address"
-                                            className="w-full border border-white/10 bg-white/5 p-4 text-[15px] text-white placeholder:text-white/35 focus:border-[#D6B25E] focus:outline-none"
+                                            className="w-full border border-zinc-200 bg-white p-4 text-[15px] text-zinc-900 placeholder:text-zinc-400 focus:border-[#C9A14A] focus:outline-none"
                                         />
-                                        {errors.address && <p className="mt-2 text-xs text-red-300">{errors.address}</p>}
+                                        {errors.address && <p className="mt-2 text-xs text-red-650">{errors.address}</p>}
                                     </div>
                                     <div>
                                         <input
@@ -468,15 +468,15 @@ export default function CheckoutPage() {
                                             onChange={(event) => updateField("city", event.target.value)}
                                             type="text"
                                             placeholder="City"
-                                            className="w-full border border-white/10 bg-white/5 p-4 text-[15px] text-white placeholder:text-white/35 focus:border-[#D6B25E] focus:outline-none"
+                                            className="w-full border border-zinc-200 bg-white p-4 text-[15px] text-zinc-900 placeholder:text-zinc-400 focus:border-[#C9A14A] focus:outline-none"
                                         />
-                                        {errors.city && <p className="mt-2 text-xs text-red-300">{errors.city}</p>}
+                                        {errors.city && <p className="mt-2 text-xs text-red-650">{errors.city}</p>}
                                     </div>
                                     <div>
                                         <select
                                             value={formData.state}
                                             onChange={(event) => updateField("state", event.target.value)}
-                                            className="w-full border border-white/10 bg-white/5 p-4 text-[15px] text-white focus:border-[#D6B25E] focus:outline-none"
+                                            className="w-full border border-zinc-200 bg-white p-4 text-[15px] text-zinc-900 focus:border-[#C9A14A] focus:outline-none"
                                         >
                                             <option value="Gujarat">Gujarat</option>
                                             <option value="Maharashtra">Maharashtra</option>
@@ -490,32 +490,32 @@ export default function CheckoutPage() {
                                             onChange={(event) => updateField("pincode", event.target.value)}
                                             type="text"
                                             placeholder="PIN Code"
-                                            className="w-full border border-white/10 bg-white/5 p-4 text-[15px] text-white placeholder:text-white/35 focus:border-[#D6B25E] focus:outline-none"
+                                            className="w-full border border-zinc-200 bg-white p-4 text-[15px] text-zinc-900 placeholder:text-zinc-400 focus:border-[#C9A14A] focus:outline-none"
                                         />
-                                        {errors.pincode && <p className="mt-2 text-xs text-red-300">{errors.pincode}</p>}
+                                        {errors.pincode && <p className="mt-2 text-xs text-red-650">{errors.pincode}</p>}
                                     </div>
                                 </div>
                             </FadeIn>
 
                             <FadeIn delay={0.2} className="mb-10">
-                                <h3 className="mb-6 border-b border-white/10 pb-3 text-[18px] font-medium text-white">
+                                <h3 className="mb-6 border-b border-zinc-200 pb-3 text-[18px] font-medium text-zinc-900">
                                     3. Payment Method
                                 </h3>
-                                <div className="luxury-panel flex flex-col gap-6 rounded-[18px] p-6">
-                                    <div className="flex flex-col gap-2 border-b border-white/5 pb-4">
+                                <div className="luxury-panel flex flex-col gap-6 rounded-[18px] p-6 bg-zinc-50 border border-zinc-200 shadow-sm">
+                                    <div className="flex flex-col gap-2 border-b border-zinc-200 pb-4">
                                         <label className="flex cursor-pointer items-center gap-3">
                                             <input
                                                 type="radio"
                                                 name="payment"
                                                 checked={formData.paymentMethod === "Razorpay"}
                                                 onChange={() => updateField("paymentMethod", "Razorpay")}
-                                                className="h-4 w-4 accent-[#D6B25E]"
+                                                className="h-4 w-4 accent-[#C9A14A]"
                                             />
-                                            <span className="text-[15px] font-medium text-white flex items-center gap-2">
-                                                Razorpay <span className="text-[10px] bg-[#D6B25E]/10 text-[#D6B25E] px-2 py-0.5 rounded font-bold uppercase tracking-wider">Test Mode</span>
+                                            <span className="text-[15px] font-medium text-zinc-900 flex items-center gap-2">
+                                                Razorpay <span className="text-[10px] bg-amber-50 border border-amber-200 text-[#C9A14A] px-2 py-0.5 rounded font-bold uppercase tracking-wider">Test Mode</span>
                                             </span>
                                         </label>
-                                        <p className="ml-7 text-[13px] text-white/60">
+                                        <p className="ml-7 text-[13px] text-zinc-500">
                                             Pay securely via Cards, UPI, Netbanking, or Wallets.
                                         </p>
                                     </div>
@@ -526,35 +526,35 @@ export default function CheckoutPage() {
                                                 name="payment"
                                                 checked={formData.paymentMethod === "Mock Payment"}
                                                 onChange={() => updateField("paymentMethod", "Mock Payment")}
-                                                className="h-4 w-4 accent-[#D6B25E]"
+                                                className="h-4 w-4 accent-[#C9A14A]"
                                             />
-                                            <span className="text-[15px] font-medium text-white">Mock Payment</span>
+                                            <span className="text-[15px] font-medium text-zinc-900">Mock Payment</span>
                                         </label>
-                                        <p className="ml-7 text-[13px] text-white/60">
+                                        <p className="ml-7 text-[13px] text-zinc-500">
                                             Secure test mode. No external gateway is used for this flow.
                                         </p>
                                     </div>
-                                    {errors.paymentMethod && <p className="text-xs text-red-300">{errors.paymentMethod}</p>}
+                                    {errors.paymentMethod && <p className="text-xs text-red-650">{errors.paymentMethod}</p>}
                                 </div>
                             </FadeIn>
 
                             {submitError && (
-                                <div className="rounded-[16px] border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+                                <div className="rounded-[16px] border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
                                     {submitError}
                                 </div>
                             )}
                         </div>
 
                         <div className="flex-1">
-                            <FadeIn delay={0.3} className="sticky top-28 rounded-[22px] border border-white/10 p-8 luxury-panel">
-                                <h3 className="mb-8 text-center text-[14px] font-medium uppercase tracking-[0.24em] text-white">
+                            <FadeIn delay={0.3} className="sticky top-28 rounded-[22px] border border-zinc-200 p-8 bg-zinc-50 shadow-sm">
+                                <h3 className="mb-8 text-center text-[14px] font-medium uppercase tracking-[0.24em] text-zinc-900 border-b border-zinc-200 pb-4">
                                     Order Summary
                                 </h3>
 
                                 <div className="mb-8 max-h-[40vh] space-y-6 overflow-y-auto pr-2 custom-scrollbar">
                                     {items.map((item) => (
                                         <div key={item.id} className="flex gap-4">
-                                            <div className="relative h-[80px] w-[80px] shrink-0 overflow-hidden rounded-[14px] bg-black/20">
+                                            <div className="relative h-[80px] w-[80px] shrink-0 overflow-hidden rounded-[14px] bg-white border border-zinc-200 shadow-sm">
                                                 <SmartImage
                                                     src={item.image || ""}
                                                     alt={item.name}
@@ -562,15 +562,15 @@ export default function CheckoutPage() {
                                                     fallbackType={item.isCustomRing ? "setting" : "jewelry"}
                                                     className="object-cover p-2"
                                                 />
-                                                <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-[#D6B25E] text-[10px] font-bold text-[#0B0B0C]">
+                                                <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-[#C9A14A] text-[10px] font-bold text-white">
                                                     {item.quantity}
                                                 </span>
                                             </div>
                                             <div className="flex flex-1 flex-col justify-center">
-                                                <h4 className="line-clamp-2 text-[14px] font-medium leading-snug text-white">
+                                                <h4 className="line-clamp-2 text-[14px] font-medium leading-snug text-zinc-900">
                                                     {item.name}
                                                 </h4>
-                                                <p className="mt-2 text-[14px] font-normal text-white/60">
+                                                <p className="mt-2 text-[14px] font-normal text-[#C9A14A]">
                                                     ₹{item.price.toLocaleString("en-IN")}
                                                 </p>
                                             </div>
@@ -578,24 +578,24 @@ export default function CheckoutPage() {
                                     ))}
                                 </div>
 
-                                <div className="mb-6 space-y-4 border-y border-white/10 py-6">
-                                    <div className="flex justify-between text-[14px] font-normal text-white/60">
+                                <div className="mb-6 space-y-4 border-y border-zinc-200 py-6">
+                                    <div className="flex justify-between text-[14px] font-normal text-zinc-500">
                                         <span>Subtotal ({cartCount} items)</span>
-                                        <span>₹{subtotal.toLocaleString("en-IN")}</span>
+                                        <span className="text-zinc-900">₹{subtotal.toLocaleString("en-IN")}</span>
                                     </div>
-                                    <div className="flex justify-between text-[14px] font-normal text-white/60">
+                                    <div className="flex justify-between text-[14px] font-normal text-zinc-500">
                                         <span>{hasCustomItem ? "Estimated GST" : "GST (18%)"}</span>
-                                        <span>₹{gstAmount.toLocaleString("en-IN")}</span>
+                                        <span className="text-zinc-900">₹{gstAmount.toLocaleString("en-IN")}</span>
                                     </div>
-                                    <div className="flex justify-between text-[14px] font-normal text-white/60">
+                                    <div className="flex justify-between text-[14px] font-normal text-zinc-500">
                                         <span>Delivery Window</span>
-                                        <span>{hasCustomItem ? "3-4 weeks" : "7-10 days"}</span>
+                                        <span className="text-zinc-900">{hasCustomItem ? "3-4 weeks" : "7-10 days"}</span>
                                     </div>
                                 </div>
 
-                                <div className="mb-8 flex items-end justify-between border-b border-white/10 pb-6">
-                                    <span className="text-[14px] font-medium uppercase tracking-[0.24em] text-white">Total</span>
-                                    <span className="text-[20px] font-medium text-white">
+                                <div className="mb-8 flex items-end justify-between border-b border-zinc-200 pb-6">
+                                    <span className="text-[14px] font-medium uppercase tracking-[0.24em] text-zinc-900">Total</span>
+                                    <span className="text-[20px] font-semibold text-[#C9A14A]">
                                         ₹{total.toLocaleString("en-IN")}
                                     </span>
                                 </div>
@@ -626,12 +626,12 @@ export default function CheckoutPage() {
                                     )}
                                 </Button>
 
-                                <div className="flex items-center justify-center gap-2 text-xs text-white/45">
+                                <div className="flex items-center justify-center gap-2 text-xs text-zinc-400">
                                     <ShieldCheck size={14} />
                                     <span>Authenticated checkout with local order persistence</span>
                                 </div>
 
-                                <div className="mt-6 rounded-[18px] border border-[#D6B25E]/20 bg-[#D6B25E]/8 p-4 text-center text-[12px] text-white/70">
+                                <div className="mt-6 rounded-[18px] border border-[#C9A14A]/25 bg-amber-50 p-4 text-center text-[12px] text-zinc-650">
                                     Estimated delivery: {new Date(estimatedDeliveryDate).toLocaleDateString("en-IN", {
                                         day: "numeric",
                                         month: "long",
@@ -639,7 +639,7 @@ export default function CheckoutPage() {
                                     })}
                                 </div>
 
-                                <div className="mt-4 flex items-center justify-center gap-2 text-[10px] uppercase tracking-[0.24em] text-white/35">
+                                <div className="mt-4 flex items-center justify-center gap-2 text-[10px] uppercase tracking-[0.24em] text-zinc-400">
                                     <Sparkles size={12} />
                                     Luxury checkout experience
                                 </div>

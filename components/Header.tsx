@@ -26,6 +26,14 @@ export function Header() {
     const { cartCount } = useCart();
     const pathname = usePathname();
     const { user } = useAuth();
+    
+    const [isCustomizerMode, setIsCustomizerMode] = useState(false);
+    useEffect(() => {
+        setIsCustomizerMode(
+            (typeof window !== "undefined" && window.location.search.includes("mode=customizer")) || 
+            (pathname?.startsWith("/customizer") ?? false)
+        );
+    }, [pathname]);
 
     const isAdmin = user && user.email?.toLowerCase() === "krishnadiamond404@gmail.com";
 
@@ -171,8 +179,8 @@ export function Header() {
                         <div className="flex justify-center items-center gap-8 py-3.5 border-t border-[#EAEAEA] w-full">
                             {NAV_ITEMS.map((item) => {
                                 const isActive = item.href === "/customizer/step-1-diamond"
-                                    ? pathname.startsWith("/customizer")
-                                    : pathname === item.href || pathname.startsWith(item.href + "/");
+                                    ? isCustomizerMode
+                                    : !isCustomizerMode && (pathname === item.href || pathname.startsWith(item.href + "/"));
 
                                 return (
                                     <Link
@@ -306,8 +314,8 @@ export function Header() {
                             <div className="flex-1 flex flex-col py-6">
                                 {NAV_ITEMS.map((item, i) => {
                                     const isActive = item.href === "/customizer/step-1-diamond"
-                                        ? pathname.startsWith("/customizer")
-                                        : pathname === item.href;
+                                        ? isCustomizerMode
+                                        : !isCustomizerMode && (pathname === item.href || pathname.startsWith(item.href + "/"));
 
                                     return (
                                         <motion.div

@@ -39,13 +39,13 @@ export default async function ShopCategoryPage() {
     const categoriesWithProducts = await Promise.all(categoryPromises);
 
     return (
-        <div className="min-h-screen pb-24 bg-[#0B0B0C] text-white">
-            <AnimatedSection className="pt-20 pb-2 md:pt-24 md:pb-4 bg-[#0B0B0C]">
+        <div className="min-h-screen pb-24 bg-white text-zinc-900">
+            <AnimatedSection className="pt-20 pb-8 md:pt-24 md:pb-12 bg-[#FAF8F4] border-b border-zinc-100">
                 <div className="container-custom">
                     <div className="max-w-[720px] text-center mx-auto">
-                        <span className="text-[9px] md:text-[10px] tracking-[0.34em] font-medium text-[#D6B25E] uppercase mb-2 block">Collections</span>
-                        <h1 className="mb-2 text-2xl md:text-3xl text-white">Discover the Signatures</h1>
-                        <p className="text-white/70 font-normal text-[13px] md:text-[14px] leading-relaxed">
+                        <span className="text-[9px] md:text-[10px] tracking-[0.34em] font-medium text-[#C9A14A] uppercase mb-3 block">Collections</span>
+                        <h1 className="mb-3 text-2xl md:text-3xl text-zinc-900 font-serif font-medium">Discover the Signatures</h1>
+                        <p className="text-zinc-500 font-normal text-[13px] md:text-[14px] leading-relaxed">
                             Explore our meticulously curated categories, featuring unparalleled craftsmanship and ethically sourced diamonds.
                         </p>
                     </div>
@@ -72,9 +72,9 @@ export default async function ShopCategoryPage() {
                                     <div className="absolute inset-0 bg-gradient-to-t from-[#0B0B0C]/90 via-[#0B0B0C]/20 to-transparent transition-opacity duration-700 opacity-90 group-hover:opacity-100" />
                                     
                                     <div className="absolute bottom-0 left-0 w-full p-8 flex flex-col items-center text-center transform transition-transform duration-700 translate-y-4 group-hover:translate-y-0">
-                                        <h3 className="text-3xl md:text-4xl font-heading text-white mb-3 group-hover:text-[#D6B25E] transition-colors duration-500">{cat.name}</h3>
+                                        <h3 className="text-3xl md:text-4xl font-heading text-white mb-3 group-hover:text-[#C9A14A] transition-colors duration-500">{cat.name}</h3>
                                         <span className="text-[10px] uppercase tracking-[0.3em] font-bold text-white/60 group-hover:text-white/90 transition-colors flex items-center gap-2">
-                                            Explore <span className="text-[#D6B25E]">→</span>
+                                            Explore <span className="text-[#C9A14A]">→</span>
                                         </span>
                                     </div>
                                 </Link>

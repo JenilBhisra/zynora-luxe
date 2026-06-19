@@ -29,7 +29,7 @@ export default async function AdminSettingsPage() {
         <div>
             <header className="mb-10 flex justify-between items-end">
                 <div>
-                    <h1 className="text-4xl font-heading text-white mb-3 tracking-wide">Ring Settings</h1>
+                    <h1 className="text-4xl font-heading text-zinc-900 mb-3 tracking-wide">Ring Settings</h1>
                     <p className="text-gray-500 text-[0.95rem] tracking-wide font-light">Manage base mountings available in the Customizer.</p>
                 </div>
             </header>

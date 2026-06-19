@@ -43,7 +43,7 @@ export function CustomizerProgressBar({ currentStep }: CustomizerProgressBarProp
     ];
 
     return (
-        <div className="w-full bg-[#FAF8F4] border-b border-zinc-100 py-3.5 px-4 sticky top-14 z-40 shadow-sm">
+        <div className="w-full bg-[#FAF8F4] border-b border-zinc-100 py-3 px-4 sticky top-16 lg:top-[120px] z-40 shadow-sm transition-all duration-300">
             <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
                 {/* Active Selection Summary */}
                 <div className="flex items-center gap-3 text-[11px] text-zinc-500 font-medium tracking-wide">
@@ -77,7 +77,7 @@ export function CustomizerProgressBar({ currentStep }: CustomizerProgressBarProp
                                 <div
                                     className={`w-5.5 h-5.5 rounded-full flex items-center justify-center text-[9px] font-bold transition-all duration-300 ${
                                         step.isActive
-                                            ? "bg-[#C9A14A] text-white shadow-sm"
+                                            ? "bg-[#C9A14A] text-[#0B0B0C] shadow-sm"
                                             : step.isCompleted
                                             ? "bg-zinc-900 text-white"
                                             : "border border-zinc-200 text-zinc-400 bg-white"

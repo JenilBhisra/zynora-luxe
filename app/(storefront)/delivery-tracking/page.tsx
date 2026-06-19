@@ -89,10 +89,10 @@ function DeliveryTrackingContent() {
 
     if (isLoadingOrder) {
         return (
-            <div className="flex min-h-[80vh] items-center justify-center bg-[#0B0B0C] text-white">
+            <div className="flex min-h-[80vh] items-center justify-center bg-white text-zinc-900">
                 <div className="text-center">
-                    <Loader2 className="mx-auto mb-4 h-10 w-10 animate-spin text-[#D6B25E]" />
-                    <p className="text-[10px] uppercase tracking-[0.28em] text-white/45">Loading tracking...</p>
+                    <Loader2 className="mx-auto mb-4 h-10 w-10 animate-spin text-[#C9A14A]" />
+                    <p className="text-[10px] uppercase tracking-[0.28em] text-zinc-400">Loading tracking...</p>
                 </div>
             </div>
         );
@@ -100,12 +100,12 @@ function DeliveryTrackingContent() {
 
     if (!order) {
         return (
-            <div className="flex min-h-[80vh] items-center justify-center bg-[#0B0B0C] px-4 text-white">
-                <div className="w-full max-w-md rounded-[20px] border border-white/10 bg-white/5 p-8 text-center">
-                    <p className="mb-3 text-[10px] uppercase tracking-[0.28em] text-white/45">Tracking unavailable</p>
-                    <h2 className="mb-4 text-2xl font-heading">No order found to track.</h2>
+            <div className="flex min-h-[80vh] items-center justify-center bg-white px-4 text-zinc-900">
+                <div className="w-full max-w-md rounded-[20px] border border-zinc-200 bg-zinc-50 p-8 text-center shadow-sm">
+                    <p className="mb-3 text-[10px] uppercase tracking-[0.28em] text-zinc-400">Tracking unavailable</p>
+                    <h2 className="mb-4 text-2xl font-heading text-zinc-900">No order found to track.</h2>
                     <Link href="/shop">
-                        <Button className="w-full bg-[#D6B25E] text-[#111] hover:bg-[#e4c676]">Continue Shopping</Button>
+                        <Button className="w-full bg-[#C9A14A] text-white hover:bg-[#B58F3B]">Continue Shopping</Button>
                     </Link>
                 </div>
             </div>
@@ -115,41 +115,41 @@ function DeliveryTrackingContent() {
     const progressPercent = (currentStep / (TRACKING_STEPS.length - 1)) * 100;
 
     return (
-        <div className="min-h-[80vh] bg-[#0B0B0C] pb-24 pt-10 font-body text-white">
+        <div className="min-h-[80vh] bg-white pb-24 pt-10 font-body text-zinc-900">
             <div className="container-custom max-w-5xl">
                 <FadeIn>
-                    <span className="mb-4 block text-[10px] font-medium uppercase tracking-[0.34em] text-[#D6B25E] md:text-[11px]">
+                    <span className="mb-4 block text-[10px] font-medium uppercase tracking-[0.34em] text-[#C9A14A] md:text-[11px]">
                         Delivery Tracking
                     </span>
-                    <h1 className="mb-4 max-w-[760px] text-[40px] font-medium leading-[1.1] tracking-tight text-white md:text-[56px]">
+                    <h1 className="mb-4 max-w-[760px] text-[40px] font-medium leading-[1.1] tracking-tight text-zinc-900 md:text-[56px]">
                         Follow your order journey.
                     </h1>
-                    <p className="max-w-2xl text-sm text-white/55">
+                    <p className="max-w-2xl text-sm text-zinc-500">
                         Order {order.orderId} is currently {TRACKING_STEPS[currentStep]}.
                     </p>
                 </FadeIn>
 
                 <div className="mt-12 grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
                     <FadeIn>
-                        <div className="luxury-panel rounded-[24px] border border-white/10 p-6 md:p-8">
-                            <div className="mb-8 flex items-center justify-between gap-4 border-b border-white/10 pb-5">
+                        <div className="luxury-panel rounded-[24px] border border-zinc-200 bg-zinc-50/50 p-6 md:p-8 shadow-sm">
+                            <div className="mb-8 flex items-center justify-between gap-4 border-b border-zinc-200 pb-5">
                                 <div>
-                                    <p className="text-[10px] uppercase tracking-[0.24em] text-white/40">Order ID</p>
-                                    <p className="mt-1 font-mono text-lg font-semibold tracking-wider text-white">
+                                    <p className="text-[10px] uppercase tracking-[0.24em] text-zinc-400">Order ID</p>
+                                    <p className="mt-1 font-mono text-lg font-semibold tracking-wider text-zinc-900">
                                         {order.orderId}
                                     </p>
                                 </div>
-                                <div className="rounded-full border border-[#D6B25E]/20 bg-[#D6B25E]/10 px-4 py-2 text-[10px] uppercase tracking-[0.24em] text-[#D6B25E]">
+                                <div className="rounded-full border border-[#C9A14A]/20 bg-amber-50 px-4 py-2 text-[10px] uppercase tracking-[0.24em] text-[#C9A14A]">
                                     {TRACKING_STEPS[currentStep]}
                                 </div>
                             </div>
 
                             <div className="relative mb-8">
-                                <div className="absolute left-4 right-4 top-6 h-px bg-white/10" />
+                                <div className="absolute left-4 right-4 top-6 h-px bg-zinc-200" />
                                 <motion.div
                                     initial={{ width: 0 }}
                                     animate={{ width: `${progressPercent}%` }}
-                                    className="absolute left-4 top-6 h-[2px] bg-[#D6B25E]"
+                                    className="absolute left-4 top-6 h-[2px] bg-[#C9A14A]"
                                 />
                                 <div className="relative flex items-start justify-between gap-2">
                                     {TRACKING_STEPS.map((step, index) => {
@@ -157,7 +157,7 @@ function DeliveryTrackingContent() {
                                         return (
                                             <div key={step} className="flex flex-1 flex-col items-center text-center">
                                                 <div
-                                                    className={`mb-3 flex h-11 w-11 items-center justify-center rounded-full border transition-colors ${completed ? "border-[#D6B25E] bg-[#D6B25E] text-[#0B0B0C]" : "border-white/10 bg-[#111] text-white/35"}`}
+                                                    className={`mb-3 flex h-11 w-11 items-center justify-center rounded-full border transition-colors ${completed ? "border-[#C9A14A] bg-[#C9A14A] text-white" : "border-zinc-200 bg-white text-zinc-400"}`}
                                                 >
                                                     {index === TRACKING_STEPS.length - 1 ? (
                                                         <CheckCircle2 size={16} />
@@ -165,7 +165,7 @@ function DeliveryTrackingContent() {
                                                         <Package size={16} />
                                                     )}
                                                 </div>
-                                                <p className={`text-[10px] uppercase tracking-[0.24em] ${completed ? "text-white" : "text-white/35"}`}>
+                                                <p className={`text-[10px] uppercase tracking-[0.24em] ${completed ? "text-zinc-900 font-medium" : "text-zinc-400"}`}>
                                                     {step}
                                                 </p>
                                             </div>
@@ -175,13 +175,13 @@ function DeliveryTrackingContent() {
                             </div>
 
                             <div className="grid gap-4 md:grid-cols-2">
-                                <div className="rounded-[18px] border border-white/10 bg-white/5 p-4">
-                                    <p className="text-[10px] uppercase tracking-[0.24em] text-white/40">Estimated Delivery</p>
-                                    <p className="mt-2 text-lg font-medium text-white">{deliveryDate || "To be updated"}</p>
+                                <div className="rounded-[18px] border border-zinc-200 bg-white p-4">
+                                    <p className="text-[10px] uppercase tracking-[0.24em] text-zinc-400">Estimated Delivery</p>
+                                    <p className="mt-2 text-lg font-medium text-zinc-900">{deliveryDate || "To be updated"}</p>
                                 </div>
-                                <div className="rounded-[18px] border border-white/10 bg-white/5 p-4">
-                                    <p className="text-[10px] uppercase tracking-[0.24em] text-white/40">Current Status</p>
-                                    <p className="mt-2 text-lg font-medium text-white">{TRACKING_STEPS[currentStep]}</p>
+                                <div className="rounded-[18px] border border-zinc-200 bg-white p-4">
+                                    <p className="text-[10px] uppercase tracking-[0.24em] text-zinc-400">Current Status</p>
+                                    <p className="mt-2 text-lg font-medium text-zinc-900">{TRACKING_STEPS[currentStep]}</p>
                                 </div>
                             </div>
                         </div>
@@ -189,10 +189,10 @@ function DeliveryTrackingContent() {
 
                     <div className="space-y-6">
                         <FadeIn delay={0.05}>
-                            <div className="rounded-[24px] border border-white/10 bg-white/5 p-6">
-                                <h3 className="mb-4 text-sm uppercase tracking-[0.24em] text-white/45">Delivery Address</h3>
-                                <div className="space-y-3 text-sm text-white/70">
-                                    <p className="font-medium text-white">{order.customer?.name || "Customer"}</p>
+                            <div className="rounded-[24px] border border-zinc-200 bg-zinc-50 p-6 shadow-sm">
+                                <h3 className="mb-4 text-sm uppercase tracking-[0.24em] text-zinc-400">Delivery Address</h3>
+                                <div className="space-y-3 text-sm text-zinc-600">
+                                    <p className="font-medium text-zinc-900">{order.customer?.name || "Customer"}</p>
                                     <p>{order.shippingAddress?.address || "Address unavailable"}</p>
                                     <p>
                                         {(order.shippingAddress?.city || "City")} - {(order.shippingAddress?.pincode || "PIN")}
@@ -203,16 +203,16 @@ function DeliveryTrackingContent() {
                         </FadeIn>
 
                         <FadeIn delay={0.1}>
-                            <div className="rounded-[24px] border border-white/10 bg-[#111] p-6">
-                                <div className="mb-4 flex items-center gap-3 text-[#D6B25E]">
+                            <div className="rounded-[24px] border border-zinc-200 bg-zinc-50 p-6 shadow-sm">
+                                <div className="mb-4 flex items-center gap-3 text-[#C9A14A]">
                                     <MapPin size={18} />
                                     <span className="text-[10px] font-bold uppercase tracking-[0.24em]">Live mock tracking</span>
                                 </div>
-                                <p className="text-sm text-white/65">
+                                <p className="text-sm text-zinc-650">
                                     The timeline advances automatically to simulate shipping updates for this order.
                                 </p>
                                 <Link href={`/order-success?orderId=${encodeURIComponent(order.orderId)}`}>
-                                    <Button className="mt-6 w-full gap-2 bg-[#D6B25E] text-[#111] hover:bg-[#e4c676]">
+                                    <Button className="mt-6 w-full gap-2 bg-[#C9A14A] text-white hover:bg-[#B58F3B]">
                                         Back to Order Details
                                     </Button>
                                 </Link>

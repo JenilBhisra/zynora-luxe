@@ -395,7 +395,7 @@ export function SettingsTable({ initialSettings }: { initialSettings: any[] }) {
     return (
         <div className="space-y-6">
             <div className="flex justify-end">
-                <button onClick={openCreateModal} className="bg-[#111111] text-white border border-transparent px-6 py-3 rounded-none font-bold uppercase tracking-widest text-xs transition-all shadow-md hover:shadow-lg hover:-translate-y-1 hover:bg-gold/10">
+                <button onClick={openCreateModal} className="bg-[#111111] text-white border border-transparent px-6 py-3 rounded-none font-bold uppercase tracking-widest text-xs transition-all shadow-md hover:shadow-lg hover:-translate-y-1 hover:bg-[#C9A14A] hover:text-white">
                     + Add Setting
                 </button>
             </div>
@@ -404,7 +404,7 @@ export function SettingsTable({ initialSettings }: { initialSettings: any[] }) {
                 <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-gray-50/80 backdrop-blur-md p-4">
                     <div className="bg-white border border-gray-200 rounded-none shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] w-full max-w-2xl max-h-[90vh] overflow-y-auto flex flex-col animate-in zoom-in-95 duration-300">
                         <div className="flex items-center justify-between px-8 py-6 border-b border-gray-100">
-                            <h3 className="text-2xl font-heading tracking-wide" style={{ color: "#D6B25E" }}>
+                            <h3 className="text-2xl font-heading tracking-wide" style={{ color: "#C9A14A" }}>
                                 {editingSetting ? "Edit Ring Setting" : "New Ring Setting Design"}
                             </h3>
                             <button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-[#111111] hover:bg-gray-100 p-2 rounded-full transition-all">
@@ -434,7 +434,7 @@ export function SettingsTable({ initialSettings }: { initialSettings: any[] }) {
                                             <label key={shape} className="flex items-center gap-2 cursor-pointer bg-gray-50 border border-gray-200 px-4 py-2 rounded-none hover:bg-gray-100 transition-colors">
                                                 <input 
                                                     type="checkbox" 
-                                                    className="accent-[#D6B25E] w-4 h-4"
+                                                    className="accent-[#C9A14A] w-4 h-4"
                                                     checked={supportedShapes.includes(shape)}
                                                     onChange={(e) => {
                                                         if (e.target.checked) {
@@ -588,7 +588,7 @@ export function SettingsTable({ initialSettings }: { initialSettings: any[] }) {
                             </div>
                             <div className="flex justify-end gap-4 pt-6 border-t border-gray-100">
                                 <button type="button" onClick={() => setIsModalOpen(false)} className="px-6 py-3 rounded-none font-bold uppercase tracking-widest text-xs text-gray-600 hover:bg-gray-100 hover:text-[#111111] transition-colors" disabled={isUploading}>Cancel</button>
-                                <button type="submit" className="bg-[#111111] text-white border border-transparent px-8 py-3 rounded-none font-bold uppercase tracking-widest text-xs shadow-md hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed transform hover:-translate-y-0.5 hover:bg-gold/10" disabled={isUploading}>
+                                <button type="submit" className="bg-[#111111] text-white border border-transparent px-8 py-3 rounded-none font-bold uppercase tracking-widest text-xs shadow-md hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed transform hover:-translate-y-0.5 hover:bg-[#C9A14A] hover:text-white" disabled={isUploading}>
                                     {isUploading ? "Uploading..." : (editingSetting ? "Save Changes" : "Save Setting")}
                                 </button>
                             </div>

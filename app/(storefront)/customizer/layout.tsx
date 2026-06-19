@@ -51,20 +51,20 @@ export default function CustomizerLayout({
     };
 
     return (
-        <main className="min-h-screen pb-16 md:pb-24 pt-8 md:pt-12 text-white font-body transition-colors duration-1000">
-            <Toaster position="top-center" richColors theme="dark" />
+        <main className="min-h-screen pb-16 md:pb-24 pt-8 md:pt-12 text-zinc-900 bg-white font-body">
+            <Toaster position="top-center" richColors theme="light" />
 
             {/* Header & Progress Bar — hidden on setting detail pages */}
             {!isDetailPage && (
                 <div className="max-w-5xl mx-auto px-4 md:px-5 mb-8 md:mb-14">
                     <div className="text-center mb-6 md:mb-10">
-                        <p className="text-[9px] font-bold uppercase tracking-[0.3em] text-[#D6B25E] mb-3">
+                        <p className="text-[9px] font-bold uppercase tracking-[0.3em] text-[#C9A14A] mb-3">
                             Custom Ring Builder
                         </p>
-                        <h1 className="text-2xl md:text-[32px] font-medium text-white mb-3 tracking-wide">
+                        <h1 className="text-xl md:text-2xl font-medium text-zinc-900 mb-2 tracking-wide font-serif">
                             Design your perfect ring
                         </h1>
-                        <p className="text-white/40 uppercase tracking-[0.2em] text-[9px] md:text-[10px]">
+                        <p className="text-zinc-500 uppercase tracking-[0.2em] text-[9px] md:text-[10px]">
                             Follow the 3 steps to create your masterpiece
                         </p>
                     </div>
@@ -72,10 +72,10 @@ export default function CustomizerLayout({
                     {/* Progress Bar */}
                     <div className="relative flex justify-between items-center max-w-3xl mx-auto">
                         {/* Background line */}
-                        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-[1px] bg-white/10 -z-10" />
+                        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-[1px] bg-zinc-200 -z-10" />
                         {/* Active line */}
                         <div
-                            className="absolute left-0 top-1/2 -translate-y-1/2 h-[2px] bg-[#D6B25E] -z-10 transition-all duration-700"
+                            className="absolute left-0 top-1/2 -translate-y-1/2 h-[2px] bg-[#C9A14A] -z-10 transition-all duration-700"
                             style={{ width: `${(Math.max(0, currentStepIndex) / (steps.length - 1)) * 100}%` }}
                         />
 
@@ -94,19 +94,19 @@ export default function CustomizerLayout({
                                 >
                                     <div className={`w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center text-[10px] md:text-xs font-bold border-2 transition-all duration-500 z-10 ${
                                         isActive
-                                            ? "border-[#D6B25E] bg-[#D6B25E] text-[#0B0B0C] shadow-[0_0_20px_rgba(214,178,94,0.35)] scale-110"
+                                            ? "border-[#C9A14A] bg-[#C9A14A] text-[#0B0B0C] shadow-sm scale-110"
                                             : isCompleted
-                                                ? "border-[#D6B25E] bg-[#D6B25E] text-[#0B0B0C]"
-                                                : "border-white/20 bg-[#0B0B0C] text-white/40"
+                                                ? "border-zinc-900 bg-zinc-900 text-white"
+                                                : "border-zinc-200 bg-white text-zinc-400"
                                     }`}>
-                                        {isCompleted ? <Check className="w-4 h-4" strokeWidth={3} /> : step.id}
+                                        {isCompleted ? <Check className="w-3.5 h-3.5" strokeWidth={3} /> : step.id}
                                     </div>
                                     <span className={`absolute -bottom-6 md:-bottom-8 whitespace-nowrap text-[8px] md:text-[9px] font-bold tracking-[0.15em] uppercase transition-colors duration-500 hidden sm:block ${
                                         isActive
-                                            ? "text-[#D6B25E]"
+                                            ? "text-[#C9A14A]"
                                             : isCompleted
-                                                ? "text-white/70"
-                                                : "text-white/25"
+                                                ? "text-zinc-800"
+                                                : "text-zinc-400"
                                     }`}>
                                         {step.name}
                                     </span>
@@ -122,7 +122,7 @@ export default function CustomizerLayout({
 
                 {/* Full-Width 3D Viewer — hidden on setting detail pages and step 2 */}
                 {!hideViewer && (
-                    <div className="w-full h-[260px] sm:h-[320px] md:h-[500px] lg:h-[600px] rounded-2xl overflow-hidden flex-shrink-0 z-10 transition-all duration-500 relative border border-white/6 bg-[#0B1715]">
+                    <div className="w-full h-[260px] sm:h-[320px] md:h-[500px] lg:h-[600px] rounded-2xl overflow-hidden flex-shrink-0 z-10 transition-all duration-500 relative border border-zinc-150 bg-[#FAF8F4]">
                         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(47,143,131,0.04)_0%,transparent_70%)] pointer-events-none" />
                         <RingViewer />
                     </div>

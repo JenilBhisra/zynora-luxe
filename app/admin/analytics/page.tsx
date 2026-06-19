@@ -60,8 +60,8 @@ export default async function AdminAnalyticsPage() {
     return (
         <div>
             <header className="mb-10">
-                <h1 className="text-4xl font-heading text-white mb-3 tracking-wide">Analytics Overview</h1>
-                <p className="text-white/40 text-[0.95rem] tracking-wide font-light">Key performance metrics and revenue aggregation.</p>
+                <h1 className="text-4xl font-heading text-zinc-900 mb-3 tracking-wide">Analytics Overview</h1>
+                <p className="text-zinc-500 text-[0.95rem] tracking-wide font-light">Key performance metrics and revenue aggregation.</p>
             </header>
 
             <div className="grid grid-cols-2 md:grid-cols-5 gap-6 mb-8">
@@ -81,9 +81,9 @@ export default async function AdminAnalyticsPage() {
 
 function MetricCard({ title, value }: { title: string, value: string | number }) {
     return (
-        <div className="bg-white/4 border border-white/8 p-6 flex flex-col justify-center items-center text-center transition-all hover:border-[#D6B25E]/25 hover:-translate-y-1 hover:shadow-[0_8px_30px_rgba(214,178,94,0.08)] group">
-            <h3 className="text-[10px] uppercase tracking-[0.2em] text-[#D6B25E]/60 font-bold mb-3 group-hover:text-[#D6B25E]/80 transition-colors">{title}</h3>
-            <p className="text-3xl font-body font-bold text-white tracking-wider">{value}</p>
+        <div className="bg-white border border-gray-200 p-6 flex flex-col justify-center items-center text-center transition-all hover:border-[#C9A14A]/25 hover:-translate-y-1 hover:shadow-md group">
+            <h3 className="text-[10px] uppercase tracking-[0.2em] text-[#C9A14A] font-bold mb-3 group-hover:text-[#C9A14A]/80 transition-colors">{title}</h3>
+            <p className="text-3xl font-body font-bold text-zinc-900 tracking-wider">{value}</p>
         </div>
     );
 }

@@ -86,7 +86,7 @@ export function UsersTable({ initialUsers }: { initialUsers: any[] }) {
                             <th className="p-5 font-bold text-right">Actions</th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-white/5">
+                    <tbody className="divide-y divide-gray-100">
                         {currentUsers.length === 0 ? (
                             <tr><td colSpan={6} className="p-10 text-center text-gray-400 text-xs uppercase tracking-widest font-bold">No users found.</td></tr>
                         ) : currentUsers.map((user) => {
@@ -134,7 +134,7 @@ export function UsersTable({ initialUsers }: { initialUsers: any[] }) {
                                     <td className="p-5 text-right space-x-3">
                                         <button
                                             onClick={() => setSelectedUser(user)}
-                                            className="text-[#111111] bg-[#111111] hover:bg-gold/10 transition-all inline-flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold px-4 py-2 rounded-none border border-transparent shadow-[0_0_10px_rgba(212,175,55,0.1)] hover:shadow-md"
+                                            className="text-white bg-[#111111] hover:bg-[#C9A14A] hover:text-white transition-all inline-flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold px-4 py-2 rounded-none border border-transparent shadow-[0_0_10px_rgba(212,175,55,0.1)] hover:shadow-md"
                                         >
                                             <Eye size={14} /> View
                                         </button>
@@ -142,7 +142,7 @@ export function UsersTable({ initialUsers }: { initialUsers: any[] }) {
                                         {user.role !== "ADMIN" && (
                                             <button
                                                 onClick={() => toggleAccess(user.id, user.role)}
-                                                className={`text-[10px] uppercase tracking-widest font-bold inline-flex items-center transition-colors px-3 py-2 rounded-none border opacity-80 hover:opacity-100 ${user.role === "BANNED" ? "text-[#111111] border-gray-300 hover:bg-gold/10" : "text-gray-500 border-gray-200 hover:bg-gray-100"}`}
+                                                className={`text-[10px] uppercase tracking-widest font-bold inline-flex items-center transition-colors px-3 py-2 rounded-none border opacity-80 hover:opacity-100 ${user.role === "BANNED" ? "text-[#111111] border-gray-300 hover:bg-[#C9A14A] hover:text-white" : "text-gray-500 border-gray-200 hover:bg-gray-100"}`}
                                             >
                                                 {user.role === "BANNED" ? "Enable" : "Disable"}
                                             </button>

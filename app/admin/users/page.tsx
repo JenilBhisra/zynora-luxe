@@ -33,8 +33,8 @@ export default async function AdminUsersPage() {
         <div>
             <header className="mb-10 flex justify-between items-end">
                 <div>
-                    <h1 className="text-4xl font-heading text-white mb-3 tracking-wide">Customer Base</h1>
-                    <p className="text-white/40 text-[0.95rem] tracking-wide font-light">Monitor registered users and track their lifetime spending value.</p>
+                    <h1 className="text-4xl font-heading text-zinc-900 mb-3 tracking-wide">Customer Base</h1>
+                    <p className="text-zinc-500 text-[0.95rem] tracking-wide font-light">Monitor registered users and track their lifetime spending value.</p>
                 </div>
             </header>
 

@@ -307,7 +307,7 @@ export function DiamondTable({ initialDiamonds }: { initialDiamonds: any[] }) {
                 </div>
                 <button
                     onClick={openAddModal}
-                    className="bg-[#111111] text-white border border-transparent hover:bg-gold/10 px-6 py-3 rounded-none font-bold uppercase tracking-widest text-xs transition-all shadow-md hover:shadow-lg hover:-translate-y-1 whitespace-nowrap"
+                    className="bg-[#111111] text-white border border-transparent hover:bg-[#C9A14A] hover:text-white px-6 py-3 rounded-none font-bold uppercase tracking-widest text-xs transition-all shadow-md hover:shadow-lg hover:-translate-y-1 whitespace-nowrap"
                 >
                     + Add Diamond
                 </button>
@@ -326,13 +326,13 @@ export function DiamondTable({ initialDiamonds }: { initialDiamonds: any[] }) {
                             <th className="p-5 font-bold text-right">Actions</th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-white/5">
+                    <tbody className="divide-y divide-gray-100">
                         {currentDiamonds.length === 0 ? (
                             <tr><td colSpan={6} className="p-10 text-center text-gray-400 text-xs uppercase tracking-widest font-bold">No diamonds match your search criteria.</td></tr>
                         ) : currentDiamonds.map((diamond) => (
-                            <tr key={diamond.id} className="hover:bg-gray-100 transition-colors">
+                            <tr key={diamond.id} className="hover:bg-gray-100/50 transition-colors">
                                 <td className="p-5">
-                                    <div className="w-14 h-14 bg-gray-50 rounded-none overflow-hidden flex items-center justify-center border border-gray-200 shadow-[0_4px_10px_rgba(0,0,0,0.2)]">
+                                    <div className="w-14 h-14 bg-gray-50 rounded-none overflow-hidden flex items-center justify-center border border-gray-200 shadow-[0_4px_10px_rgba(0,0,0,0.05)]">
                                         {diamond.imageUrl ? (
                                             <Image src={diamond.imageUrl} alt={diamond.shape} width={56} height={56} className="w-full h-full object-cover" />
                                         ) : (
@@ -345,9 +345,9 @@ export function DiamondTable({ initialDiamonds }: { initialDiamonds: any[] }) {
                                     <p className="text-[11px] text-gray-400 font-mono mt-1">ID: {diamond.id.slice(-6).toUpperCase()}</p>
                                 </td>
                                 <td className="p-5 text-[0.95rem] text-gray-700">
-                                    <span className="inline-flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-soft-cream/50"></span>{diamond.color} Color</span>
-                                    <span className="mx-2 text-white/10">|</span>
-                                    {diamond.clarity} <span className="mx-2 text-white/10">|</span> {diamond.cut}
+                                    <span className="inline-flex items-center gap-2"><span className="w-1.5 h-1.5 rounded-full bg-[#C9A14A]"></span>{diamond.color} Color</span>
+                                    <span className="mx-2 text-gray-300">|</span>
+                                    {diamond.clarity} <span className="mx-2 text-gray-300">|</span> {diamond.cut}
                                     <br />
                                     <span className="text-[10px] font-bold text-gray-800 mt-2 inline-block bg-gray-50 border border-gray-200 px-2 py-1 rounded-md">{diamond.certification}</span>
                                 </td>
@@ -357,17 +357,17 @@ export function DiamondTable({ initialDiamonds }: { initialDiamonds: any[] }) {
                                 <td className="p-5">
                                     <button
                                         onClick={() => toggleStock(diamond.id, diamond.stockStatus)}
-                                        className={`text-[9px] font-bold px-3 py-1.5 rounded-full tracking-[0.15em] uppercase transition-colors border ${diamond.stockStatus === "AVAILABLE" ? "bg-soft-cream/10 text-[#111111] border-soft-cream/20 hover:bg-soft-cream/20" : "bg-gray-50 text-gray-400 border-gray-200 hover:bg-gray-200"
+                                        className={`text-[9px] font-bold px-3 py-1.5 rounded-full tracking-[0.15em] uppercase transition-colors border ${diamond.stockStatus === "AVAILABLE" ? "bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100" : "bg-gray-50 text-gray-400 border-gray-200 hover:bg-gray-200"
                                             }`}
                                     >
                                         {diamond.stockStatus}
                                     </button>
                                 </td>
                                 <td className="p-5 text-right space-x-3">
-                                    <button onClick={() => openEditModal(diamond)} className="p-2 text-gray-400 hover:text-[#111111] transition-colors inline-block bg-gray-50 hover:bg-gray-200 rounded-none" title="Edit">
+                                    <button onClick={() => openEditModal(diamond)} className="p-2 text-gray-400 hover:text-[#111111] transition-colors inline-block bg-gray-50 hover:bg-gray-200 rounded-none border border-gray-200" title="Edit">
                                         <Edit2 size={16} />
                                     </button>
-                                    <button onClick={() => openDeleteModal(diamond)} className="p-2 text-gray-400 hover:text-white transition-colors inline-block bg-gray-50 hover:bg-gray-200 rounded-none" title="Delete">
+                                    <button onClick={() => openDeleteModal(diamond)} className="p-2 text-gray-400 hover:text-red-600 transition-colors inline-block bg-gray-50 hover:bg-red-50 rounded-none border border-gray-200 hover:border-red-200" title="Delete">
                                         <Trash2 size={16} />
                                     </button>
                                 </td>
@@ -403,7 +403,7 @@ export function DiamondTable({ initialDiamonds }: { initialDiamonds: any[] }) {
                                         <button
                                             key={pageNum}
                                             onClick={() => setCurrentPage(pageNum)}
-                                            className={`w-9 h-9 flex items-center justify-center rounded-none text-sm font-bold transition-all ${currentPage === pageNum ? 'bg-[#111111] border border-[#111111] text-[#111111] shadow-[0_0_10px_rgba(212,175,55,0.3)]' : 'text-gray-600 hover:bg-gray-100 hover:text-[#111111] border border-transparent hover:border-gray-300'}`}
+                                            className={`w-9 h-9 flex items-center justify-center rounded-none text-sm font-bold transition-all ${currentPage === pageNum ? 'bg-[#111111] border border-[#111111] text-white shadow-[0_0_10px_rgba(212,175,55,0.3)]' : 'text-gray-600 hover:bg-gray-100 hover:text-[#111111] border border-transparent hover:border-gray-300'}`}
                                         >
                                             {pageNum}
                                         </button>
@@ -535,7 +535,7 @@ export function DiamondTable({ initialDiamonds }: { initialDiamonds: any[] }) {
                                 <button type="button" onClick={() => setIsAddEditModalOpen(false)} className="px-6 py-3 rounded-none font-bold uppercase tracking-widest text-xs text-gray-600 hover:bg-gray-100 hover:text-[#111111] transition-colors" disabled={isUploading}>
                                     Cancel
                                 </button>
-                                <button type="submit" className="bg-[#111111] text-white border border-transparent px-8 py-3 rounded-none font-bold uppercase tracking-widest text-xs shadow-md hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed transform hover:-translate-y-0.5" disabled={isUploading}>
+                                <button type="submit" className="bg-[#111111] text-white border border-transparent hover:bg-[#C9A14A] hover:text-white px-8 py-3 rounded-none font-bold uppercase tracking-widest text-xs shadow-md hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed transform hover:-translate-y-0.5" disabled={isUploading}>
                                     {isUploading ? "Uploading..." : (editingDiamond ? "Save Changes" : "Save Diamond")}
                                 </button>
                             </div>

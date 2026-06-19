@@ -99,8 +99,8 @@ export function ProductListClient({
                     return (
                         <FadeIn key={product.id} delay={(i % 8) * 0.05} className="group cursor-pointer">
                             <Link href={`/product/${product.slug}`} className="block h-full">
-                                <div className="h-full flex flex-col luxury-shell premium-hover-lift rounded-[22px] overflow-hidden">
-                                    <div className="relative aspect-[4/5] overflow-hidden bg-[#0F0F11] mb-5">
+                                <div className="h-full flex flex-col luxury-shell premium-hover-lift rounded-[22px] overflow-hidden bg-white border border-zinc-100 shadow-sm">
+                                    <div className="relative aspect-[4/5] overflow-hidden bg-zinc-50 mb-5 border-b border-zinc-100">
                                         <SmartImage
                                             src={image}
                                             alt={product.name}
@@ -109,18 +109,18 @@ export function ProductListClient({
                                             className="object-cover image-zoom-reveal transition-transform duration-700 ease-out group-hover:scale-[1.08]"
                                             priority={i < 4}
                                         />
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent opacity-50" />
-                                        <span className="absolute top-4 right-4 text-[9px] uppercase tracking-[0.24em] font-bold text-[#D6B25E] opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/5 to-transparent opacity-40" />
+                                        <span className="absolute top-4 right-4 text-[9px] uppercase tracking-[0.24em] font-bold text-[#C9A14A] opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-white/90 px-2.5 py-1 rounded-full shadow-sm">
                                             View Details
                                         </span>
                                     </div>
                                     <div className="text-center pb-5 px-4">
-                                        <h3 className="text-[16px] md:text-[17px] font-medium text-white mb-2 line-clamp-1 group-hover:text-[#D6B25E] transition-colors duration-500">
+                                        <h3 className="text-[16px] md:text-[17px] font-medium text-zinc-900 mb-2 line-clamp-1 group-hover:text-[#C9A14A] transition-colors duration-500 font-serif">
                                             {product.name}
                                         </h3>
-                                        <p className="text-[14px] text-white/70">
+                                        <p className="text-[14px] text-zinc-600 font-semibold">
                                             {showFrom && (
-                                                <span className="text-[10px] text-white/40 uppercase tracking-widest mr-1">
+                                                <span className="text-[10px] text-zinc-400 uppercase tracking-widest mr-1">
                                                     From
                                                 </span>
                                             )}
@@ -138,11 +138,11 @@ export function ProductListClient({
                     Array.from({ length: limit }).map((_, idx) => (
                         <div
                             key={`skeleton-${idx}`}
-                            className="animate-pulse flex flex-col overflow-hidden luxury-shell rounded-[22px] p-4 border border-white/5 bg-white/[0.02]"
+                            className="animate-pulse flex flex-col overflow-hidden luxury-shell rounded-[22px] p-4 border border-zinc-100 bg-white shadow-sm"
                         >
-                            <div className="aspect-[4/5] bg-white/5 mb-5 relative overflow-hidden rounded-[16px]" />
-                            <div className="h-4 bg-white/6 w-2/3 mb-2 mx-auto" />
-                            <div className="h-4 bg-white/4 w-1/3 mb-5 mx-auto" />
+                            <div className="aspect-[4/5] bg-zinc-100 mb-5 relative overflow-hidden rounded-[16px]" />
+                            <div className="h-4 bg-zinc-200 w-2/3 mb-2 mx-auto" />
+                            <div className="h-4 bg-zinc-100 w-1/3 mb-5 mx-auto" />
                         </div>
                     ))}
             </div>
@@ -153,7 +153,7 @@ export function ProductListClient({
                         variant="outline"
                         onClick={loadMoreProducts}
                         disabled={isLoading}
-                        className="px-10 py-4 text-[12px] uppercase tracking-[0.2em] font-semibold border-white/20 text-white hover:bg-white/5 hover:border-[#D6B25E]/60 min-w-[200px]"
+                        className="px-10 py-4 text-[12px] uppercase tracking-[0.2em] font-semibold border-zinc-200 text-zinc-800 hover:bg-zinc-900 hover:text-white min-w-[200px]"
                     >
                         {isLoading ? "Loading..." : "Load More Designs"}
                     </Button>

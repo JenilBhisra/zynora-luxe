@@ -37,10 +37,10 @@ export function OrderTable({ initialOrders }: { initialOrders: any[] }) {
 
     const getStatusStyle = (status: string) => {
         switch (status) {
-            case "PAID": return "bg-gray-100 text-white border-gray-300";
-            case "SHIPPED": return "bg-soft-cream/10 text-[#111111] border-soft-cream/20";
-            case "DELIVERED": return "bg-[#111111] text-white border border-transparent";
-            case "PENDING": return "bg-gold/10 text-[#111111] border-gray-300";
+            case "PAID": return "bg-green-50 text-green-700 border-green-200";
+            case "SHIPPED": return "bg-blue-50 text-blue-700 border-blue-200";
+            case "DELIVERED": return "bg-gray-900 text-white border-transparent";
+            case "PENDING": return "bg-orange-50 text-orange-700 border-orange-200";
             default: return "bg-gray-50 text-gray-600 border-gray-200";
         }
     };
@@ -61,7 +61,7 @@ export function OrderTable({ initialOrders }: { initialOrders: any[] }) {
     };
 
     return (
-        <div className="relative">
+        <div className="space-y-6">
             <div className="w-full overflow-x-auto bg-white  border border-gray-100 shadow-sm rounded-none pb-4">
                 <table className="w-full text-left border-collapse whitespace-nowrap">
                     <thead>
@@ -75,7 +75,7 @@ export function OrderTable({ initialOrders }: { initialOrders: any[] }) {
                             <th className="p-5 font-bold text-right">Action</th>
                         </tr>
                     </thead>
-                    <tbody className="divide-y divide-white/5">
+                    <tbody className="divide-y divide-gray-100">
                         {orders.length === 0 ? (
                             <tr><td colSpan={7} className="p-10 text-center text-gray-400 text-xs uppercase tracking-widest font-bold">No orders found.</td></tr>
                         ) : orders.map((order) => (
@@ -109,7 +109,7 @@ export function OrderTable({ initialOrders }: { initialOrders: any[] }) {
                                 <td className="p-5 text-right">
                                     <button
                                         onClick={() => setSelectedOrder(order)}
-                                        className="text-[#111111] bg-[#111111] border border-transparent hover:bg-gold/10 transition-all inline-flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold px-4 py-2 rounded-none shadow-[0_0_10px_rgba(212,175,55,0.1)] hover:shadow-md"
+                                        className="text-white bg-[#111111] border border-transparent hover:bg-[#C9A14A] hover:text-white transition-all inline-flex items-center gap-2 text-[10px] uppercase tracking-widest font-bold px-4 py-2 rounded-none shadow-[0_0_10px_rgba(212,175,55,0.1)] hover:shadow-md"
                                     >
                                         <Eye size={14} /> Details
                                     </button>

@@ -188,12 +188,12 @@ export default function ProductClient({ product }: { product: any }) {
     };
 
     return (
-        <div className="min-h-screen pb-32 font-body text-white selection:bg-[#D6B25E]/20 bg-[#0B0B0C]">
+        <div className="min-h-screen pb-32 font-body text-zinc-900 bg-white">
             {/* Breadcrumb */}
-            <div className="container-custom py-6 text-[12px] text-white/55 tracking-[0.06em] uppercase font-medium">
-                <span className="hover:text-[#D6B25E] cursor-pointer transition-colors">Home</span> <span className="mx-2 text-white/20">/</span>
-                <span className="hover:text-[#D6B25E] cursor-pointer transition-colors">{product.category?.name || "Rings"}</span> <span className="mx-2 text-white/20">/</span>
-                <span className="text-white">{product.name}</span>
+            <div className="container-custom py-6 text-[12px] text-zinc-500 tracking-[0.06em] uppercase font-medium">
+                <span className="hover:text-[#C9A14A] cursor-pointer transition-colors">Home</span> <span className="mx-2 text-zinc-300">/</span>
+                <span className="hover:text-[#C9A14A] cursor-pointer transition-colors">{product.category?.name || "Rings"}</span> <span className="mx-2 text-zinc-300">/</span>
+                <span className="text-zinc-900">{product.name}</span>
             </div>
 
             <div className="container-custom flex flex-col lg:flex-row gap-12 mb-24 relative">
@@ -262,7 +262,7 @@ export default function ProductClient({ product }: { product: any }) {
                                 <button
                                     key={`${item.src}-${i}`}
                                     onClick={() => setActiveMediaIndex(i)}
-                                    className={`w-[100px] h-[100px] shrink-0 relative rounded-[14px] overflow-hidden transition-all duration-300 ${activeMediaIndex === i ? "ring-1 ring-[#D6B25E]/40 opacity-100" : "bg-white/6 opacity-70 hover:opacity-100"}`}
+                                    className={`w-[100px] h-[100px] shrink-0 relative rounded-[14px] overflow-hidden transition-all duration-300 ${activeMediaIndex === i ? "ring-1 ring-[#C9A14A] opacity-100" : "bg-zinc-100 opacity-70 hover:opacity-100"}`}
                                 >
                                     {item.type === "image" ? (
                                         <SmartImage src={item.src} alt="thumbnail" fill fallbackType={imageFallbackType} imageKey={`${product.id}:thumb:${i}`} className="object-cover" />
@@ -283,17 +283,17 @@ export default function ProductClient({ product }: { product: any }) {
                 {/* Right: Details (Scrollable Flow) */}
                 <section className="flex-1 lg:max-w-[45%] pt-4 flex flex-col">
                     <FadeIn delay={0.2}>
-                        <span className="text-xs tracking-[0.34em] font-medium text-[#D6B25E] uppercase mb-3 block">Product Detail</span>
+                        <span className="text-xs tracking-[0.34em] font-medium text-[#C9A14A] uppercase mb-3 block">Product Detail</span>
                         <h1 className="mb-6 max-w-[640px]">
                             {product.name}
                         </h1>
 
-                        <div className="flex items-baseline gap-6 mb-8 border-b border-white/10 pb-6">
-                            <span className="text-[28px] font-medium text-white">₹{displayPrice.toLocaleString("en-IN")}</span>
-                            <span className="text-[12px] uppercase tracking-[0.06em] text-white/55">Inclusive of all taxes</span>
+                        <div className="flex items-baseline gap-6 mb-8 border-b border-zinc-200 pb-6">
+                            <span className="text-[28px] font-medium text-zinc-900">₹{displayPrice.toLocaleString("en-IN")}</span>
+                            <span className="text-[12px] uppercase tracking-[0.06em] text-zinc-55">Inclusive of all taxes</span>
                         </div>
 
-                        <p className="text-[15px] font-normal text-white/68 mb-10 max-w-[640px] leading-relaxed">
+                        <p className="text-[15px] font-normal text-zinc-500 mb-10 max-w-[640px] leading-relaxed">
                             {product.description}
                         </p>
 
@@ -302,7 +302,7 @@ export default function ProductClient({ product }: { product: any }) {
                             {/* Karat Selector */}
                             {availableKarats.length > 0 && (
                                 <div className="w-full">
-                                    <label className="block text-[12px] tracking-[0.34em] font-medium text-white/60 uppercase mb-3">Select Gold Karat</label>
+                                    <label className="block text-[12px] tracking-[0.34em] font-medium text-zinc-500 uppercase mb-3">Select Gold Karat</label>
                                     <div className="flex flex-wrap gap-3">
                                         {availableKarats.map((k) => (
                                             <button
@@ -310,13 +310,13 @@ export default function ProductClient({ product }: { product: any }) {
                                                 onClick={() => setSelectedKarat(k)}
                                                 className={`relative px-5 py-3 text-[13px] font-bold tracking-[0.18em] uppercase transition-all duration-300 rounded-none border ${
                                                     selectedKarat === k
-                                                        ? "bg-[#D6B25E] text-[#0B0B0C] border-[#D6B25E] shadow-[0_0_20px_rgba(214,178,94,0.25)]"
-                                                        : "bg-white/5 text-white/80 border-white/15 hover:border-[#D6B25E]/50 hover:text-white"
+                                                        ? "bg-[#C9A14A] text-white border-[#C9A14A] shadow-sm"
+                                                        : "bg-white text-zinc-800 border-zinc-200 hover:border-[#C9A14A]/50 hover:text-[#C9A14A]"
                                                 }`}
                                             >
                                                 {k}
                                                 <span className={`block text-[10px] font-medium mt-0.5 ${
-                                                    selectedKarat === k ? "text-[#0B0B0C]/70" : "text-white/45"
+                                                    selectedKarat === k ? "text-white/85" : "text-zinc-400"
                                                 }`}>
                                                     ₹{karatPricesMap[k].toLocaleString("en-IN")}
                                                 </span>
@@ -327,52 +327,52 @@ export default function ProductClient({ product }: { product: any }) {
                             )}
                             {/* Metal Selector */}
                             <div className="w-full">
-                                <label className="block text-[12px] tracking-[0.34em] font-medium text-white/60 uppercase mb-3">Select Metal Finish</label>
+                                <label className="block text-[12px] tracking-[0.34em] font-medium text-zinc-500 uppercase mb-3">Select Metal Finish</label>
                                 <div className="relative">
-                                    <select className="w-full p-4 rounded-none border border-white/10 bg-white/5 text-white appearance-none focus:outline-none focus:border-[#D6B25E] transition-colors cursor-pointer text-[14px]">
+                                    <select className="w-full p-4 rounded-none border border-zinc-200 bg-white text-zinc-900 appearance-none focus:outline-none focus:border-[#C9A14A] transition-colors cursor-pointer text-[14px]">
                                         <option>{product.metalType}</option>
                                         <option>18K Yellow Gold</option>
                                         <option>18K Rose Gold</option>
                                         <option>Platinum 950</option>
                                     </select>
-                                    <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 text-white/40 pointer-events-none" size={16} />
+                                    <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none" size={16} />
                                 </div>
                             </div>
                         </div>
 
                         {/* Delivery Info */}
                         <div className="flex items-center gap-5 luxury-panel p-5 mb-8 relative overflow-hidden rounded-[20px]">
-                            <div className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center shrink-0 bg-white/5">
-                                <Truck className="text-[#D6B25E]" size={18} strokeWidth={1.5} />
+                            <div className="w-10 h-10 rounded-full border border-zinc-200 flex items-center justify-center shrink-0 bg-zinc-50">
+                                <Truck className="text-[#C9A14A]" size={18} strokeWidth={1.5} />
                             </div>
-                            <span className="text-[14px] text-white/68 leading-snug">
-                                <strong className="block text-white font-medium mb-1 tracking-wide">Guaranteed Delivery</strong>
+                            <span className="text-[14px] text-zinc-500 leading-snug">
+                                <strong className="block text-zinc-900 font-medium mb-1 tracking-wide">Guaranteed Delivery</strong>
                                 Delivered within 7-10 working days across India via insured shipping.
                             </span>
                         </div>
 
                         {/* Inventory Status Alert */}
                         {product.stockCount <= 0 ? (
-                            <div className="mb-8 p-4 rounded-xl border border-red-500/30 bg-red-500/10 text-center">
-                                <span className="text-red-400 font-bold uppercase tracking-widest text-xs">Out of Stock</span>
+                            <div className="mb-8 p-4 rounded-xl border border-red-200 bg-red-50 text-center">
+                                <span className="text-red-700 font-bold uppercase tracking-widest text-xs">Out of Stock</span>
                             </div>
                         ) : product.stockCount < 5 ? (
-                            <div className="mb-8 p-4 rounded-xl border border-amber-500/30 bg-amber-500/10 text-center">
-                                <span className="text-amber-400 font-bold uppercase tracking-widest text-xs">
+                            <div className="mb-8 p-4 rounded-xl border border-amber-200 bg-amber-50 text-center">
+                                <span className="text-amber-700 font-bold uppercase tracking-widest text-xs">
                                     Hurry! Only {product.stockCount} {product.stockCount === 1 ? 'piece' : 'pieces'} left in stock
                                 </span>
                             </div>
                         ) : null}
 
                         {/* Sticky Add to Cart Actions */}
-                        <div className="flex flex-col gap-4 sticky bottom-10 z-40 luxury-panel p-4 border border-white/10 shadow-2xl rounded-[20px]">
-                            <Button fullWidth onClick={handleAddToCart} disabled={product.stockCount <= 0} className="py-4 text-[14px] tracking-[0.1em] bg-[#D6B25E] text-[#0B0B0C] hover:bg-[#E3C67C] disabled:opacity-50 disabled:cursor-not-allowed">
+                        <div className="flex flex-col gap-4 sticky bottom-10 z-40 luxury-panel p-4 border border-zinc-200 shadow-md rounded-[20px] bg-white/90 backdrop-blur-md">
+                            <Button fullWidth onClick={handleAddToCart} disabled={product.stockCount <= 0} className="py-4 text-[14px] tracking-[0.1em] bg-[#C9A14A] text-white border-[#C9A14A] hover:bg-black hover:border-black disabled:opacity-50 disabled:cursor-not-allowed">
                                 {product.stockCount <= 0 ? "OUT OF STOCK" : "ADD TO CART"}
                             </Button>
-                            <Button variant="outline" fullWidth onClick={handleBuyNow} disabled={product.stockCount <= 0} className="py-4 text-[14px] tracking-[0.1em] border-white/15 text-white hover:bg-white/6 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed">
+                            <Button variant="outline" fullWidth onClick={handleBuyNow} disabled={product.stockCount <= 0} className="py-4 text-[14px] tracking-[0.1em] border-zinc-300 text-zinc-900 bg-white hover:bg-zinc-50 disabled:opacity-50 disabled:cursor-not-allowed">
                                 BUY NOW
                             </Button>
-                            <Button variant="outline" fullWidth onClick={() => setIsCustomizing(true)} className="py-4 text-[14px] tracking-[0.1em] border-[#D6B25E] text-[#D6B25E] hover:bg-[#D6B25E] hover:text-[#0B0B0C] transition-all duration-300">
+                            <Button variant="outline" fullWidth onClick={() => setIsCustomizing(true)} className="py-4 text-[14px] tracking-[0.1em] border-[#C9A14A] text-[#C9A14A] hover:bg-[#C9A14A] hover:text-white transition-all duration-300">
                                 ✨ Customize This Design
                             </Button>
                         </div>
@@ -381,18 +381,18 @@ export default function ProductClient({ product }: { product: any }) {
             </div>
 
             {/* Product Specifications & Details Tabs */}
-            <section className="max-w-[1100px] mx-auto pt-16 border-t border-white/10 px-5">
+            <section className="max-w-[1100px] mx-auto pt-16 border-t border-zinc-200 px-5">
                 <FadeIn>
-                    <div className="flex justify-center gap-12 border-b border-white/10 mb-16">
+                    <div className="flex justify-center gap-12 border-b border-zinc-200 mb-16">
                         <button
                             onClick={() => setActiveTab("specs")}
-                            className={`pb-5 text-xl font-heading tracking-wide transition-all duration-500 relative group ${activeTab === "specs" ? "text-white" : "text-white/40 hover:text-white/80"} ${activeTab === "specs" ? "after:absolute after:bottom-[-1px] after:left-0 after:w-full after:h-[2px] after:bg-[#D6B25E]" : "after:absolute after:bottom-[-1px] after:left-0 after:w-0 after:h-[1px] after:bg-[#D6B25E] after:group-hover:w-full after:transition-all after:duration-500"}`}
+                            className={`pb-5 text-xl font-heading tracking-wide transition-all duration-500 relative group ${activeTab === "specs" ? "text-zinc-900" : "text-zinc-400 hover:text-zinc-650"} ${activeTab === "specs" ? "after:absolute after:bottom-[-1px] after:left-0 after:w-full after:h-[2px] after:bg-[#C9A14A]" : "after:absolute after:bottom-[-1px] after:left-0 after:w-0 after:h-[1px] after:bg-[#C9A14A] after:group-hover:w-full after:transition-all after:duration-500"}`}
                         >
                             Product Specifications
                         </button>
                         <button
                             onClick={() => setActiveTab("reviews")}
-                            className={`pb-5 text-xl font-heading tracking-wide transition-all duration-500 relative group ${activeTab === "reviews" ? "text-white" : "text-white/40 hover:text-white/80"} ${activeTab === "reviews" ? "after:absolute after:bottom-[-1px] after:left-0 after:w-full after:h-[2px] after:bg-[#D6B25E]" : "after:absolute after:bottom-[-1px] after:left-0 after:w-0 after:h-[1px] after:bg-[#D6B25E] after:group-hover:w-full after:transition-all after:duration-500"}`}
+                            className={`pb-5 text-xl font-heading tracking-wide transition-all duration-500 relative group ${activeTab === "reviews" ? "text-zinc-900" : "text-zinc-400 hover:text-zinc-650"} ${activeTab === "reviews" ? "after:absolute after:bottom-[-1px] after:left-0 after:w-full after:h-[2px] after:bg-[#C9A14A]" : "after:absolute after:bottom-[-1px] after:left-0 after:w-0 after:h-[1px] after:bg-[#C9A14A] after:group-hover:w-full after:transition-all after:duration-500"}`}
                         >
                             Customer Reviews
                         </button>
@@ -412,8 +412,8 @@ export default function ProductClient({ product }: { product: any }) {
                                 ].map((row, i) => (
                                     <FadeIn key={i} delay={i * 0.06}>
                                         <div className="luxury-panel premium-hover-lift py-8 px-4 flex flex-col justify-center items-center text-center rounded-[18px] cursor-pointer">
-                                            <span className="text-[10px] text-white/50 uppercase tracking-[0.28em] font-bold mb-3">{row.label}</span>
-                                            <span className="text-[16px] text-white font-medium">{row.val}</span>
+                                            <span className="text-[10px] text-zinc-400 uppercase tracking-[0.28em] font-bold mb-3">{row.label}</span>
+                                            <span className="text-[16px] text-zinc-900 font-medium">{row.val}</span>
                                         </div>
                                     </FadeIn>
                                 ))}
@@ -422,17 +422,17 @@ export default function ProductClient({ product }: { product: any }) {
 
                         {activeTab === "reviews" && (
                             <div className="text-center py-10 max-w-[800px] mx-auto">
-                                <h3 className="text-6xl font-heading text-white mb-4 tracking-wide">4.9</h3>
-                                <div className="flex justify-center gap-2 text-[#D6B25E] mb-4 w-40 mx-auto opacity-80">
+                                <h3 className="text-6xl font-heading text-zinc-900 mb-4 tracking-wide">4.9</h3>
+                                <div className="flex justify-center gap-2 text-[#C9A14A] mb-4 w-40 mx-auto opacity-85">
                                     <StarIcon /> <StarIcon /> <StarIcon /> <StarIcon /> <StarIcon />
                                 </div>
-                                <p className="text-white/60 text-base mb-16 uppercase tracking-widest font-medium">Based on 24 reviews</p>
+                                <p className="text-zinc-500 text-base mb-16 uppercase tracking-widest font-medium">Based on 24 reviews</p>
 
-                                <div className="text-left border-t border-white/10 pt-10 pb-8">
-                                    <div className="flex gap-2 text-[#D6B25E] mb-4 w-24 opacity-80"><StarIcon /><StarIcon /><StarIcon /><StarIcon /><StarIcon /></div>
-                                    <h4 className="text-2xl text-white mb-3 font-heading tracking-wide">Absolutely Stunning</h4>
-                                    <p className="text-white/75 mb-4 leading-relaxed font-light">The ring is even more beautiful in person. The craftsmanship is flawless, and the diamond sparkles incredibly.</p>
-                                    <p className="text-sm text-white/55 uppercase tracking-widest font-medium">Anjali S. — October 12, 2023</p>
+                                <div className="text-left border-t border-zinc-200 pt-10 pb-8">
+                                    <div className="flex gap-2 text-[#C9A14A] mb-4 w-24 opacity-85"><StarIcon /><StarIcon /><StarIcon /><StarIcon /><StarIcon /></div>
+                                    <h4 className="text-2xl text-zinc-900 mb-3 font-heading tracking-wide">Absolutely Stunning</h4>
+                                    <p className="text-zinc-600 mb-4 leading-relaxed font-light">The ring is even more beautiful in person. The craftsmanship is flawless, and the diamond sparkles incredibly.</p>
+                                    <p className="text-sm text-zinc-400 uppercase tracking-widest font-medium">Anjali S. — October 12, 2023</p>
                                 </div>
 
                                 <div className="mt-10">
@@ -446,10 +446,10 @@ export default function ProductClient({ product }: { product: any }) {
 
             {/* Customization Request Modal Overlay */}
             {isCustomizing && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-sm overflow-y-auto">
-                    <div className="relative w-full max-w-2xl my-8 bg-[#0B0B0C] border border-[#D6B25E]/30 rounded-[22px] p-6 md:p-8 shadow-[0_0_50px_rgba(214,178,94,0.15)] text-white overflow-hidden">
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-50/80 backdrop-blur-md overflow-y-auto">
+                    <div className="relative w-full max-w-2xl my-8 bg-white border border-zinc-200 rounded-[22px] p-6 md:p-8 shadow-2xl text-zinc-900 overflow-hidden">
                         {/* Top gold line accent */}
-                        <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-transparent via-[#D6B25E] to-transparent" />
+                        <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-transparent via-[#C9A14A] to-transparent" />
                         
                         {/* Close button */}
                         <button
@@ -457,7 +457,7 @@ export default function ProductClient({ product }: { product: any }) {
                                 setIsCustomizing(false);
                                 setSubmitSuccess(false);
                             }}
-                            className="absolute top-5 right-5 text-white/50 hover:text-white transition-colors"
+                            className="absolute top-5 right-5 text-zinc-400 hover:text-zinc-900 transition-colors"
                             aria-label="Close modal"
                         >
                             <X size={24} />
@@ -466,40 +466,40 @@ export default function ProductClient({ product }: { product: any }) {
                         {!submitSuccess ? (
                             <div>
                                 <div className="text-center mb-8">
-                                    <h3 className="text-2xl md:text-3xl font-heading text-[#D6B25E] tracking-wide uppercase">Bespoke Design Customization</h3>
-                                    <p className="text-xs text-white/60 uppercase tracking-widest mt-2">Personalize your Zynora Luxe jewelry design</p>
+                                    <h3 className="text-2xl md:text-3xl font-heading text-[#C9A14A] tracking-wide uppercase">Bespoke Design Customization</h3>
+                                    <p className="text-xs text-zinc-500 uppercase tracking-widest mt-2">Personalize your Zynora Luxe jewelry design</p>
                                 </div>
 
                                 <form onSubmit={handleCustomizationSubmit} className="space-y-6 max-h-[70vh] overflow-y-auto pr-2 custom-scrollbar">
                                     {/* Auto-filled Product Info */}
-                                    <div className="bg-[#141416] border border-white/5 rounded-xl p-4 space-y-2">
-                                        <span className="text-[10px] tracking-[0.2em] uppercase text-[#D6B25E] font-bold">Selected Design Details</span>
+                                    <div className="bg-zinc-50 border border-zinc-200 rounded-xl p-4 space-y-2">
+                                        <span className="text-[10px] tracking-[0.2em] uppercase text-[#C9A14A] font-bold">Selected Design Details</span>
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-1">
                                             <div>
-                                                <span className="text-xs text-white/50 block">Product ID:</span>
-                                                <span className="text-sm font-medium text-white/90">{product.id}</span>
+                                                <span className="text-xs text-zinc-500 block">Product ID:</span>
+                                                <span className="text-sm font-medium text-zinc-800">{product.id}</span>
                                             </div>
                                             <div>
-                                                <span className="text-xs text-white/50 block">Design Name:</span>
-                                                <span className="text-sm font-medium text-[#D6B25E]">{product.name}</span>
+                                                <span className="text-xs text-zinc-500 block">Design Name:</span>
+                                                <span className="text-sm font-medium text-[#C9A14A]">{product.name}</span>
                                             </div>
                                             <div>
-                                                <span className="text-xs text-white/50 block">Estimated Starting Price:</span>
-                                                <span className="text-sm font-medium text-white/90">₹{displayPrice.toLocaleString("en-IN")}</span>
+                                                <span className="text-xs text-zinc-500 block">Estimated Starting Price:</span>
+                                                <span className="text-sm font-medium text-zinc-800">₹{displayPrice.toLocaleString("en-IN")}</span>
                                             </div>
                                             <div>
-                                                <span className="text-xs text-white/50 block">Metal Purity:</span>
-                                                <span className="text-sm font-medium text-white/90">{selectedKarat || "18K"} {product.metalType || "Gold"}</span>
+                                                <span className="text-xs text-zinc-500 block">Metal Purity:</span>
+                                                <span className="text-sm font-medium text-zinc-800">{selectedKarat || "18K"} {product.metalType || "Gold"}</span>
                                             </div>
                                         </div>
                                     </div>
 
                                     {/* Customer Information */}
                                     <div className="space-y-4">
-                                        <h4 className="text-sm uppercase tracking-wider text-white/80 border-b border-white/5 pb-2 font-semibold font-heading">Your Information</h4>
+                                        <h4 className="text-sm uppercase tracking-wider text-zinc-850 border-b border-zinc-200 pb-2 font-semibold font-heading">Your Information</h4>
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             <div className="space-y-1">
-                                                <label htmlFor="customerName" className="block text-xs uppercase tracking-widest text-white/70">Full Name *</label>
+                                                <label htmlFor="customerName" className="block text-xs uppercase tracking-widest text-zinc-650">Full Name *</label>
                                                 <input
                                                     type="text"
                                                     id="customerName"
@@ -510,13 +510,13 @@ export default function ProductClient({ product }: { product: any }) {
                                                             setFormErrors(prev => ({ ...prev, customerName: "" }));
                                                         }
                                                     }}
-                                                    className={`w-full bg-white/5 border ${formErrors.customerName ? 'border-red-500/50' : 'border-white/10'} rounded-lg p-3 text-sm focus:outline-none focus:border-[#D6B25E] transition-colors`}
+                                                    className={`w-full bg-zinc-50 border ${formErrors.customerName ? 'border-red-300' : 'border-zinc-200'} rounded-lg p-3 text-sm text-zinc-900 focus:outline-none focus:border-[#C9A14A] transition-colors`}
                                                     placeholder="Enter your full name"
                                                 />
-                                                {formErrors.customerName && <span className="text-xs text-red-400 block">{formErrors.customerName}</span>}
+                                                {formErrors.customerName && <span className="text-xs text-red-500 block">{formErrors.customerName}</span>}
                                             </div>
                                             <div className="space-y-1">
-                                                <label htmlFor="customerEmail" className="block text-xs uppercase tracking-widest text-white/70">Email Address *</label>
+                                                <label htmlFor="customerEmail" className="block text-xs uppercase tracking-widest text-zinc-650">Email Address *</label>
                                                 <input
                                                     type="email"
                                                     id="customerEmail"
@@ -527,13 +527,13 @@ export default function ProductClient({ product }: { product: any }) {
                                                             setFormErrors(prev => ({ ...prev, customerEmail: "" }));
                                                         }
                                                     }}
-                                                    className={`w-full bg-white/5 border ${formErrors.customerEmail ? 'border-red-500/50' : 'border-white/10'} rounded-lg p-3 text-sm focus:outline-none focus:border-[#D6B25E] transition-colors`}
+                                                    className={`w-full bg-zinc-50 border ${formErrors.customerEmail ? 'border-red-300' : 'border-zinc-200'} rounded-lg p-3 text-sm text-zinc-900 focus:outline-none focus:border-[#C9A14A] transition-colors`}
                                                     placeholder="Enter your email address"
                                                 />
-                                                {formErrors.customerEmail && <span className="text-xs text-red-400 block">{formErrors.customerEmail}</span>}
+                                                {formErrors.customerEmail && <span className="text-xs text-red-500 block">{formErrors.customerEmail}</span>}
                                             </div>
                                             <div className="space-y-1 md:col-span-2">
-                                                <label htmlFor="customerPhone" className="block text-xs uppercase tracking-widest text-white/70">WhatsApp / Phone Number *</label>
+                                                <label htmlFor="customerPhone" className="block text-xs uppercase tracking-widest text-zinc-650">WhatsApp / Phone Number *</label>
                                                 <input
                                                     type="tel"
                                                     id="customerPhone"
@@ -544,25 +544,25 @@ export default function ProductClient({ product }: { product: any }) {
                                                             setFormErrors(prev => ({ ...prev, customerPhone: "" }));
                                                         }
                                                     }}
-                                                    className={`w-full bg-white/5 border ${formErrors.customerPhone ? 'border-red-500/50' : 'border-white/10'} rounded-lg p-3 text-sm focus:outline-none focus:border-[#D6B25E] transition-colors`}
+                                                    className={`w-full bg-zinc-50 border ${formErrors.customerPhone ? 'border-red-300' : 'border-zinc-200'} rounded-lg p-3 text-sm text-zinc-900 focus:outline-none focus:border-[#C9A14A] transition-colors`}
                                                     placeholder="Enter your contact number"
                                                 />
-                                                {formErrors.customerPhone && <span className="text-xs text-red-400 block">{formErrors.customerPhone}</span>}
+                                                {formErrors.customerPhone && <span className="text-xs text-red-500 block">{formErrors.customerPhone}</span>}
                                             </div>
                                         </div>
                                     </div>
 
                                     {/* Customization Details */}
                                     <div className="space-y-4">
-                                        <h4 className="text-sm uppercase tracking-wider text-white/80 border-b border-white/5 pb-2 font-semibold font-heading">Customization Selections</h4>
+                                        <h4 className="text-sm uppercase tracking-wider text-zinc-850 border-b border-zinc-200 pb-2 font-semibold font-heading">Customization Selections</h4>
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             <div className="space-y-1">
-                                                <label className="block text-xs uppercase tracking-widest text-white/70">Metal Finish</label>
+                                                <label className="block text-xs uppercase tracking-widest text-zinc-650">Metal Finish</label>
                                                 <div className="relative">
                                                     <select
                                                         value={metalType}
                                                         onChange={(e) => setMetalType(e.target.value)}
-                                                        className="w-full bg-[#141416] border border-white/10 rounded-lg p-3 text-sm focus:outline-none focus:border-[#D6B25E] transition-colors appearance-none cursor-pointer"
+                                                        className="w-full bg-zinc-50 border border-zinc-200 rounded-lg p-3 text-sm text-zinc-900 focus:outline-none focus:border-[#C9A14A] transition-colors appearance-none cursor-pointer"
                                                     >
                                                         <option value="18K White Gold">18K White Gold</option>
                                                         <option value="18K Yellow Gold">18K Yellow Gold</option>
@@ -572,28 +572,28 @@ export default function ProductClient({ product }: { product: any }) {
                                                         <option value="14K Rose Gold">14K Rose Gold</option>
                                                         <option value="Platinum 950">Platinum 950</option>
                                                     </select>
-                                                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 pointer-events-none" size={14} />
+                                                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none" size={14} />
                                                 </div>
                                             </div>
 
                                             <div className="space-y-1">
-                                                <label className="block text-xs uppercase tracking-widest text-white/70">Jewelry Size</label>
+                                                <label className="block text-xs uppercase tracking-widest text-zinc-650">Jewelry Size</label>
                                                 <input
                                                     type="text"
                                                     value={jewelrySize}
                                                     onChange={(e) => setJewelrySize(e.target.value)}
-                                                    className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-sm focus:outline-none focus:border-[#D6B25E] transition-colors"
+                                                    className="w-full bg-zinc-50 border border-zinc-200 rounded-lg p-3 text-sm text-zinc-900 focus:outline-none focus:border-[#C9A14A] transition-colors"
                                                     placeholder="e.g. Ring Size 6, Chain length 18 in"
                                                 />
                                             </div>
 
                                             <div className="space-y-1">
-                                                <label className="block text-xs uppercase tracking-widest text-white/70">Stone Type</label>
+                                                <label className="block text-xs uppercase tracking-widest text-zinc-650">Stone Type</label>
                                                 <div className="relative">
                                                     <select
                                                         value={stoneType}
                                                         onChange={(e) => setStoneType(e.target.value)}
-                                                        className="w-full bg-[#141416] border border-white/10 rounded-lg p-3 text-sm focus:outline-none focus:border-[#D6B25E] transition-colors appearance-none cursor-pointer"
+                                                        className="w-full bg-zinc-50 border border-zinc-200 rounded-lg p-3 text-sm text-zinc-900 focus:outline-none focus:border-[#C9A14A] transition-colors appearance-none cursor-pointer"
                                                     >
                                                         <option value="Natural Diamond">Natural Diamond</option>
                                                         <option value="Lab-Grown Diamond">Lab-Grown Diamond</option>
@@ -603,17 +603,17 @@ export default function ProductClient({ product }: { product: any }) {
                                                         <option value="Ruby">Ruby</option>
                                                         <option value="No Stone">No Stone / Plain Metal</option>
                                                     </select>
-                                                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 pointer-events-none" size={14} />
+                                                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none" size={14} />
                                                 </div>
                                             </div>
 
                                             <div className="space-y-1">
-                                                <label className="block text-xs uppercase tracking-widest text-white/70">Stone Size</label>
+                                                <label className="block text-xs uppercase tracking-widest text-zinc-650">Stone Size</label>
                                                 <div className="relative">
                                                     <select
                                                         value={stoneSize}
                                                         onChange={(e) => setStoneSize(e.target.value)}
-                                                        className="w-full bg-[#141416] border border-white/10 rounded-lg p-3 text-sm focus:outline-none focus:border-[#D6B25E] transition-colors appearance-none cursor-pointer"
+                                                        className="w-full bg-zinc-50 border border-zinc-200 rounded-lg p-3 text-sm text-zinc-900 focus:outline-none focus:border-[#C9A14A] transition-colors appearance-none cursor-pointer"
                                                     >
                                                         <option value="0.50 Carat">0.50 Carat</option>
                                                         <option value="0.75 Carat">0.75 Carat</option>
@@ -622,14 +622,14 @@ export default function ProductClient({ product }: { product: any }) {
                                                         <option value="2.00 Carat">2.00 Carat</option>
                                                         <option value="3.00 Carat+">3.00 Carat+</option>
                                                     </select>
-                                                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 pointer-events-none" size={14} />
+                                                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none" size={14} />
                                                 </div>
                                             </div>
 
                                             <div className="space-y-1 md:col-span-2">
                                                 <div className="flex justify-between items-center">
-                                                    <label className="block text-xs uppercase tracking-widest text-white/70">Engraving Inscription</label>
-                                                    <span className={`text-[10px] ${engraving.length >= 30 ? 'text-red-400 font-bold' : 'text-white/45'}`}>
+                                                    <label className="block text-xs uppercase tracking-widest text-zinc-650">Engraving Inscription</label>
+                                                    <span className={`text-[10px] ${engraving.length >= 30 ? 'text-red-500 font-bold' : 'text-zinc-400'}`}>
                                                         {engraving.length} / 30 chars
                                                     </span>
                                                 </div>
@@ -638,7 +638,7 @@ export default function ProductClient({ product }: { product: any }) {
                                                     maxLength={30}
                                                     value={engraving}
                                                     onChange={(e) => setEngraving(e.target.value)}
-                                                    className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-sm focus:outline-none focus:border-[#D6B25E] transition-colors tracking-widest"
+                                                    className="w-full bg-zinc-50 border border-zinc-200 rounded-lg p-3 text-sm text-zinc-900 focus:outline-none focus:border-[#C9A14A] transition-colors tracking-widest"
                                                     placeholder="e.g. A & K - Forever"
                                                 />
                                             </div>
@@ -647,7 +647,7 @@ export default function ProductClient({ product }: { product: any }) {
 
                                     {/* Special Requirements */}
                                     <div className="space-y-1">
-                                        <label htmlFor="requirements" className="block text-xs uppercase tracking-widest text-white/70">Additional Requirements *</label>
+                                        <label htmlFor="requirements" className="block text-xs uppercase tracking-widest text-zinc-650">Additional Requirements *</label>
                                         <textarea
                                             id="requirements"
                                             rows={4}
@@ -658,15 +658,15 @@ export default function ProductClient({ product }: { product: any }) {
                                                     setFormErrors(prev => ({ ...prev, requirements: "" }));
                                                 }
                                             }}
-                                            className={`w-full bg-white/5 border ${formErrors.requirements ? 'border-red-500/50' : 'border-white/10'} rounded-lg p-3 text-sm focus:outline-none focus:border-[#D6B25E] transition-colors resize-none`}
+                                            className={`w-full bg-zinc-50 border ${formErrors.requirements ? 'border-red-300' : 'border-zinc-200'} rounded-lg p-3 text-sm text-zinc-900 focus:outline-none focus:border-[#C9A14A] transition-colors resize-none`}
                                             placeholder="Describe changes in diamond shape, custom bands, custom designs, metal variations, or additional notes..."
                                         />
-                                        {formErrors.requirements && <span className="text-xs text-red-400 block">{formErrors.requirements}</span>}
+                                        {formErrors.requirements && <span className="text-xs text-red-500 block">{formErrors.requirements}</span>}
                                     </div>
 
                                     {/* Submit error */}
                                     {formErrors.submit && (
-                                        <div className="flex items-center gap-2 text-red-400 text-xs bg-red-500/10 p-3 rounded-lg border border-red-500/20">
+                                        <div className="flex items-center gap-2 text-red-500 text-xs bg-red-50 p-3 rounded-lg border border-red-200">
                                             <AlertCircle size={14} />
                                             <span>{formErrors.submit}</span>
                                         </div>
@@ -678,7 +678,7 @@ export default function ProductClient({ product }: { product: any }) {
                                             fullWidth
                                             type="submit"
                                             disabled={isSubmitting}
-                                            className="py-4 text-[14px] bg-[#D6B25E] text-[#0B0B0C] hover:bg-[#E3C67C] disabled:opacity-50 transition-all font-semibold rounded-xl"
+                                            className="py-4 text-[14px] bg-[#C9A14A] text-white border-[#C9A14A] hover:bg-[#b08b3a] hover:border-[#b08b3a] disabled:opacity-50 transition-all font-semibold rounded-xl"
                                         >
                                             {isSubmitting ? "SUBMITTING REQUEST..." : "SUBMIT CUSTOMIZATION REQUEST"}
                                         </Button>
@@ -687,13 +687,13 @@ export default function ProductClient({ product }: { product: any }) {
                             </div>
                         ) : (
                             <div className="flex flex-col items-center justify-center py-16 text-center space-y-6">
-                                <div className="w-20 h-20 rounded-full border border-[#D6B25E] flex items-center justify-center bg-[#D6B25E]/10 animate-[scaleIn_0.5s_ease-out] shadow-[0_0_30px_rgba(214,178,94,0.3)]">
-                                    <Check size={40} className="text-[#D6B25E]" />
+                                <div className="w-20 h-20 rounded-full border border-[#C9A14A] flex items-center justify-center bg-[#C9A14A]/10 animate-[scaleIn_0.5s_ease-out] shadow-[0_0_30px_rgba(201,161,74,0.15)]">
+                                    <Check size={40} className="text-[#C9A14A]" />
                                 </div>
                                 <div className="space-y-2 max-w-md">
-                                    <h3 className="text-2xl font-heading text-[#D6B25E] tracking-wide uppercase">Request Received</h3>
-                                    <p className="text-sm text-white/80 leading-relaxed">
-                                        Thank you for your bespoke request. Our master designer will review your specifications and contact you at <strong className="text-[#D6B25E]">{customerEmail}</strong> or via WhatsApp within 24 hours.
+                                    <h3 className="text-2xl font-heading text-[#C9A14A] tracking-wide uppercase">Request Received</h3>
+                                    <p className="text-sm text-zinc-700 leading-relaxed">
+                                        Thank you for your bespoke request. Our master designer will review your specifications and contact you at <strong className="text-[#C9A14A]">{customerEmail}</strong> or via WhatsApp within 24 hours.
                                     </p>
                                 </div>
                                 <div className="pt-4">
@@ -702,7 +702,7 @@ export default function ProductClient({ product }: { product: any }) {
                                             setIsCustomizing(false);
                                             setSubmitSuccess(false);
                                         }}
-                                        className="px-8 py-3.5 border border-[#D6B25E] text-[#D6B25E] hover:bg-[#D6B25E] hover:text-[#0B0B0C] uppercase tracking-widest text-xs font-semibold rounded-lg transition-all"
+                                        className="px-8 py-3.5 border border-[#C9A14A] text-[#C9A14A] hover:bg-[#C9A14A] hover:text-white uppercase tracking-widest text-xs font-semibold rounded-lg transition-all"
                                     >
                                         Back to Product
                                     </button>
@@ -741,15 +741,15 @@ function ReviewForm({ productId }: { productId: string }) {
     };
 
     if (!user) {
-        return <div className="mt-12 py-8 border-t border-white/10 text-white/60 tracking-widest uppercase text-base text-center font-medium">Please login to write a review.</div>;
+        return <div className="mt-12 py-8 border-t border-zinc-200 text-zinc-500 tracking-widest uppercase text-base text-center font-medium">Please login to write a review.</div>;
     }
 
     return (
-        <form onSubmit={handleSubmit} className="mt-12 pt-10 border-t border-white/10 text-left max-w-[600px] mx-auto">
-            <h4 className="text-2xl font-heading text-white mb-8">Write a Review</h4>
+        <form onSubmit={handleSubmit} className="mt-12 pt-10 border-t border-zinc-200 text-left max-w-[600px] mx-auto">
+            <h4 className="text-2xl font-heading text-zinc-900 mb-8">Write a Review</h4>
             <div className="mb-6">
-                <label className="block text-sm uppercase tracking-widest text-white/70 mb-3 font-medium">Rating</label>
-                <select value={rating} onChange={(e) => setRating(Number(e.target.value))} className="w-full max-w-[200px] p-4 rounded-none border border-white/10 text-white appearance-none bg-white/5 focus:outline-none focus:border-[#D6B25E] transition-colors cursor-pointer font-medium">
+                <label className="block text-sm uppercase tracking-widest text-zinc-650 mb-3 font-medium">Rating</label>
+                <select value={rating} onChange={(e) => setRating(Number(e.target.value))} className="w-full max-w-[200px] p-4 rounded-none border border-zinc-200 text-zinc-900 appearance-none bg-white focus:outline-none focus:border-[#C9A14A] transition-colors cursor-pointer font-medium">
                     <option value="5">5 Stars</option>
                     <option value="4">4 Stars</option>
                     <option value="3">3 Stars</option>
@@ -758,12 +758,12 @@ function ReviewForm({ productId }: { productId: string }) {
                 </select>
             </div>
             <div className="mb-8">
-                <label className="block text-sm uppercase tracking-widest text-white/80 mb-3 font-medium">Review</label>
+                <label className="block text-sm uppercase tracking-widest text-zinc-650 mb-3 font-medium">Review</label>
                 <textarea
                     value={comment}
                     onChange={(e) => setComment(e.target.value)}
                     rows={5}
-                    className="w-full p-5 rounded-none border border-white/10 bg-white/5 text-white focus:outline-none focus:border-[#D6B25E] transition-colors resize-none placeholder:text-white/30"
+                    className="w-full p-5 rounded-none border border-zinc-200 bg-white text-zinc-900 focus:outline-none focus:border-[#C9A14A] transition-colors resize-none placeholder:text-zinc-400"
                     placeholder="Share your experience..."
                 />
             </div>

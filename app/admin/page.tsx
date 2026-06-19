@@ -87,9 +87,9 @@ export default async function AdminDashboardPage() {
     return (
         <div className="space-y-10">
             <header className="mb-10">
-                <span className="text-[11px] tracking-[0.3em] font-bold text-[#D6B25E]/70 uppercase mb-4 block">Administration</span>
-                <h1 className="text-[40px] leading-[1.1] font-medium tracking-tight text-white mb-3">Workspace Overview</h1>
-                <p className="text-white/35 text-[15px] max-w-[640px]">Welcome to the ZYNORA LUXE administrative console.</p>
+                <span className="text-[11px] tracking-[0.3em] font-bold text-[#C9A14A] uppercase mb-4 block">Administration</span>
+                <h1 className="text-[40px] leading-[1.1] font-medium tracking-tight text-zinc-900 mb-3">Workspace Overview</h1>
+                <p className="text-zinc-500 text-[15px] max-w-[640px]">Welcome to the ZYNORA LUXE administrative console.</p>
             </header>
 
             {/* Quick KPI Cards Grid */}
@@ -107,11 +107,11 @@ export default async function AdminDashboardPage() {
             </div>
 
             {/* Recent Orders Table */}
-            <div className="mt-12 bg-white/4 border border-white/8 p-8">
-                <h3 className="uppercase tracking-[0.06em] text-[12px] font-bold text-[#D6B25E]/70 mb-8">Recent Orders</h3>
+            <div className="mt-12 bg-white border border-gray-200 p-8 shadow-sm rounded-none">
+                <h3 className="uppercase tracking-[0.06em] text-[12px] font-bold text-[#C9A14A] mb-8">Recent Orders</h3>
                 <div className="overflow-x-auto custom-scrollbar pb-4">
                     <table className="w-full text-sm text-left">
-                        <thead className="text-[10px] text-[#D6B25E]/55 uppercase tracking-widest bg-white/3 border-y border-white/8">
+                        <thead className="text-[10px] text-zinc-500 uppercase tracking-widest bg-gray-50 border-y border-gray-200">
                             <tr>
                                 <th className="px-6 py-5 font-bold">Order ID</th>
                                 <th className="px-6 py-5 font-bold">Customer</th>
@@ -123,22 +123,22 @@ export default async function AdminDashboardPage() {
                         </thead>
                         <tbody>
                             {recentOrders.map((order) => (
-                                <tr key={order.id} className="border-b border-white/5 hover:bg-white/3 transition-colors">
-                                    <td className="px-6 py-5 font-medium text-white tracking-wide">{order.id}</td>
-                                    <td className="px-6 py-5 text-white/55 font-light">{order.user?.name || 'Guest'}</td>
-                                    <td className="px-6 py-5 text-white/55 font-light">{new Date(order.createdAt).toLocaleDateString()}</td>
-                                    <td className="px-6 py-5 text-[#D6B25E] font-bold tracking-wide">₹{order.totalAmount.toLocaleString('en-IN')}</td>
+                                <tr key={order.id} className="border-b border-gray-100 hover:bg-gray-50/50 transition-colors">
+                                    <td className="px-6 py-5 font-medium text-zinc-900 tracking-wide">{order.id}</td>
+                                    <td className="px-6 py-5 text-zinc-500 font-light">{order.user?.name || 'Guest'}</td>
+                                    <td className="px-6 py-5 text-zinc-500 font-light">{new Date(order.createdAt).toLocaleDateString()}</td>
+                                    <td className="px-6 py-5 text-[#C9A14A] font-bold tracking-wide">₹{order.totalAmount.toLocaleString('en-IN')}</td>
                                     <td className="px-6 py-5">
-                                        <span className={`px-3 py-1.5 text-[9px] uppercase tracking-[0.15em] font-bold rounded-sm border ${order.status === 'PENDING' ? 'bg-orange-500/10 text-orange-400 border-orange-500/20' :
-                                            order.status === 'PAID' ? 'bg-green-500/10 text-green-400 border-green-500/20' :
-                                                order.status === 'SHIPPED' ? 'bg-blue-500/10 text-blue-400 border-blue-500/20' :
-                                                    'bg-white/5 text-white/40 border-white/10'
+                                        <span className={`px-3 py-1.5 text-[9px] uppercase tracking-[0.15em] font-bold rounded-sm border ${order.status === 'PENDING' ? 'bg-orange-50 text-orange-700 border-orange-200' :
+                                            order.status === 'PAID' ? 'bg-green-50 text-green-700 border-green-200' :
+                                                order.status === 'SHIPPED' ? 'bg-blue-50 text-blue-700 border-blue-200' :
+                                                    'bg-gray-50 text-zinc-500 border-gray-200'
                                             }`}>
                                             {order.status}
                                         </span>
                                     </td>
                                     <td className="px-6 py-5">
-                                        <Link href={`/admin/orders?id=${order.id}`} className="text-white/30 hover:text-[#D6B25E] transition-colors inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest no-link-underline">
+                                        <Link href={`/admin/orders?id=${order.id}`} className="text-zinc-400 hover:text-[#C9A14A] transition-colors inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest no-link-underline">
                                             <Eye size={16} /> View
                                         </Link>
                                     </td>
@@ -146,7 +146,7 @@ export default async function AdminDashboardPage() {
                             ))}
                             {recentOrders.length === 0 && (
                                 <tr>
-                                    <td colSpan={6} className="px-6 py-10 text-center text-white/25 tracking-widest uppercase text-xs">No orders found.</td>
+                                    <td colSpan={6} className="px-6 py-10 text-center text-zinc-400 tracking-widest uppercase text-xs">No orders found.</td>
                                 </tr>
                             )}
                         </tbody>
@@ -159,22 +159,22 @@ export default async function AdminDashboardPage() {
 
 function KpiCard({ title, value, trend, isAlert }: { title: string, value: string, trend?: string, isAlert?: boolean }) {
     return (
-        <div className="bg-white/4 border border-white/8 p-7 relative overflow-hidden group transition-all duration-300 hover:-translate-y-1 hover:border-[#D6B25E]/25 hover:shadow-[0_8px_30px_rgba(214,178,94,0.08)]">
-            <h3 className="text-[10px] uppercase tracking-[0.22em] text-[#D6B25E]/60 font-bold mb-3">{title}</h3>
-            <p className="text-[28px] font-medium text-white tracking-tight">{value}</p>
+        <div className="bg-white border border-gray-200 p-7 relative overflow-hidden group transition-all duration-300 hover:-translate-y-1 hover:border-[#C9A14A]/25 hover:shadow-md">
+            <h3 className="text-[10px] uppercase tracking-[0.22em] text-[#C9A14A] font-bold mb-3">{title}</h3>
+            <p className="text-[28px] font-medium text-zinc-900 tracking-tight">{value}</p>
 
             {trend && (
-                <div className="absolute top-7 right-6 text-[10px] uppercase tracking-widest font-bold text-[#D6B25E] bg-[#D6B25E]/10 border border-[#D6B25E]/20 px-2 py-1 rounded-sm">
+                <div className="absolute top-7 right-6 text-[10px] uppercase tracking-widest font-bold text-[#C9A14A] bg-[#C9A14A]/5 border border-[#C9A14A]/10 px-2 py-1 rounded-sm">
                     {trend}
                 </div>
             )}
             {isAlert && (
-                <div className="absolute top-7 right-6 text-[10px] uppercase tracking-widest font-bold text-red-400 bg-red-500/10 border border-red-500/20 px-2 py-1 rounded-sm animate-pulse">
+                <div className="absolute top-7 right-6 text-[10px] uppercase tracking-widest font-bold text-red-700 bg-red-50 border border-red-200 px-2 py-1 rounded-sm animate-pulse">
                     Action Required
                 </div>
             )}
 
-            <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-[#D6B25E]/0 via-[#D6B25E]/40 to-[#D6B25E]/0 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
+            <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-[#C9A14A]/0 via-[#C9A14A]/40 to-[#C9A14A]/0 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
         </div>
     );
 }

@@ -34,8 +34,8 @@ export default async function AdminProductsPage() {
             <header className="mb-10 flex justify-between items-end">
                 <div>
                     <p className="section-kicker mb-4">Catalog</p>
-                    <h1 className="section-title text-white mb-3 tracking-wide">Showcase Products</h1>
-                    <p className="text-white/40 text-[0.95rem] tracking-wide font-light">Manage finished jewelry, pre-set rings, and inventory limits.</p>
+                    <h1 className="section-title text-zinc-900 mb-3 tracking-wide">Showcase Products</h1>
+                    <p className="text-zinc-500 text-[0.95rem] tracking-wide font-light">Manage finished jewelry, pre-set rings, and inventory limits.</p>
                 </div>
             </header>
 

@@ -20,19 +20,19 @@ export const metadata: Metadata = {
 
 export default function DiamondsPage() {
     return (
-        <main className="min-h-screen pb-32 bg-[#0B0B0C] text-white">
-            <AnimatedSection className="py-20 md:py-28 bg-[#0B0B0C]">
-                <div className="container-custom flex flex-col items-center text-center max-w-4xl mx-auto">
-                    <span className="text-[10px] md:text-[11px] tracking-[0.34em] font-medium text-[#D6B25E] uppercase mb-4 block">Diamonds</span>
-                    <h1 className="mb-6 max-w-[720px] mx-auto text-white">
+        <main className="min-h-screen pb-32 bg-white text-zinc-900">
+            <AnimatedSection className="py-12 md:py-16 bg-[#FAF8F4] border-b border-zinc-100">
+                <div className="container-custom flex flex-col items-center text-center max-w-4xl mx-auto px-4">
+                    <span className="text-[9px] md:text-[10px] tracking-[0.34em] font-bold text-[#C9A14A] uppercase mb-3 block">Diamonds</span>
+                    <h1 className="mb-4 text-3xl md:text-4xl font-serif text-zinc-900 font-medium tracking-wide">
                         Find Your Perfect Diamond
                     </h1>
-                    <p className="text-white/70 font-normal max-w-[560px] mx-auto text-[16px] md:text-[18px] leading-[1.9]">
+                    <p className="text-zinc-500 font-normal max-w-[560px] mx-auto text-sm md:text-base leading-relaxed">
                         Certified loose diamonds selected for brilliance and balance. Search by carat, cut, color, clarity, and certification in a refined, premium layout.
                     </p>
                 </div>
             </AnimatedSection>
-            <div className="max-w-7xl mx-auto px-4 md:px-8">
+            <div className="max-w-7xl mx-auto px-4 md:px-8 mt-8">
                 <DiamondSearchClient />
             </div>
         </main>

@@ -32,8 +32,8 @@ export default function PaymentPage() {
 
     if (!mounted || !ring || !customer) {
         return (
-            <div className="bg-[#0B0B0C] min-h-[80vh] flex items-center justify-center text-white">
-                <div className="w-8 h-8 border-2 border-white/20 border-t-[#D6B25E] rounded-full animate-spin" />
+            <div className="bg-white min-h-[80vh] flex items-center justify-center text-zinc-900">
+                <div className="w-8 h-8 border-2 border-zinc-200 border-t-[#C9A14A] rounded-full animate-spin" />
             </div>
         );
     }
@@ -99,18 +99,18 @@ export default function PaymentPage() {
     // Processing overlay
     if (isProcessing) {
         return (
-            <div className="bg-[#0B0B0C] min-h-[80vh] flex items-center justify-center text-white">
-                <div className="text-center max-w-md mx-auto p-10 luxury-shell rounded-[22px]">
+            <div className="bg-[#FAF8F4] min-h-[80vh] flex items-center justify-center text-zinc-900">
+                <div className="text-center max-w-md mx-auto p-10 luxury-shell rounded-[22px] border border-zinc-200 bg-white">
                     <div className="relative w-20 h-20 mx-auto mb-8">
-                        <div className="absolute inset-0 border-4 border-white/10 rounded-full" />
-                        <div className="absolute inset-0 border-4 border-[#D6B25E] border-t-transparent rounded-full animate-spin" />
+                        <div className="absolute inset-0 border-4 border-zinc-100 rounded-full" />
+                        <div className="absolute inset-0 border-4 border-[#C9A14A] border-t-transparent rounded-full animate-spin" />
                         {processingStep === 3 && (
                             <div className="absolute inset-0 flex items-center justify-center animate-in fade-in zoom-in duration-300">
-                                <CheckCircle className="text-green-500" size={32} />
+                                <CheckCircle className="text-green-600" size={32} />
                             </div>
                         )}
                     </div>
-                    <h3 className="font-heading text-lg text-white mb-6 uppercase tracking-wide">Processing Payment</h3>
+                    <h3 className="font-heading text-lg text-zinc-900 mb-6 uppercase tracking-wide">Processing Payment</h3>
                     <div className="space-y-3">
                         {processingSteps.map((step, i) => (
                             <div
@@ -119,22 +119,22 @@ export default function PaymentPage() {
                                     i < processingStep
                                         ? "text-green-600"
                                         : i === processingStep
-                                        ? "text-white font-medium"
-                                        : "text-white/30"
+                                        ? "text-zinc-900 font-medium"
+                                        : "text-zinc-400"
                                 }`}
                             >
                                 {i < processingStep ? (
-                                    <CheckCircle size={16} className="text-green-500 shrink-0" />
+                                    <CheckCircle size={16} className="text-green-600 shrink-0" />
                                 ) : i === processingStep ? (
-                                    <div className="w-4 h-4 border-2 border-[#D6B25E] border-t-transparent rounded-full animate-spin shrink-0" />
+                                    <div className="w-4 h-4 border-2 border-[#C9A14A] border-t-transparent rounded-full animate-spin shrink-0" />
                                 ) : (
-                                    <div className="w-4 h-4 border border-white/10 rounded-full shrink-0" />
+                                    <div className="w-4 h-4 border border-zinc-200 rounded-full shrink-0" />
                                 )}
                                 {step}
                             </div>
                         ))}
                     </div>
-                    <p className="text-[10px] text-white/40 mt-8 uppercase tracking-widest">
+                    <p className="text-[10px] text-zinc-400 mt-8 uppercase tracking-widest">
                         Demo payment simulation
                     </p>
                 </div>
@@ -143,13 +143,13 @@ export default function PaymentPage() {
     }
 
     return (
-        <div className="bg-[#0B0B0C] min-h-[80vh] pt-6 pb-24 font-body text-white">
+        <div className="bg-[#FAF8F4] min-h-[80vh] pt-6 pb-24 font-body text-zinc-900">
             <div className="container-custom max-w-5xl">
                 {/* Back */}
                 <FadeIn>
                     <button
                         onClick={() => router.back()}
-                        className="flex items-center gap-2 text-white/45 hover:text-white text-xs uppercase tracking-widest font-bold mb-6 transition-colors"
+                        className="flex items-center gap-2 text-zinc-500 hover:text-zinc-900 text-xs uppercase tracking-widest font-bold mb-6 transition-colors"
                     >
                         <ArrowLeft size={14} /> Back to Checkout
                     </button>
@@ -162,27 +162,27 @@ export default function PaymentPage() {
 
                 <FadeIn>
                     <div className="flex items-center justify-center gap-3 mb-1">
-                        <Lock size={18} className="text-[#D6B25E]" />
-                        <h1 className="text-3xl md:text-4xl font-heading text-white tracking-wide">Secure Payment</h1>
+                        <Lock size={18} className="text-[#C9A14A]" />
+                        <h1 className="text-3xl md:text-4xl font-heading text-zinc-900 tracking-wide">Secure Payment</h1>
                     </div>
-                    <p className="text-white/45 text-sm tracking-wide mb-10 text-center">Choose your preferred payment method</p>
+                    <p className="text-zinc-500 text-sm tracking-wide mb-10 text-center">Choose your preferred payment method</p>
                 </FadeIn>
 
                 <div className="flex flex-col lg:flex-row gap-10">
                     {/* Left: Payment Methods */}
                     <div className="flex-[1.4]">
                         <FadeIn>
-                            <div className="luxury-shell border border-white/10 shadow-sm rounded-[22px] overflow-hidden">
+                            <div className="luxury-shell border border-zinc-200 bg-white shadow-sm rounded-[22px] overflow-hidden">
                                 {/* Tabs */}
-                                <div className="flex border-b border-white/10">
+                                <div className="flex border-b border-zinc-200">
                                     {tabs.map((tab) => (
                                         <button
                                             key={tab.key}
                                             onClick={() => setActiveTab(tab.key)}
                                             className={`flex-1 flex items-center justify-center gap-2 py-4 text-xs uppercase tracking-widest font-bold transition-all border-b-2 ${
                                                 activeTab === tab.key
-                                                    ? "border-[#D6B25E] text-white bg-white/5"
-                                                    : "border-transparent text-white/40 hover:text-white"
+                                                    ? "border-[#C9A14A] text-zinc-900 bg-zinc-50"
+                                                    : "border-transparent text-zinc-400 hover:text-zinc-900"
                                             }`}
                                         >
                                             {tab.icon}
@@ -194,14 +194,14 @@ export default function PaymentPage() {
                                 <div className="p-6">
                                     {/* Card Tab */}
                                     {activeTab === "card" && (
-                                        <div className="animate-in fade-in duration-300 space-y-5 text-white">
+                                        <div className="animate-in fade-in duration-300 space-y-5 text-zinc-900">
                                             {/* Card Preview */}
-                                            <div className="relative bg-gradient-to-br from-[#101012] to-[#1b1b1f] text-white p-6 rounded-lg shadow-xl overflow-hidden border border-white/10">
+                                            <div className="relative bg-gradient-to-br from-[#101012] to-[#1b1b1f] text-white p-6 rounded-lg shadow-xl overflow-hidden border border-zinc-800">
                                                 <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
                                                 <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2" />
                                                 <div className="relative z-10">
                                                     <div className="flex items-center justify-between mb-8">
-                                                        <div className="w-10 h-7 bg-gradient-to-r from-[#D6B25E] to-[#E3C67C] rounded-sm" />
+                                                        <div className="w-10 h-7 bg-gradient-to-r from-[#C9A14A] to-[#E3C67C] rounded-sm" />
                                                         <span className="text-xs tracking-widest text-white/60 uppercase">Credit Card</span>
                                                     </div>
                                                     <p className="font-mono text-lg tracking-[0.25em] mb-6 text-white/90">4242 •••• •••• 4242</p>
@@ -220,37 +220,37 @@ export default function PaymentPage() {
 
                                             <div className="space-y-4">
                                                 <div>
-                                                    <label className="text-[10px] uppercase tracking-widest font-bold text-white/40 mb-2 block">Card Number</label>
+                                                    <label className="text-[10px] uppercase tracking-widest font-bold text-zinc-500 mb-2 block">Card Number</label>
                                                     <input
                                                         type="text"
                                                         defaultValue="4242 4242 4242 4242"
-                                                        className="w-full px-4 py-3.5 border border-white/10 bg-white/5 text-white focus:outline-none focus:border-[#D6B25E] transition-colors font-mono text-sm"
+                                                        className="w-full px-4 py-3.5 border border-zinc-200 bg-zinc-50 text-zinc-900 focus:outline-none focus:border-[#C9A14A] transition-colors font-mono text-sm"
                                                     />
                                                 </div>
                                                 <div className="grid grid-cols-2 gap-4">
                                                     <div>
-                                                        <label className="text-[10px] uppercase tracking-widest font-bold text-white/40 mb-2 block">Expiry</label>
+                                                        <label className="text-[10px] uppercase tracking-widest font-bold text-zinc-500 mb-2 block">Expiry</label>
                                                         <input
                                                             type="text"
                                                             defaultValue="12/28"
-                                                            className="w-full px-4 py-3.5 border border-white/10 bg-white/5 text-white focus:outline-none focus:border-[#D6B25E] transition-colors font-mono text-sm"
+                                                            className="w-full px-4 py-3.5 border border-zinc-200 bg-zinc-50 text-zinc-900 focus:outline-none focus:border-[#C9A14A] transition-colors font-mono text-sm"
                                                         />
                                                     </div>
                                                     <div>
-                                                        <label className="text-[10px] uppercase tracking-widest font-bold text-white/40 mb-2 block">CVV</label>
+                                                        <label className="text-[10px] uppercase tracking-widest font-bold text-zinc-500 mb-2 block">CVV</label>
                                                         <input
                                                             type="text"
                                                             defaultValue="123"
-                                                            className="w-full px-4 py-3.5 border border-white/10 bg-white/5 text-white focus:outline-none focus:border-[#D6B25E] transition-colors font-mono text-sm"
+                                                            className="w-full px-4 py-3.5 border border-zinc-200 bg-zinc-50 text-zinc-900 focus:outline-none focus:border-[#C9A14A] transition-colors font-mono text-sm"
                                                         />
                                                     </div>
                                                 </div>
                                                 <div>
-                                                    <label className="text-[10px] uppercase tracking-widest font-bold text-white/40 mb-2 block">Name on Card</label>
+                                                    <label className="text-[10px] uppercase tracking-widest font-bold text-zinc-500 mb-2 block">Name on Card</label>
                                                     <input
                                                         type="text"
                                                         defaultValue={customer.name}
-                                                        className="w-full px-4 py-3.5 border border-white/10 bg-white/5 text-white focus:outline-none focus:border-[#D6B25E] transition-colors text-sm"
+                                                        className="w-full px-4 py-3.5 border border-zinc-200 bg-zinc-50 text-zinc-900 focus:outline-none focus:border-[#C9A14A] transition-colors text-sm"
                                                     />
                                                 </div>
                                             </div>

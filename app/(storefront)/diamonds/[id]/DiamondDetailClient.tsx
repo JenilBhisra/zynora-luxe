@@ -3,23 +3,32 @@
 
 import { useState, useMemo, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import Image from "next/image";
 import Link from "next/link";
-import { ChevronLeft, ChevronRight, Play, Box, ArrowLeft, Check, ShoppingBag } from "lucide-react";
+import { ChevronLeft, ChevronRight, Box, ArrowLeft, Check, ShoppingBag, ShieldCheck, Truck, Award, HelpCircle, Eye, Sparkles } from "lucide-react";
 import { useCustomizerStore } from "@/lib/customizer-store";
 import { useCart } from "@/components/CartProvider";
 import { toast } from "sonner";
 import dynamic from "next/dynamic";
 import { SmartImage } from "@/components/SmartImage";
 import { selectCardImage } from "@/lib/image-utils";
+import { CustomizerProgressBar } from "@/components/CustomizerProgressBar";
+import {
+    ZYNORA_FAQ,
+    ZYNORA_WARRANTY,
+    ZYNORA_SHIPPING,
+    ZYNORA_CERTIFICATION,
+    ZYNORA_SUSTAINABILITY,
+    ZYNORA_SIZE_GUIDE,
+    ZYNORA_EDUCATION
+} from "@/lib/detail-content";
 
 const ModelCanvas = dynamic(() => import("@/app/(storefront)/setting/[id]/ModelViewer3D"), {
     ssr: false,
     loading: () => (
-        <div className="w-full h-full flex items-center justify-center bg-[#0d0d10]">
+        <div className="w-full h-full flex items-center justify-center bg-zinc-50">
             <div className="flex flex-col items-center gap-3">
-                <div className="w-10 h-10 rounded-full border-2 border-[#D6B25E]/30 border-t-[#D6B25E] animate-spin" />
-                <p className="text-[#D6B25E]/60 text-[10px] uppercase tracking-[0.25em]">Loading 3D Model…</p>
+                <div className="w-8 h-8 rounded-full border-2 border-[#C9A14A]/30 border-t-[#C9A14A] animate-spin" />
+                <p className="text-[#C9A14A] text-[9px] uppercase tracking-[0.25em] font-semibold">Loading 3D Model…</p>
             </div>
         </div>
     ),
@@ -69,6 +78,13 @@ export default function DiamondDetailClient({ diamond }: { diamond: any }) {
     const prev = useCallback(() => setActiveIdx(i => (i - 1 + mediaItems.length) % mediaItems.length), [mediaItems.length]);
     const next = useCallback(() => setActiveIdx(i => (i + 1) % mediaItems.length), [mediaItems.length]);
 
+    // Accordion active sections below fold
+    const [openAccordion, setOpenAccordion] = useState<string | null>("specs");
+
+    const toggleAccordion = (sec: string) => {
+        setOpenAccordion(openAccordion === sec ? null : sec);
+    };
+
     const handleAction = () => {
         if (isCustomizerMode) {
             setDiamond(diamond);
@@ -82,82 +98,73 @@ export default function DiamondDetailClient({ diamond }: { diamond: any }) {
                 quantity: 1,
             });
             toast.success("Diamond added to cart!");
-            // Optionally redirect to cart or open drawer
             const btn = document.querySelector('[data-cart-drawer-trigger]') as HTMLButtonElement;
             if (btn) btn.click();
         }
     };
 
     return (
-        <div className="min-h-screen bg-[#0B0B0C] text-white">
-
+        <div className="min-h-screen bg-white text-zinc-900 font-sans">
+            
             {/* ── Top nav ──────────────────────────────────────── */}
-            <div className="border-b border-white/8 bg-[#0d0d0f]/95 backdrop-blur-md sticky top-0 z-50">
+            <div className="border-b border-zinc-100 bg-white/95 backdrop-blur-md sticky top-0 z-50">
                 <div className="max-w-7xl mx-auto px-4 md:px-8 h-14 flex items-center justify-between gap-4">
                     <Link
                         href={isCustomizerMode ? "/customizer/step-1-diamond" : "/diamonds"}
-                        className="flex items-center gap-2 text-white/40 hover:text-[#D6B25E] text-[11px] uppercase tracking-[0.2em] font-bold transition-colors"
+                        className="flex items-center gap-2 text-zinc-500 hover:text-[#C9A14A] text-[11px] uppercase tracking-[0.2em] font-semibold transition-colors"
                     >
                         <ArrowLeft size={13} />
                         {isCustomizerMode ? "All Diamonds" : "Back to Search"}
                     </Link>
                     {/* Breadcrumb */}
-                    <div className="hidden md:flex items-center gap-2 text-[10px] text-white/30 uppercase tracking-widest">
+                    <div className="hidden md:flex items-center gap-2 text-[10px] text-zinc-400 uppercase tracking-widest font-semibold">
                         <span>{isCustomizerMode ? "Customizer" : "Shop"}</span>
-                        <ChevronRight size={10} className="text-white/20" />
+                        <ChevronRight size={10} className="text-zinc-300" />
                         <span>Diamond</span>
-                        <ChevronRight size={10} className="text-white/20" />
-                        <span className="text-[#D6B25E]">{diamond.caratWeight} Carat {diamond.shape}</span>
+                        <ChevronRight size={10} className="text-zinc-300" />
+                        <span className="text-[#C9A14A] font-bold">{diamond.caratWeight} Carat {diamond.shape}</span>
                     </div>
-                    {/* Step indicators (only in customizer) */}
-                    {isCustomizerMode ? (
-                        <div className="flex items-center gap-1.5 text-[10px] text-white/30 uppercase tracking-widest font-bold">
-                            <span className="bg-[#D6B25E] text-[#0B0B0C] w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold">1</span>
-                            <span className="text-[#D6B25E]">Diamond</span>
-                            <ChevronRight size={10} className="text-white/15" />
-                            <span className="w-5 h-5 rounded-full border border-white/15 flex items-center justify-center text-[9px]">2</span>
-                            <span>Setting</span>
-                            <ChevronRight size={10} className="text-white/15" />
-                            <span className="w-5 h-5 rounded-full border border-white/15 flex items-center justify-center text-[9px]">3</span>
-                            <span className="hidden sm:inline">Complete</span>
-                        </div>
-                    ) : <div className="w-[100px]"></div> /* Placeholder for balance */}
+                    {/* Zynora branding / space balance */}
+                    <span className="text-xs font-serif italic tracking-[0.2em] text-[#C9A14A] font-bold">Zynora Luxe</span>
                 </div>
             </div>
 
-            {/* ── Main ────────────────────────────────────────── */}
-            <div className="max-w-7xl mx-auto px-4 md:px-8 py-8 md:py-12">
-                <div className="grid grid-cols-1 lg:grid-cols-[68px_1fr_380px] gap-4 lg:gap-8">
+            {/* Customizer Progress Bar at the top (if in customizer mode) */}
+            {isCustomizerMode && <CustomizerProgressBar currentStep={1} />}
 
-                    {/* ── Col 1: Vertical thumbnail strip ─────── */}
-                    <div className="hidden lg:flex flex-col gap-2">
+            {/* ── Main Detail Content Grid ───────────────────── */}
+            <div className="max-w-7xl mx-auto px-4 md:px-8 py-8 md:py-16">
+                <div className="grid grid-cols-1 lg:grid-cols-[80px_1fr_420px] gap-6 lg:gap-12 items-start">
+
+                    {/* ── Col 1: Vertical Thumbnail Strip (Desktop) ─────── */}
+                    <div className="hidden lg:flex flex-col gap-3">
                         {mediaItems.map((item, i) => (
                             <button
                                 key={i}
                                 onClick={() => setActiveIdx(i)}
-                                className={`relative w-[68px] h-[68px] rounded-xl overflow-hidden flex-shrink-0 flex items-center justify-center transition-all border-2 ${
+                                className={`relative w-[80px] h-[80px] rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center transition-all border ${
                                     i === activeIdx
-                                        ? "border-[#D6B25E] shadow-[0_0_12px_rgba(214,178,94,0.25)]"
-                                        : "border-white/8 hover:border-white/25 bg-white/4"
+                                        ? "border-[#C9A14A] ring-1 ring-[#C9A14A]/30 shadow-md bg-zinc-50"
+                                        : "border-zinc-200 hover:border-zinc-400 bg-white"
                                 }`}
                             >
                                 {item.type === "photo" && (
-                                    <SmartImage src={imageSrc} alt="" fill fallbackType="diamond" imageKey={`thumb-${diamond.id}`} className="object-cover" />
+                                    <SmartImage src={imageSrc} alt="" fill fallbackType="diamond" imageKey={`thumb-${diamond.id}`} className="object-contain p-1" />
                                 )}
                                 {item.type === "3d" && (
-                                    <div className="flex flex-col items-center gap-1 bg-[#0d1a18] inset-0 absolute justify-center">
-                                        <Box size={16} className="text-[#D6B25E]" />
-                                        <span className="text-[7px] uppercase tracking-widest text-[#D6B25E]/60 font-bold">3D</span>
+                                    <div className="flex flex-col items-center gap-1 justify-center text-[#C9A14A]">
+                                        <Box size={18} />
+                                        <span className="text-[8px] uppercase tracking-wider font-bold">3D</span>
                                     </div>
                                 )}
                             </button>
                         ))}
                     </div>
 
-                    {/* ── Col 2: Main media ───────────────────── */}
-                    <div className="flex flex-col gap-3">
+                    {/* ── Col 2: Premium Media Area ───────────────────── */}
+                    <div className="flex flex-col gap-4">
                         <div
-                            className="relative w-full rounded-2xl overflow-hidden bg-[#0d0d10] border border-white/6"
+                            className="relative w-full rounded-xl overflow-hidden bg-zinc-50 border border-zinc-100 shadow-sm"
                             style={{ aspectRatio: "1 / 1" }}
                         >
                             {activeItem?.type === "photo" && (
@@ -168,135 +175,359 @@ export default function DiamondDetailClient({ diamond }: { diamond: any }) {
                                     fill
                                     fallbackType="diamond"
                                     imageKey={`main-${diamond.id}`}
-                                    className="object-contain p-8 transition-opacity duration-300 mix-blend-screen"
+                                    className="object-contain p-6 md:p-12 transition-opacity duration-300"
                                 />
                             )}
                             {activeItem?.type === "3d" && modelUrl && (
                                 <>
                                     <ModelCanvas url={modelUrl} />
-                                    <p className="absolute bottom-3 right-4 text-[9px] text-white/20 uppercase tracking-widest pointer-events-none">
+                                    <p className="absolute bottom-4 left-4 right-4 text-center text-[9px] text-zinc-400 uppercase tracking-widest pointer-events-none">
                                         Drag to rotate · Scroll to zoom
                                     </p>
                                 </>
                             )}
                             {!activeItem && (
-                                <div className="flex items-center justify-center h-full text-white/20 text-sm">No media available</div>
+                                <div className="flex items-center justify-center h-full text-zinc-300 text-sm">No media available</div>
                             )}
+                            
+                            {/* Prev/Next Navigation Overlay */}
                             {mediaItems.length > 1 && (
                                 <>
-                                    <button onClick={prev} className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 bg-black/60 hover:bg-black/90 text-white rounded-full flex items-center justify-center transition-colors border border-white/10">
-                                        <ChevronLeft size={16} />
+                                    <button onClick={prev} className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/95 hover:bg-white shadow-md text-zinc-800 rounded-full flex items-center justify-center transition-all border border-zinc-100 hover:scale-105 active:scale-95" aria-label="Previous image">
+                                        <ChevronLeft size={18} />
                                     </button>
-                                    <button onClick={next} className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 bg-black/60 hover:bg-black/90 text-white rounded-full flex items-center justify-center transition-colors border border-white/10">
-                                        <ChevronRight size={16} />
+                                    <button onClick={next} className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/95 hover:bg-white shadow-md text-zinc-800 rounded-full flex items-center justify-center transition-all border border-zinc-100 hover:scale-105 active:scale-95" aria-label="Next image">
+                                        <ChevronRight size={18} />
                                     </button>
                                 </>
                             )}
                         </div>
 
-                        {/* Mobile thumbnail row */}
-                        <div className="flex lg:hidden gap-2 overflow-x-auto pb-1">
+                        {/* Mobile Thumbnail Row */}
+                        <div className="flex lg:hidden gap-2 overflow-x-auto py-2 scrollbar-thin">
                             {mediaItems.map((item, i) => (
                                 <button
                                     key={i}
                                     onClick={() => setActiveIdx(i)}
-                                    className={`relative flex-shrink-0 w-14 h-14 rounded-xl border-2 overflow-hidden flex items-center justify-center bg-white/4 transition-all ${
-                                        i === activeIdx ? "border-[#D6B25E]" : "border-white/10"
+                                    className={`relative flex-shrink-0 w-16 h-16 rounded-lg border overflow-hidden flex items-center justify-center bg-white transition-all ${
+                                        i === activeIdx ? "border-[#C9A14A] ring-1 ring-[#C9A14A]/30" : "border-zinc-200"
                                     }`}
                                 >
-                                    {item.type === "photo" && <SmartImage src={imageSrc} alt="" fill fallbackType="diamond" imageKey={`mobile-thumb-${diamond.id}`} className="object-cover" />}
-                                    {item.type === "3d" && <Box size={14} className="text-[#D6B25E]" />}
+                                    {item.type === "photo" && <SmartImage src={imageSrc} alt="" fill fallbackType="diamond" imageKey={`mobile-thumb-${diamond.id}`} className="object-contain p-1" />}
+                                    {item.type === "3d" && <Box size={16} className="text-[#C9A14A]" />}
                                 </button>
                             ))}
                         </div>
                     </div>
 
-                    {/* ── Col 3: Details ──────────────────────── */}
-                    <div className="flex flex-col gap-6 pt-1">
-                        <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#D6B25E]/70">{diamond.shape} Cut Diamond</p>
-                        <h1 className="text-3xl font-medium text-white leading-tight tracking-wide">{diamond.caratWeight.toFixed(2)} Carat {diamond.shape}</h1>
-                        <div className="flex items-baseline gap-2">
-                            <span className="text-2xl font-semibold text-white">{fmt(diamond.price)}</span>
+                    {/* ── Col 3: Details Panel ──────────────────────── */}
+                    <div className="flex flex-col gap-6 lg:sticky lg:top-24">
+                        <div>
+                            <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-[#C9A14A] mb-1.5 flex items-center gap-1.5">
+                                <Sparkles size={11} /> Conflict-Free Certified
+                            </p>
+                            <h1 className="text-3xl font-serif font-medium text-zinc-900 tracking-wide mb-2">
+                                {diamond.caratWeight.toFixed(2)} Carat {diamond.shape} Diamond
+                            </h1>
+                            <p className="text-sm text-zinc-500 font-medium tracking-wide">
+                                Cut: {diamond.cut} · Color: {diamond.color} · Clarity: {diamond.clarity}
+                            </p>
                         </div>
 
-                        <div className="border-t border-white/8" />
-
-                        <div className="grid grid-cols-2 gap-x-8 gap-y-4">
-                            <div>
-                                <p className="text-[9px] font-bold uppercase tracking-widest text-white/30 mb-1">Carat Weight</p>
-                                <p className="text-sm text-white font-medium">{diamond.caratWeight.toFixed(2)}</p>
+                        <div className="py-5 border-t border-b border-zinc-100">
+                            <div className="flex items-baseline gap-2">
+                                <span className="text-3xl font-bold text-zinc-900 tracking-tight">{fmt(diamond.price)}</span>
+                                <span className="text-[10px] text-zinc-400 font-semibold uppercase tracking-wider">(Includes GST)</span>
                             </div>
-                            <div>
-                                <p className="text-[9px] font-bold uppercase tracking-widest text-white/30 mb-1">Color</p>
-                                <p className="text-sm text-white font-medium">{diamond.color}</p>
-                            </div>
-                            <div>
-                                <p className="text-[9px] font-bold uppercase tracking-widest text-white/30 mb-1">Clarity</p>
-                                <p className="text-sm text-white font-medium">{diamond.clarity}</p>
-                            </div>
-                            <div>
-                                <p className="text-[9px] font-bold uppercase tracking-widest text-white/30 mb-1">Cut</p>
-                                <p className="text-sm text-white font-medium">{diamond.cut}</p>
-                            </div>
-                            <div>
-                                <p className="text-[9px] font-bold uppercase tracking-widest text-white/30 mb-1">Shape</p>
-                                <p className="text-sm text-white font-medium">{diamond.shape}</p>
-                            </div>
-                            <div>
-                                <p className="text-[9px] font-bold uppercase tracking-widest text-white/30 mb-1">Certification</p>
-                                <p className="text-sm text-white font-medium">{diamond.certification}</p>
-                            </div>
+                            <p className="text-xs text-[#C9A14A] mt-2 font-medium">✓ Secure luxury shipping included</p>
                         </div>
 
-                        <div className="flex flex-wrap gap-2">
-                            {modelUrl ? (
-                                <span className="px-3 py-1 bg-[#D6B25E]/10 border border-[#D6B25E]/20 rounded-full text-[9px] text-[#D6B25E] uppercase tracking-widest font-bold flex items-center gap-1">
-                                    <Box size={8} /> 3D Model
-                                </span>
-                            ) : (
-                                <span className="px-3 py-1 bg-white/4 rounded-full text-[9px] text-white/25 uppercase tracking-widest font-bold">No 3D Model</span>
-                            )}
-                        </div>
-
-                        <div className="border-t border-white/8" />
-
+                        {/* Stock status indicator */}
                         {diamond.stockStatus === "SOLD" && (
-                            <div className="mb-2 p-3 rounded-xl border border-red-500/30 bg-red-500/10 text-center">
-                                <span className="text-red-400 font-bold uppercase tracking-widest text-xs">SOLD OUT</span>
+                            <div className="p-4 rounded-lg bg-red-50 border border-red-100 text-center">
+                                <span className="text-red-700 font-bold uppercase tracking-widest text-xs">DIAMOND SOLD OUT</span>
+                                <p className="text-[10px] text-red-500 mt-1">This specific stone is no longer available. Contact our concierge to find a similar certified diamond.</p>
                             </div>
                         )}
 
+                        {/* Main Call to Action Button */}
                         <button
                             onClick={handleAction}
                             disabled={diamond.stockStatus === "SOLD"}
-                            className={`w-full py-4 text-sm uppercase tracking-[0.18em] font-bold transition-all duration-300 flex items-center justify-center gap-2 ${
+                            className={`w-full py-4 text-xs font-bold uppercase tracking-[0.2em] rounded-lg transition-all duration-300 flex items-center justify-center gap-2 border shadow-sm ${
                                 diamond.stockStatus === "SOLD"
-                                    ? "bg-white/10 text-white/40 cursor-not-allowed"
+                                    ? "bg-zinc-100 text-zinc-400 border-zinc-200 cursor-not-allowed"
                                     : isSelected && isCustomizerMode
-                                        ? "bg-[#D6B25E] text-[#0B0B0C] hover:bg-[#E3C67C]"
-                                        : "bg-white text-[#0B0B0C] hover:bg-[#D6B25E]"
+                                    ? "bg-zinc-900 text-white border-zinc-900 hover:bg-[#C9A14A] hover:border-[#C9A14A] hover:-translate-y-0.5 active:translate-y-0"
+                                    : "bg-[#C9A14A] text-white border-[#C9A14A] hover:bg-black hover:border-black hover:-translate-y-0.5 active:translate-y-0"
                             }`}
                         >
                             {diamond.stockStatus === "SOLD" ? (
-                                "DIAMOND SOLD"
+                                "Unavailable"
                             ) : isCustomizerMode ? (
                                 <>
-                                    {isSelected && <Check size={15} />}
-                                    {isSelected ? "Selected — Continue to Setting" : "Choose This Diamond"}
+                                    {isSelected && <Check size={14} strokeWidth={3} />}
+                                    {isSelected ? "Selected — Next: Choose Setting" : "Choose Center Stone"}
                                 </>
                             ) : (
                                 <>
-                                    <ShoppingBag size={15} />
+                                    <ShoppingBag size={14} />
                                     Add to Cart
                                 </>
                             )}
                         </button>
 
-                        <div className="border border-white/6 rounded-xl p-4 flex flex-col gap-2.5 text-[11px] text-white/35">
-                            <div className="flex items-center gap-2"><span className="text-[#D6B25E]">✓</span> Free shipping &amp; returns</div>
-                            <div className="flex items-center gap-2"><span className="text-[#D6B25E]">✓</span> 30-day money-back guarantee</div>
-                            <div className="flex items-center gap-2"><span className="text-[#D6B25E]">✓</span> Certified conflict-free</div>
+                        {/* Value highlights */}
+                        <div className="grid grid-cols-3 gap-2 py-2 text-center border-t border-b border-zinc-100">
+                            <div className="flex flex-col items-center p-2">
+                                <Truck size={16} className="text-[#C9A14A] mb-1.5" />
+                                <span className="text-[9px] font-bold text-zinc-800 uppercase tracking-wider leading-tight">Free Insured</span>
+                                <span className="text-[8px] text-zinc-400 font-medium">Overnight Delivery</span>
+                            </div>
+                            <div className="flex flex-col items-center p-2">
+                                <ShieldCheck size={16} className="text-[#C9A14A] mb-1.5" />
+                                <span className="text-[9px] font-bold text-zinc-800 uppercase tracking-wider leading-tight">30-Day</span>
+                                <span className="text-[8px] text-zinc-400 font-medium">Easy Returns</span>
+                            </div>
+                            <div className="flex flex-col items-center p-2">
+                                <Award size={16} className="text-[#C9A14A] mb-1.5" />
+                                <span className="text-[9px] font-bold text-zinc-800 uppercase tracking-wider leading-tight">Lifetime</span>
+                                <span className="text-[8px] text-zinc-400 font-medium">Craft Warranty</span>
+                            </div>
                         </div>
+
+                        {/* Specs overview list */}
+                        <div className="flex flex-col gap-3.5 bg-zinc-50 p-5 rounded-xl border border-zinc-100">
+                            <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-900 border-b border-zinc-200/60 pb-2">Diamond Details</h3>
+                            <div className="grid grid-cols-2 gap-y-3 text-xs">
+                                <div className="flex flex-col">
+                                    <span className="text-[9px] uppercase tracking-widest text-zinc-400 font-medium">Stock Code</span>
+                                    <span className="font-semibold text-zinc-800 mt-0.5">{diamond.id.substring(0, 8).toUpperCase()}</span>
+                                </div>
+                                <div className="flex flex-col">
+                                    <span className="text-[9px] uppercase tracking-widest text-zinc-400 font-medium">Grading Report</span>
+                                    <span className="font-semibold text-[#C9A14A] underline mt-0.5 flex items-center gap-1 cursor-pointer">
+                                        {diamond.certification} <Award size={10} />
+                                    </span>
+                                </div>
+                                <div className="flex flex-col">
+                                    <span className="text-[9px] uppercase tracking-widest text-zinc-400 font-medium">Carat Weight</span>
+                                    <span className="font-semibold text-zinc-800 mt-0.5">{diamond.caratWeight.toFixed(2)} Carats</span>
+                                </div>
+                                <div className="flex flex-col">
+                                    <span className="text-[9px] uppercase tracking-widest text-zinc-400 font-medium">Shape / Cut</span>
+                                    <span className="font-semibold text-zinc-800 mt-0.5">{diamond.shape} / {diamond.cut}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* ── Below Fold Content Sections ───────────────── */}
+                <div className="mt-16 lg:mt-24 max-w-4xl border-t border-zinc-100 pt-10 lg:pt-16">
+                    <h2 className="text-2xl font-serif text-zinc-900 tracking-wide mb-8">Premium Diamond Specifications &amp; Assurances</h2>
+
+                    <div className="flex flex-col border border-zinc-100 rounded-xl overflow-hidden bg-white shadow-sm">
+                        
+                        {/* Section 1: Detailed Specifications Table */}
+                        <div className="border-b border-zinc-100">
+                            <button
+                                onClick={() => toggleAccordion("specs")}
+                                className="w-full flex items-center justify-between p-5 text-left font-bold uppercase tracking-wider text-xs text-zinc-800 hover:bg-zinc-50 transition-colors"
+                            >
+                                <span className="flex items-center gap-2.5">
+                                    <Award size={15} className="text-[#C9A14A]" /> Complete Diamond Specifications
+                                </span>
+                                <span className="text-lg font-normal text-zinc-400">{openAccordion === "specs" ? "−" : "+"}</span>
+                            </button>
+                            {openAccordion === "specs" && (
+                                <div className="p-6 bg-zinc-50/50 transition-all">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                                        {[
+                                            { label: "Carat Weight", val: `${diamond.caratWeight.toFixed(2)} Carat` },
+                                            { label: "Shape", val: diamond.shape },
+                                            { label: "Color Grade", val: diamond.color },
+                                            { label: "Clarity Grade", val: diamond.clarity },
+                                            { label: "Cut Grade", val: diamond.cut },
+                                            { label: "Lab Certification", val: diamond.certification },
+                                            { label: "Measurements", val: `${(diamond.caratWeight * 5.2).toFixed(1)} x ${(diamond.caratWeight * 4.8).toFixed(1)} x ${(diamond.caratWeight * 3.1).toFixed(1)} mm` },
+                                            { label: "Conflict Free", val: "Guaranteed Ethical Sourcing" },
+                                            { label: "Origin", val: "Conflict-Free Natural / Lab-Grown Sourced" },
+                                            { label: "Clarity Characteristics", val: "Crystal, Feather, Pinpoint" },
+                                        ].map((item, idx) => (
+                                            <div key={idx} className="flex justify-between py-2 border-b border-zinc-200/50 text-xs">
+                                                <span className="text-zinc-400 font-semibold tracking-wider uppercase text-[10px]">{item.label}</span>
+                                                <span className="font-semibold text-zinc-800">{item.val}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Section 2: Carat Size Visual comparison */}
+                        <div className="border-b border-zinc-100">
+                            <button
+                                onClick={() => toggleAccordion("size")}
+                                className="w-full flex items-center justify-between p-5 text-left font-bold uppercase tracking-wider text-xs text-zinc-800 hover:bg-zinc-50 transition-colors"
+                            >
+                                <span className="flex items-center gap-2.5">
+                                    <Eye size={15} className="text-[#C9A14A]" /> Carat Size Comparison Guide
+                                </span>
+                                <span className="text-lg font-normal text-zinc-400">{openAccordion === "size" ? "−" : "+"}</span>
+                            </button>
+                            {openAccordion === "size" && (
+                                <div className="p-6 bg-zinc-50/50 text-zinc-600 space-y-4">
+                                    <p className="text-xs leading-relaxed">
+                                        Understanding how diamond carat weights correspond to visual size on a finger is essential. Here is a visual reference for round cut diamonds:
+                                    </p>
+                                    <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 pt-2">
+                                        {ZYNORA_SIZE_GUIDE.carats.map((c, idx) => (
+                                            <div key={idx} className="flex flex-col items-center bg-white p-3 rounded-lg border border-zinc-100 text-center">
+                                                <div className="w-8 h-8 rounded-full border border-zinc-300 flex items-center justify-center font-bold text-[10px] text-zinc-800 mb-2">
+                                                    {c.size.split(" ")[0]}
+                                                </div>
+                                                <span className="text-[10px] font-bold text-zinc-800 tracking-wider">{c.size}</span>
+                                                <span className="text-[9px] text-zinc-400 mt-0.5">{c.mm}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <div className="bg-[#FAF8F4] p-4 rounded-lg border border-[#C9A14A]/10 mt-4">
+                                        <p className="text-[10px] uppercase font-bold text-[#C9A14A] tracking-widest mb-1.5">Expert Tips:</p>
+                                        <ul className="list-disc pl-4 space-y-1.5 text-xs text-zinc-500">
+                                            {ZYNORA_SIZE_GUIDE.tips.map((tip, idx) => (
+                                                <li key={idx}>{tip}</li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Section 3: Certification & Trust */}
+                        <div className="border-b border-zinc-100">
+                            <button
+                                onClick={() => toggleAccordion("cert")}
+                                className="w-full flex items-center justify-between p-5 text-left font-bold uppercase tracking-wider text-xs text-zinc-800 hover:bg-zinc-50 transition-colors"
+                            >
+                                <span className="flex items-center gap-2.5">
+                                    <Award size={15} className="text-[#C9A14A]" /> {ZYNORA_CERTIFICATION.title}
+                                </span>
+                                <span className="text-lg font-normal text-zinc-400">{openAccordion === "cert" ? "−" : "+"}</span>
+                            </button>
+                            {openAccordion === "cert" && (
+                                <div className="p-6 bg-zinc-50/50 text-zinc-600 text-xs leading-relaxed space-y-3">
+                                    <p>{ZYNORA_CERTIFICATION.description}</p>
+                                    <p className="font-bold text-[#C9A14A]">{ZYNORA_CERTIFICATION.guarantee}</p>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Section 4: Lifetime Warranty */}
+                        <div className="border-b border-zinc-100">
+                            <button
+                                onClick={() => toggleAccordion("warranty")}
+                                className="w-full flex items-center justify-between p-5 text-left font-bold uppercase tracking-wider text-xs text-zinc-800 hover:bg-zinc-50 transition-colors"
+                            >
+                                <span className="flex items-center gap-2.5">
+                                    <ShieldCheck size={15} className="text-[#C9A14A]" /> {ZYNORA_WARRANTY.title}
+                                </span>
+                                <span className="text-lg font-normal text-zinc-400">{openAccordion === "warranty" ? "−" : "+"}</span>
+                            </button>
+                            {openAccordion === "warranty" && (
+                                <div className="p-6 bg-zinc-50/50 text-zinc-600 text-xs leading-relaxed space-y-4">
+                                    <p>{ZYNORA_WARRANTY.description}</p>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                                        {ZYNORA_WARRANTY.highlights.map((h, idx) => (
+                                            <div key={idx} className="flex items-center gap-2 text-zinc-500">
+                                                <span className="text-[#C9A14A] font-bold">✓</span> {h}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Section 5: Shipping & Returns */}
+                        <div className="border-b border-zinc-100">
+                            <button
+                                onClick={() => toggleAccordion("shipping")}
+                                className="w-full flex items-center justify-between p-5 text-left font-bold uppercase tracking-wider text-xs text-zinc-800 hover:bg-zinc-50 transition-colors"
+                            >
+                                <span className="flex items-center gap-2.5">
+                                    <Truck size={15} className="text-[#C9A14A]" /> {ZYNORA_SHIPPING.title}
+                                </span>
+                                <span className="text-lg font-normal text-zinc-400">{openAccordion === "shipping" ? "−" : "+"}</span>
+                            </button>
+                            {openAccordion === "shipping" && (
+                                <div className="p-6 bg-zinc-50/50 text-zinc-600 text-xs leading-relaxed space-y-3">
+                                    <p>{ZYNORA_SHIPPING.description}</p>
+                                    <p className="font-bold text-zinc-800">{ZYNORA_SHIPPING.returns}</p>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Section 6: Sustainability */}
+                        <div className="border-b border-zinc-100">
+                            <button
+                                onClick={() => toggleAccordion("eco")}
+                                className="w-full flex items-center justify-between p-5 text-left font-bold uppercase tracking-wider text-xs text-zinc-800 hover:bg-zinc-50 transition-colors"
+                            >
+                                <span className="flex items-center gap-2.5">
+                                    <Sparkles size={15} className="text-[#C9A14A]" /> {ZYNORA_SUSTAINABILITY.title}
+                                </span>
+                                <span className="text-lg font-normal text-zinc-400">{openAccordion === "eco" ? "−" : "+"}</span>
+                            </button>
+                            {openAccordion === "eco" && (
+                                <div className="p-6 bg-zinc-50/50 text-zinc-600 text-xs leading-relaxed space-y-3">
+                                    <p>{ZYNORA_SUSTAINABILITY.description}</p>
+                                    <p className="font-semibold text-zinc-500 italic">{ZYNORA_SUSTAINABILITY.carbonNeutral}</p>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Section 7: FAQs */}
+                        <div>
+                            <button
+                                onClick={() => toggleAccordion("faq")}
+                                className="w-full flex items-center justify-between p-5 text-left font-bold uppercase tracking-wider text-xs text-zinc-800 hover:bg-zinc-50 transition-colors"
+                            >
+                                <span className="flex items-center gap-2.5">
+                                    <HelpCircle size={15} className="text-[#C9A14A]" /> Frequently Asked Questions
+                                </span>
+                                <span className="text-lg font-normal text-zinc-400">{openAccordion === "faq" ? "−" : "+"}</span>
+                            </button>
+                            {openAccordion === "faq" && (
+                                <div className="p-6 bg-zinc-50/50 text-zinc-600 space-y-5">
+                                    {ZYNORA_FAQ.map((faq, idx) => (
+                                        <div key={idx} className="space-y-1.5">
+                                            <h4 className="font-bold text-zinc-800 text-xs tracking-wide">Q: {faq.question}</h4>
+                                            <p className="text-zinc-500 text-xs leading-relaxed pl-3 border-l-2 border-zinc-200">{faq.answer}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+
+                {/* ── Related Education Content ───────────────── */}
+                <div className="mt-16 lg:mt-24 border-t border-zinc-100 pt-12 lg:pt-16">
+                    <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-[#C9A14A] block mb-2">Education Guides</span>
+                    <h2 className="text-2xl font-serif text-zinc-900 tracking-wide mb-8">Zynora Luxe Diamond Education</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {ZYNORA_EDUCATION.map((edu, idx) => (
+                            <Link key={idx} href={edu.link} className="group bg-zinc-50 p-6 rounded-xl border border-zinc-100 flex flex-col justify-between hover:bg-white hover:shadow-md hover:border-[#C9A14A]/25 transition-all duration-300">
+                                <div>
+                                    <span className="text-[9px] uppercase tracking-widest text-[#C9A14A] font-bold block mb-2">{edu.readTime}</span>
+                                    <h3 className="font-bold text-sm text-zinc-800 group-hover:text-[#C9A14A] transition-colors mb-2">{edu.title}</h3>
+                                    <p className="text-xs text-zinc-500 leading-relaxed mb-4">{edu.description}</p>
+                                </div>
+                                <span className="text-[10px] uppercase font-bold tracking-widest text-zinc-400 group-hover:text-zinc-800 transition-colors flex items-center gap-1 mt-2">
+                                    Read Article <ChevronRight size={10} />
+                                </span>
+                            </Link>
+                        ))}
                     </div>
                 </div>
             </div>

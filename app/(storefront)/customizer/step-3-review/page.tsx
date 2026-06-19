@@ -137,10 +137,10 @@ export default function Step4ReviewPage() {
         <div className="animate-in fade-in duration-700 max-w-3xl mx-auto mb-20 text-white">
             <h2 className="text-[28px] font-medium text-white mb-10 text-center block">Review Your Ring</h2>
 
-            <div className="luxury-shell p-8 md:p-10 border border-white/10 rounded-[22px]">
+            <div className="luxury-shell p-8 md:p-10 border border-zinc-100 rounded-[22px]">
 
                 {/* Text Summary */}
-                <div className="border-b border-white/10 pb-10 mb-10">
+                <div className="border-b border-zinc-150 pb-10 mb-10">
                     <span className="text-[10px] font-medium uppercase tracking-[0.28em] text-white/50 mb-3 block">
                         Your Masterpiece
                     </span>
@@ -168,26 +168,26 @@ export default function Step4ReviewPage() {
                 </div>
 
                 {/* Breakdown */}
-                <h4 className="text-[18px] mb-6 text-white font-medium">Order Details</h4>
+                <h4 className="text-[18px] mb-6 text-zinc-900 font-medium">Order Details</h4>
                 <div className="space-y-5 mb-12 text-[14px]">
-                    <div className="flex justify-between items-center py-3 border-b border-white/10">
-                        <span className="text-white/65">
+                    <div className="flex justify-between items-center py-3 border-b border-zinc-100">
+                        <span className="text-zinc-600">
                             Setting ({setting.name})
-                            {ringKarat && <span className="text-white/40 ml-1.5">· {ringKarat}{ringSize ? ` · Size ${ringSize}` : ""}</span>}
+                            {ringKarat && <span className="text-zinc-400 ml-1.5">· {ringKarat}{ringSize ? ` · Size ${ringSize}` : ""}</span>}
                         </span>
-                        <span className="font-medium text-white">{formatPrice(settingDisplayPrice)}</span>
+                        <span className="font-semibold text-zinc-900">{formatPrice(settingDisplayPrice)}</span>
                     </div>
-                    <div className="flex justify-between items-center py-3 border-b border-white/10">
-                        <span className="text-white/65">Diamond ({diamond.caratWeight}ct {diamond.shape})</span>
-                        <span className="font-medium text-white">{formatPrice(diamond.price)}</span>
+                    <div className="flex justify-between items-center py-3 border-b border-zinc-100">
+                        <span className="text-zinc-600">Diamond ({diamond.caratWeight}ct {diamond.shape})</span>
+                        <span className="font-semibold text-zinc-900">{formatPrice(diamond.price)}</span>
                     </div>
-                    <div className="flex justify-between items-center py-3 border-b border-white/10">
-                        <span className="text-white/65">Metal ({metalType})</span>
-                        <span className="font-medium text-white">{formatPrice(config.metalPriceAdjustment)}</span>
+                    <div className="flex justify-between items-center py-3 border-b border-zinc-100">
+                        <span className="text-zinc-600">Metal ({metalType})</span>
+                        <span className="font-semibold text-zinc-900">{formatPrice(config.metalPriceAdjustment)}</span>
                     </div>
-                    <div className="flex justify-between items-center py-5 bg-white/5 px-6 mt-6 border-b border-white/10 rounded-[16px]">
-                        <span className="font-medium text-white tracking-[0.28em] uppercase text-[10px]">Final Total</span>
-                        <span className="font-medium text-[20px] text-white">{formatPrice(totalPrice)}</span>
+                    <div className="flex justify-between items-center py-5 bg-zinc-50 px-6 mt-6 border-b border-zinc-100 rounded-[16px]">
+                        <span className="font-semibold text-zinc-500 tracking-[0.28em] uppercase text-[10px]">Final Total</span>
+                        <span className="font-bold text-[20px] text-[#C9A14A]">{formatPrice(totalPrice)}</span>
                     </div>
                 </div>
 
@@ -207,10 +207,10 @@ export default function Step4ReviewPage() {
                 </div>
 
                 {/* Actions */}
-                <div className="flex flex-col md:flex-row justify-between items-center gap-4 pt-8 border-t border-white/10">
+                <div className="flex flex-col md:flex-row justify-between items-center gap-4 pt-8 border-t border-zinc-150">
                     <button
                         onClick={() => router.push("/customizer/step-1-diamond")}
-                        className="text-white/40 hover:text-white text-xs font-bold uppercase tracking-widest transition-colors w-full md:w-auto text-left"
+                        className="text-zinc-400 hover:text-zinc-800 text-xs font-bold uppercase tracking-widest transition-colors w-full md:w-auto text-left"
                     >
                         Back to Diamond
                     </button>
@@ -218,7 +218,7 @@ export default function Step4ReviewPage() {
                         <button
                             onClick={handleAddToCart}
                             disabled={isAdded || isPurchasing}
-                            className={`w-full sm:w-auto px-8 py-4 rounded-none text-xs font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-3 border border-white/15 ${isAdded ? 'bg-[#D6B25E] border-[#D6B25E] text-[#0B0B0C]' : 'bg-transparent text-white hover:bg-[#D6B25E] hover:text-[#0B0B0C]'
+                            className={`w-full sm:w-auto px-8 py-4 rounded-none text-xs font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-3 border ${isAdded ? 'bg-[#C9A14A] border-[#C9A14A] text-white' : 'bg-transparent text-zinc-700 border-zinc-300 hover:bg-zinc-50'
                                 }`}
                         >
                             {isAdded ? (
@@ -235,7 +235,7 @@ export default function Step4ReviewPage() {
                         <button
                             onClick={handleProceedToPurchase}
                             disabled={isAdded || isPurchasing}
-                            className="w-full sm:w-auto px-10 py-4 rounded-none text-xs font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-3 bg-[#D6B25E] text-[#0B0B0C] hover:bg-[#E3C67C] hover:shadow-[0_0_20px_rgba(214,178,94,0.18)] hover:-translate-y-1"
+                            className="w-full sm:w-auto px-10 py-4 rounded-none text-xs font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-3 bg-[#C9A14A] text-white hover:bg-black hover:shadow-[0_0_20px_rgba(201,161,74,0.18)] hover:-translate-y-0.5"
                         >
                             {isPurchasing ? (
                                 <span className="flex items-center gap-2">

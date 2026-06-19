@@ -2,21 +2,33 @@
 "use client";
 
 import { useState, useMemo, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronLeft, ChevronRight, Play, Box, ArrowLeft, Check } from "lucide-react";
+import { ChevronLeft, ChevronRight, Box, ArrowLeft, Check, ShoppingBag, ShieldCheck, Truck, Award, HelpCircle, Eye, Sparkles } from "lucide-react";
 import { useCustomizerStore } from "@/lib/customizer-store";
 import type { MetalType } from "@/lib/customizer-store";
+import { useCart } from "@/components/CartProvider";
+import { toast } from "sonner";
 import dynamic from "next/dynamic";
+import { CustomizerProgressBar } from "@/components/CustomizerProgressBar";
+import {
+    ZYNORA_FAQ,
+    ZYNORA_WARRANTY,
+    ZYNORA_SHIPPING,
+    ZYNORA_CERTIFICATION,
+    ZYNORA_SUSTAINABILITY,
+    ZYNORA_SIZE_GUIDE,
+    ZYNORA_EDUCATION
+} from "@/lib/detail-content";
 
 const ModelCanvas = dynamic(() => import("./ModelViewer3D"), {
     ssr: false,
     loading: () => (
-        <div className="w-full h-full flex items-center justify-center bg-[#0d0d10]">
+        <div className="w-full h-full flex items-center justify-center bg-zinc-50">
             <div className="flex flex-col items-center gap-3">
-                <div className="w-10 h-10 rounded-full border-2 border-[#D6B25E]/30 border-t-[#D6B25E] animate-spin" />
-                <p className="text-[#D6B25E]/60 text-[10px] uppercase tracking-[0.25em]">Loading 3D Model…</p>
+                <div className="w-8 h-8 rounded-full border-2 border-[#C9A14A]/30 border-t-[#C9A14A] animate-spin" />
+                <p className="text-[#C9A14A] text-[9px] uppercase tracking-[0.25em] font-semibold">Loading 3D Model…</p>
             </div>
         </div>
     ),
@@ -34,27 +46,30 @@ const METAL_OPTIONS: { label: MetalType; color: string; ring: string; priceAdjus
 
 export default function SettingDetailClient({ setting }: { setting: any }) {
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const mode = searchParams.get("mode");
+    const isCustomizerMode = mode === "customizer";
+
     const setSetting = useCustomizerStore((s) => s.setSetting);
     const setMetalType = useCustomizerStore((s) => s.setMetalType);
+    const setRingKaratSize = useCustomizerStore((s) => s.setRingKaratSize);
     const selectedSetting = useCustomizerStore((s) => s.config.setting);
     const currentMetal = useCustomizerStore((s) => s.config.metalType);
     const isSelected = selectedSetting?.id === setting.id;
 
-    // Parse size prices from the setting — nested format: { karat: { size: price } }
+    const { addToCart } = useCart();
+
     const RING_SIZES = ["2","2 1/4","2 1/2","2 3/4","3","3 1/4","3 1/2","3 3/4","4","4 1/4","4 1/2","4 3/4","5","5 1/4","5 1/2","5 3/4","6","6 1/4","6 1/2","6 3/4","7","7 1/4","7 1/2","7 3/4","8","8 1/4","8 1/2","8 3/4","9","9 1/4","9 1/2","9 3/4","10","10 1/4","10 1/2","10 3/4","11","11 1/4","11 1/2","11 3/4","12"];
     const ALL_KARATS = ["9K", "14K", "18K", "22K"] as const;
 
-    // Parse nested sizePrices — this is the source of truth for karat options
     const sizePricesNested: Record<string, Record<string, number>> = (() => {
         try { return JSON.parse(setting.sizePrices || "{}"); } catch { return {}; }
     })();
 
-    // Also parse legacy karatPrices (may be empty for newly-created settings)
     const karatPricesMap: Record<string, number> = (() => {
         try { return JSON.parse(setting.karatPrices || "{}"); } catch { return {}; }
     })();
 
-    // Derive available karats from nested sizePrices keys (primary) or legacy karatPrices (fallback)
     const availableKarats = ALL_KARATS.filter(k => {
         const hasNestedSizes = sizePricesNested[k] && Object.keys(sizePricesNested[k]).length > 0;
         const hasLegacyPrice = karatPricesMap[k] !== undefined;
@@ -62,27 +77,23 @@ export default function SettingDetailClient({ setting }: { setting: any }) {
     });
     const [selectedKarat, setSelectedKarat] = useState<string>(availableKarats[0] ?? "");
 
-    // Sizes available for the currently selected karat
     const sizePricesForKarat: Record<string, number> = selectedKarat
         ? (sizePricesNested[selectedKarat] || {})
         : {};
     const availableSizes = RING_SIZES.filter(s => sizePricesForKarat[s] !== undefined);
     const [selectedSize, setSelectedSize] = useState<string>(availableSizes[0] ?? "");
 
-    // Display price: use nested size price if available, else legacy karatPrices, else base
     const karatBase = selectedKarat && karatPricesMap[selectedKarat] !== undefined
         ? karatPricesMap[selectedKarat]
         : setting.price;
     const sizeAddon = selectedSize && sizePricesForKarat[selectedSize] !== undefined
         ? sizePricesForKarat[selectedSize]
         : 0;
-    // If nested pricing exists for this karat, the size price IS the full price
     const hasNestedPricing = selectedKarat && sizePricesNested[selectedKarat] && Object.keys(sizePricesNested[selectedKarat]).length > 0;
     const displayPrice = hasNestedPricing
-        ? sizeAddon  // size price is the complete price for this karat+size
+        ? sizeAddon
         : karatBase + (availableSizes.length > 0 ? sizeAddon : 0);
 
-    // When karat changes, update selectedSize to first available size for that karat
     const handleKaratChange = (newKarat: string) => {
         setSelectedKarat(newKarat);
         const newSizePrices = sizePricesNested[newKarat] || {};
@@ -96,7 +107,7 @@ export default function SettingDetailClient({ setting }: { setting: any }) {
         try {
             const parsed = JSON.parse(setting.images || "[]");
             if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-        } catch { /* ignore */ }
+        } catch { }
         return setting.imageUrl ? [setting.imageUrl] : [];
     }, [setting]);
 
@@ -117,193 +128,258 @@ export default function SettingDetailClient({ setting }: { setting: any }) {
     }, [images, videoUrl, modelUrl]);
 
     const [activeIdx, setActiveIdx] = useState(0);
-    const [selectedMetal, setSelectedMetal] = useState<MetalType>(currentMetal);
+    const [selectedMetal, setSelectedMetal] = useState<MetalType>(currentMetal || "18K White Gold");
     const activeItem = mediaItems[activeIdx] ?? null;
 
     const prev = useCallback(() => setActiveIdx(i => (i - 1 + mediaItems.length) % mediaItems.length), [mediaItems.length]);
     const next = useCallback(() => setActiveIdx(i => (i + 1) % mediaItems.length), [mediaItems.length]);
 
+    const [openAccordion, setOpenAccordion] = useState<string | null>("specs");
+
+    const toggleAccordion = (sec: string) => {
+        setOpenAccordion(openAccordion === sec ? null : sec);
+    };
+
+    const currentMetalOption = useMemo(() => {
+        return METAL_OPTIONS.find(m => m.label === selectedMetal) ?? METAL_OPTIONS[0];
+    }, [selectedMetal]);
+
+    // Customizer Flow CTA Handler
     const handleChoose = () => {
-        const metalOption = METAL_OPTIONS.find(m => m.label === selectedMetal) ?? METAL_OPTIONS[0];
-        setMetalType(metalOption.label, metalOption.priceAdjustment);
+        setMetalType(currentMetalOption.label, currentMetalOption.priceAdjustment);
+        setRingKaratSize(selectedKarat, selectedSize, karatBase, sizeAddon);
         setSetting(setting);
         router.push("/customizer/step-3-review");
     };
 
+    // Standalone Add to Cart Handler
+    const handleAddToCart = () => {
+        const finalPrice = displayPrice + currentMetalOption.priceAdjustment;
+        addToCart({
+            id: `setting-${setting.id}-${selectedMetal.replace(/\s+/g, '-')}-${selectedKarat}-${selectedSize.replace(/\s+/g, '-')}`,
+            name: `${setting.name} Setting (${selectedKarat} ${selectedMetal}, Size ${selectedSize})`,
+            price: finalPrice,
+            image: images[0] || setting.imageUrl || "/products/setting-1.jpg",
+            quantity: 1,
+            metalType: selectedMetal,
+        });
+        toast.success("Setting added to cart!");
+        const btn = document.querySelector('[data-cart-drawer-trigger]') as HTMLButtonElement;
+        if (btn) btn.click();
+    };
+
+    // Standalone Add to Ring Builder Handler
+    const handleAddToRing = () => {
+        setMetalType(currentMetalOption.label, currentMetalOption.priceAdjustment);
+        setRingKaratSize(selectedKarat, selectedSize, karatBase, sizeAddon);
+        setSetting(setting);
+        toast.success("Setting selected! Now select a center diamond.");
+        router.push("/customizer/step-1-diamond");
+    };
+
     return (
-        <div className="min-h-screen bg-[#0B0B0C] text-white">
+        <div className="min-h-screen bg-white text-zinc-900 font-sans">
 
             {/* ── Top nav ──────────────────────────────────────── */}
-            <div className="border-b border-white/8 bg-[#0d0d0f]/95 backdrop-blur-md sticky top-0 z-50">
+            <div className="border-b border-zinc-100 bg-white/95 backdrop-blur-md sticky top-0 z-50">
                 <div className="max-w-7xl mx-auto px-4 md:px-8 h-14 flex items-center justify-between gap-4">
                     <Link
-                        href="/customizer/step-2-setting"
-                        className="flex items-center gap-2 text-white/40 hover:text-[#D6B25E] text-[11px] uppercase tracking-[0.2em] font-bold transition-colors"
+                        href={isCustomizerMode ? "/customizer/step-2-setting" : "/ring-settings"}
+                        className="flex items-center gap-2 text-zinc-500 hover:text-[#C9A14A] text-[11px] uppercase tracking-[0.2em] font-semibold transition-colors"
                     >
                         <ArrowLeft size={13} />
-                        All Settings
+                        {isCustomizerMode ? "All Settings" : "Back to Settings"}
                     </Link>
                     {/* Breadcrumb */}
-                    <div className="hidden md:flex items-center gap-2 text-[10px] text-white/30 uppercase tracking-widest">
-                        <span>Customizer</span>
-                        <ChevronRight size={10} className="text-white/20" />
+                    <div className="hidden md:flex items-center gap-2 text-[10px] text-zinc-400 uppercase tracking-widest font-semibold">
+                        <span>{isCustomizerMode ? "Customizer" : "Shop"}</span>
+                        <ChevronRight size={10} className="text-zinc-300" />
                         <span>Choose Setting</span>
-                        <ChevronRight size={10} className="text-white/20" />
-                        <span className="text-[#D6B25E]">{setting.name}</span>
+                        <ChevronRight size={10} className="text-zinc-300" />
+                        <span className="text-[#C9A14A] font-bold">{setting.name}</span>
                     </div>
-                    {/* Step indicators */}
-                    <div className="flex items-center gap-1.5 text-[10px] text-white/30 uppercase tracking-widest font-bold">
-                        <span className="w-5 h-5 rounded-full border border-white/15 flex items-center justify-center text-[9px]">1</span>
-                        <span>Diamond</span>
-                        <ChevronRight size={10} className="text-white/15" />
-                        <span className="bg-[#D6B25E] text-[#0B0B0C] w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold">2</span>
-                        <span className="text-[#D6B25E]">Setting</span>
-                        <ChevronRight size={10} className="text-white/15" />
-                        <span className="w-5 h-5 rounded-full border border-white/15 flex items-center justify-center text-[9px]">3</span>
-                        <span className="hidden sm:inline">Complete</span>
-                    </div>
+                    {/* Zynora branding */}
+                    <span className="text-xs font-serif italic tracking-[0.2em] text-[#C9A14A] font-bold">Zynora Luxe</span>
                 </div>
             </div>
 
-            {/* ── Main ────────────────────────────────────────── */}
-            <div className="max-w-7xl mx-auto px-4 md:px-8 py-8 md:py-12">
-                <div className="grid grid-cols-1 lg:grid-cols-[68px_1fr_380px] gap-4 lg:gap-8">
+            {/* Customizer Progress Bar at the top (if in customizer mode) */}
+            {isCustomizerMode && <CustomizerProgressBar currentStep={2} />}
 
-                    {/* ── Col 1: Vertical thumbnail strip ─────── */}
-                    <div className="hidden lg:flex flex-col gap-2">
+            {/* ── Main Detail Content Grid ───────────────────── */}
+            <div className="max-w-7xl mx-auto px-4 md:px-8 py-8 md:py-16">
+                <div className="grid grid-cols-1 lg:grid-cols-[80px_1fr_420px] gap-6 lg:gap-12 items-start">
+
+                    {/* ── Col 1: Vertical Thumbnail Strip (Desktop) ─────── */}
+                    <div className="hidden lg:flex flex-col gap-3">
                         {mediaItems.map((item, i) => (
                             <button
                                 key={i}
                                 onClick={() => setActiveIdx(i)}
-                                className={`relative w-[68px] h-[68px] rounded-xl overflow-hidden flex-shrink-0 flex items-center justify-center transition-all border-2 ${
+                                className={`relative w-[80px] h-[80px] rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center transition-all border ${
                                     i === activeIdx
-                                        ? "border-[#D6B25E] shadow-[0_0_12px_rgba(214,178,94,0.25)]"
-                                        : "border-white/8 hover:border-white/25 bg-white/4"
+                                        ? "border-[#C9A14A] ring-1 ring-[#C9A14A]/30 shadow-md bg-zinc-50"
+                                        : "border-zinc-200 hover:border-zinc-400 bg-white"
                                 }`}
                             >
                                 {item.type === "photo" && (
-                                    <Image src={(item as any).src} alt="" fill className="object-cover" unoptimized />
+                                    <div className="relative w-full h-full">
+                                        <Image src={(item as any).src} alt="" fill className="object-contain p-1" unoptimized />
+                                    </div>
                                 )}
                                 {item.type === "video" && (
-                                    <div className="flex flex-col items-center gap-1 bg-black/60 inset-0 absolute justify-center">
-                                        <Play size={16} className="text-[#D6B25E]" />
-                                        <span className="text-[7px] uppercase tracking-widest text-white/50 font-bold">Video</span>
+                                    <div className="flex flex-col items-center gap-1 justify-center text-[#C9A14A]">
+                                        <ChevronRight size={18} className="rotate-90 border border-zinc-200 rounded-full p-0.5" />
+                                        <span className="text-[8px] uppercase tracking-wider font-bold">Video</span>
                                     </div>
                                 )}
                                 {item.type === "3d" && (
-                                    <div className="flex flex-col items-center gap-1 bg-[#0d1a18] inset-0 absolute justify-center">
-                                        <Box size={16} className="text-[#D6B25E]" />
-                                        <span className="text-[7px] uppercase tracking-widest text-[#D6B25E]/60 font-bold">3D</span>
+                                    <div className="flex flex-col items-center gap-1 justify-center text-[#C9A14A]">
+                                        <Box size={18} />
+                                        <span className="text-[8px] uppercase tracking-wider font-bold">3D</span>
                                     </div>
                                 )}
                             </button>
                         ))}
                     </div>
 
-                    {/* ── Col 2: Main media ───────────────────── */}
-                    <div className="flex flex-col gap-3">
+                    {/* ── Col 2: Premium Media Area ───────────────────── */}
+                    <div className="flex flex-col gap-4">
                         <div
-                            className="relative w-full rounded-2xl overflow-hidden bg-[#0d0d10] border border-white/6"
+                            className="relative w-full rounded-xl overflow-hidden bg-zinc-50 border border-zinc-100 shadow-sm"
                             style={{ aspectRatio: "1 / 1" }}
                         >
                             {activeItem?.type === "photo" && (
-                                <Image
-                                    key={activeIdx}
-                                    src={(activeItem as any).src}
-                                    alt={setting.name}
-                                    fill
-                                    className="object-contain p-8 transition-opacity duration-300"
-                                    unoptimized
-                                />
+                                <div className="relative w-full h-full">
+                                    <Image
+                                        key={activeIdx}
+                                        src={(activeItem as any).src}
+                                        alt={setting.name}
+                                        fill
+                                        className="object-contain p-6 md:p-12 transition-opacity duration-300"
+                                        unoptimized
+                                    />
+                                </div>
                             )}
                             {activeItem?.type === "video" && videoUrl && (
-                                <video src={videoUrl} controls autoPlay className="w-full h-full object-contain" />
+                                <div className="relative w-full h-full bg-black">
+                                    <video src={videoUrl} controls autoPlay className="w-full h-full object-contain" />
+                                </div>
                             )}
                             {activeItem?.type === "3d" && modelUrl && (
                                 <>
                                     <ModelCanvas url={modelUrl} />
-                                    <p className="absolute bottom-3 right-4 text-[9px] text-white/20 uppercase tracking-widest pointer-events-none">
+                                    <p className="absolute bottom-4 left-4 right-4 text-center text-[9px] text-zinc-400 uppercase tracking-widest pointer-events-none">
                                         Drag to rotate · Scroll to zoom
                                     </p>
                                 </>
                             )}
                             {!activeItem && (
-                                <div className="flex items-center justify-center h-full text-white/20 text-sm">No media available</div>
+                                <div className="flex items-center justify-center h-full text-zinc-300 text-sm">No media available</div>
                             )}
+                            
+                            {/* Prev/Next Navigation Overlay */}
                             {mediaItems.length > 1 && (
                                 <>
-                                    <button onClick={prev} className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 bg-black/60 hover:bg-black/90 text-white rounded-full flex items-center justify-center transition-colors border border-white/10">
-                                        <ChevronLeft size={16} />
+                                    <button onClick={prev} className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/95 hover:bg-white shadow-md text-zinc-800 rounded-full flex items-center justify-center transition-all border border-zinc-100 hover:scale-105 active:scale-95" aria-label="Previous media">
+                                        <ChevronLeft size={18} />
                                     </button>
-                                    <button onClick={next} className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 bg-black/60 hover:bg-black/90 text-white rounded-full flex items-center justify-center transition-colors border border-white/10">
-                                        <ChevronRight size={16} />
+                                    <button onClick={next} className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/95 hover:bg-white shadow-md text-zinc-800 rounded-full flex items-center justify-center transition-all border border-zinc-100 hover:scale-105 active:scale-95" aria-label="Next media">
+                                        <ChevronRight size={18} />
                                     </button>
                                 </>
                             )}
                         </div>
 
-                        {/* Mobile thumbnail row */}
-                        <div className="flex lg:hidden gap-2 overflow-x-auto pb-1">
+                        {/* Mobile Thumbnail Row */}
+                        <div className="flex lg:hidden gap-2 overflow-x-auto py-2 scrollbar-thin">
                             {mediaItems.map((item, i) => (
                                 <button
                                     key={i}
                                     onClick={() => setActiveIdx(i)}
-                                    className={`relative flex-shrink-0 w-14 h-14 rounded-xl border-2 overflow-hidden flex items-center justify-center bg-white/4 transition-all ${
-                                        i === activeIdx ? "border-[#D6B25E]" : "border-white/10"
+                                    className={`relative flex-shrink-0 w-16 h-16 rounded-lg border overflow-hidden flex items-center justify-center bg-white transition-all ${
+                                        i === activeIdx ? "border-[#C9A14A] ring-1 ring-[#C9A14A]/30" : "border-zinc-200"
                                     }`}
                                 >
-                                    {item.type === "photo" && <Image src={(item as any).src} alt="" fill className="object-cover" unoptimized />}
-                                    {item.type === "video" && <Play size={14} className="text-[#D6B25E]" />}
-                                    {item.type === "3d" && <Box size={14} className="text-[#D6B25E]" />}
+                                    {item.type === "photo" && (
+                                        <div className="relative w-full h-full">
+                                            <Image src={(item as any).src} alt="" fill className="object-contain p-1" unoptimized />
+                                        </div>
+                                    )}
+                                    {item.type === "video" && <ChevronRight size={14} className="text-[#C9A14A]" />}
+                                    {item.type === "3d" && <Box size={14} className="text-[#C9A14A]" />}
                                 </button>
                             ))}
                         </div>
                     </div>
 
-                    {/* ── Col 3: Details ──────────────────────── */}
-                    <div className="flex flex-col gap-6 pt-1">
-                        <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#D6B25E]/70">{setting.category} Setting</p>
-                        <h1 className="text-3xl font-medium text-white leading-tight tracking-wide">{setting.name}</h1>
-                        <div className="flex items-baseline gap-2">
-                            <span className="text-2xl font-semibold text-white">{fmt(displayPrice)}</span>
-                            <span className="text-sm text-white/35">(Setting Only)</span>
+                    {/* ── Col 3: Details Panel ──────────────────────── */}
+                    <div className="flex flex-col gap-6 lg:sticky lg:top-24">
+                        <div>
+                            <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-[#C9A14A] mb-1.5 flex items-center gap-1.5">
+                                <Sparkles size={11} /> Handcrafted setting
+                            </p>
+                            <h1 className="text-3xl font-serif font-medium text-zinc-900 tracking-wide mb-2">
+                                {setting.name}
+                            </h1>
+                            <p className="text-xs text-zinc-500 font-medium tracking-wide uppercase">
+                                Category: {setting.category} setting
+                            </p>
                         </div>
 
-                        <div className="border-t border-white/8" />
+                        <div className="py-5 border-t border-b border-zinc-100">
+                            <div className="flex items-baseline gap-2">
+                                <span className="text-3xl font-bold text-zinc-900 tracking-tight">
+                                    {fmt(displayPrice + currentMetalOption.priceAdjustment)}
+                                </span>
+                                <span className="text-[10px] text-zinc-400 font-semibold uppercase tracking-wider">
+                                    (Setting Only)
+                                </span>
+                            </div>
+                            {currentMetalOption.priceAdjustment > 0 && (
+                                <p className="text-[10px] text-zinc-400 font-medium mt-1">
+                                    * Includes {currentMetalOption.label} upgrade (+{fmt(currentMetalOption.priceAdjustment)})
+                                </p>
+                            )}
+                        </div>
 
-                        {/* Karat Selector — shown when karat data exists */}
+                        {/* Metal selector */}
+                        <div>
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-2">
+                                Precious Metal: <span className="text-zinc-800 font-semibold">{selectedMetal}</span>
+                            </p>
+                            <div className="flex gap-3">
+                                {METAL_OPTIONS.map((m) => (
+                                    <button
+                                        key={m.label}
+                                        title={m.label}
+                                        onClick={() => setSelectedMetal(m.label)}
+                                        className={`w-9 h-9 rounded-full transition-all duration-200 border-2 ${
+                                            selectedMetal === m.label
+                                                ? "scale-105 border-[#C9A14A] ring-2 ring-[#C9A14A]/10 ring-offset-1"
+                                                : "border-zinc-200 opacity-70 hover:opacity-100 hover:scale-102"
+                                        }`}
+                                        style={{ backgroundColor: m.color }}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Karat selector */}
                         {availableKarats.length > 0 && (
                             <div>
-                                <p className="text-[10px] font-bold uppercase tracking-widest text-white/40 mb-3">
-                                    Gold Karat: <span className="text-[#D6B25E]">{selectedKarat}</span>
+                                <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-2">
+                                    Karat: <span className="text-zinc-800 font-semibold">{selectedKarat} Gold</span>
                                 </p>
-                                <div className="relative">
-                                    <select
-                                        value={selectedKarat}
-                                        onChange={e => handleKaratChange(e.target.value)}
-                                        className="w-full appearance-none bg-white/6 border border-white/12 text-white text-[13px] font-medium px-4 py-3 pr-10 rounded-none focus:outline-none focus:border-[#D6B25E] transition-colors cursor-pointer hover:border-white/25"
-                                    >
-                                        {availableKarats.map(k => (
-                                            <option key={k} value={k} className="bg-[#111] text-white">
-                                                {k} Gold
-                                            </option>
-                                        ))}
-                                    </select>
-                                    <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-white/40">
-                                        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                                            <path d="M2 4L6 8L10 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                                        </svg>
-                                    </div>
-                                </div>
-                                <div className="mt-2 grid grid-cols-4 gap-1.5">
+                                <div className="grid grid-cols-4 gap-2">
                                     {availableKarats.map(k => (
                                         <button
                                             key={k}
                                             onClick={() => handleKaratChange(k)}
-                                            className={`py-2 px-1 text-center text-[11px] font-bold uppercase tracking-wider transition-all duration-200 border rounded-none ${
+                                            className={`py-2 px-1 text-center text-[10px] font-bold uppercase tracking-wider transition-all duration-200 border rounded-md ${
                                                 selectedKarat === k
-                                                    ? "bg-[#D6B25E] text-[#0B0B0C] border-[#D6B25E]"
-                                                    : "bg-white/4 text-white/60 border-white/10 hover:border-[#D6B25E]/40 hover:text-white"
+                                                    ? "bg-[#C9A14A] text-white border-[#C9A14A]"
+                                                    : "bg-white text-zinc-600 border-zinc-200 hover:border-[#C9A14A]/40"
                                             }`}
                                         >
                                             {k}
@@ -313,42 +389,26 @@ export default function SettingDetailClient({ setting }: { setting: any }) {
                             </div>
                         )}
 
-                        {/* Ring Size Selector — prices depend on selected karat */}
+                        {/* Ring Size selector */}
                         {availableSizes.length > 0 && (
                             <div>
-                                <p className="text-[10px] font-bold uppercase tracking-widest text-white/40 mb-3">
-                                    Ring Size (US): <span className="text-[#D6B25E]">{selectedSize}</span>
+                                <div className="flex justify-between items-baseline mb-2">
+                                    <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">
+                                        Ring Size (US): <span className="text-zinc-800 font-semibold">{selectedSize}</span>
+                                    </p>
                                     {selectedSize && sizePricesForKarat[selectedSize] !== undefined && (
-                                        <span className="ml-2 text-white/30">+{fmt(sizePricesForKarat[selectedSize])}</span>
+                                        <span className="text-[9px] font-semibold text-zinc-400 uppercase">+{fmt(sizePricesForKarat[selectedSize])} Size Add-on</span>
                                     )}
-                                </p>
-                                <div className="relative mb-2">
-                                    <select
-                                        value={selectedSize}
-                                        onChange={e => setSelectedSize(e.target.value)}
-                                        className="w-full appearance-none bg-white/6 border border-white/12 text-white text-[13px] font-medium px-4 py-3 pr-10 rounded-none focus:outline-none focus:border-[#D6B25E] transition-colors cursor-pointer hover:border-white/25"
-                                    >
-                                        {availableSizes.map(s => (
-                                            <option key={s} value={s} className="bg-[#111] text-white">
-                                                Size {s} US — ₹{sizePricesForKarat[s].toLocaleString("en-IN")}
-                                            </option>
-                                        ))}
-                                    </select>
-                                    <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-white/40">
-                                        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                                            <path d="M2 4L6 8L10 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                                        </svg>
-                                    </div>
                                 </div>
-                                <div className="grid grid-cols-4 gap-1 max-h-24 overflow-y-auto custom-scrollbar">
+                                <div className="grid grid-cols-4 gap-1.5 max-h-28 overflow-y-auto custom-scrollbar p-1 border border-zinc-100 rounded-lg">
                                     {availableSizes.map(s => (
                                         <button
                                             key={s}
                                             onClick={() => setSelectedSize(s)}
-                                            className={`py-1.5 px-1 text-center text-[10px] font-bold transition-all duration-200 border rounded-none ${
+                                            className={`py-1.5 text-center text-[10px] font-semibold rounded transition-all duration-200 border ${
                                                 selectedSize === s
-                                                    ? "bg-[#D6B25E] text-[#0B0B0C] border-[#D6B25E]"
-                                                    : "bg-white/4 text-white/55 border-white/10 hover:border-[#D6B25E]/40 hover:text-white"
+                                                    ? "bg-zinc-900 text-white border-zinc-900"
+                                                    : "bg-white text-zinc-500 border-zinc-100 hover:border-zinc-300"
                                             }`}
                                         >
                                             {s}
@@ -358,75 +418,240 @@ export default function SettingDetailClient({ setting }: { setting: any }) {
                             </div>
                         )}
 
-                        <div>
-                            <p className="text-[10px] font-bold uppercase tracking-widest text-white/40 mb-3">
-                                Metal: <span className="text-white">{selectedMetal}</span>
-                            </p>
-                            <div className="flex gap-3">
-                                {METAL_OPTIONS.map((m) => (
+                        {/* Description */}
+                        <div className="bg-zinc-50 p-4 rounded-xl border border-zinc-100">
+                            <p className="text-[9px] font-bold uppercase tracking-widest text-zinc-400 mb-1">Craftsmanship &amp; Style</p>
+                            <p className="text-xs text-zinc-600 leading-relaxed font-normal">{setting.description}</p>
+                        </div>
+
+                        {/* CTA Buttons */}
+                        <div className="flex flex-col gap-2.5">
+                            {isCustomizerMode ? (
+                                <button
+                                    onClick={handleChoose}
+                                    className="w-full py-4 text-xs font-bold uppercase tracking-[0.2em] rounded-lg transition-all duration-300 flex items-center justify-center gap-2 border bg-[#C9A14A] text-white border-[#C9A14A] hover:bg-black hover:border-black hover:-translate-y-0.5 active:translate-y-0 shadow-sm"
+                                >
+                                    {isSelected && <Check size={14} strokeWidth={3} />}
+                                    {isSelected ? "Selected — Next: Review Design" : "Choose This Setting"}
+                                </button>
+                            ) : (
+                                <>
+                                    {/* Standalone Add to Cart */}
                                     <button
-                                        key={m.label}
-                                        title={m.label}
-                                        onClick={() => setSelectedMetal(m.label)}
-                                        className={`w-9 h-9 rounded-full transition-all duration-200 ${
-                                            selectedMetal === m.label
-                                                ? "scale-110 ring-2 ring-[#D6B25E] ring-offset-2 ring-offset-[#0B0B0C]"
-                                                : "opacity-60 hover:opacity-100 hover:scale-105"
-                                        }`}
-                                        style={{ backgroundColor: m.color, boxShadow: `0 0 0 1px ${m.ring}` }}
-                                    />
-                                ))}
+                                        onClick={handleAddToCart}
+                                        className="w-full py-4 text-xs font-bold uppercase tracking-[0.2em] rounded-lg transition-all duration-300 flex items-center justify-center gap-2 border bg-zinc-900 text-white border-zinc-900 hover:bg-[#C9A14A] hover:border-[#C9A14A] hover:-translate-y-0.5 active:translate-y-0 shadow-sm"
+                                    >
+                                        <ShoppingBag size={14} />
+                                        Add Setting to Cart
+                                    </button>
+
+                                    {/* Standalone Add to Ring Builder */}
+                                    <button
+                                        onClick={handleAddToRing}
+                                        className="w-full py-4 text-xs font-bold uppercase tracking-[0.2em] rounded-lg transition-all duration-300 flex items-center justify-center gap-2 border bg-white text-zinc-800 border-zinc-200 hover:border-zinc-900 hover:bg-zinc-50 hover:-translate-y-0.5 active:translate-y-0"
+                                    >
+                                        <Sparkles size={14} className="text-[#C9A14A]" />
+                                        Design Custom Ring
+                                    </button>
+                                </>
+                            )}
+                        </div>
+
+                        {/* Value Highlights strip */}
+                        <div className="grid grid-cols-3 gap-2 py-2 text-center border-t border-b border-zinc-100">
+                            <div className="flex flex-col items-center p-2">
+                                <Truck size={16} className="text-[#C9A14A] mb-1.5" />
+                                <span className="text-[9px] font-bold text-zinc-800 uppercase tracking-wider leading-tight">Free Insured</span>
+                                <span className="text-[8px] text-zinc-400 font-medium">Overnight Shipping</span>
+                            </div>
+                            <div className="flex flex-col items-center p-2">
+                                <ShieldCheck size={16} className="text-[#C9A14A] mb-1.5" />
+                                <span className="text-[9px] font-bold text-zinc-800 uppercase tracking-wider leading-tight">30-Day</span>
+                                <span className="text-[8px] text-zinc-400 font-medium">Easy Returns</span>
+                            </div>
+                            <div className="flex flex-col items-center p-2">
+                                <Award size={16} className="text-[#C9A14A] mb-1.5" />
+                                <span className="text-[9px] font-bold text-zinc-800 uppercase tracking-wider leading-tight">Lifetime</span>
+                                <span className="text-[8px] text-zinc-400 font-medium">Setting Warranty</span>
                             </div>
                         </div>
+                    </div>
+                </div>
 
+                {/* ── Below Fold Content Sections ───────────────── */}
+                <div className="mt-16 lg:mt-24 max-w-4xl border-t border-zinc-100 pt-10 lg:pt-16">
+                    <h2 className="text-2xl font-serif text-zinc-900 tracking-wide mb-8">Premium Setting Specifications &amp; Assurances</h2>
+
+                    <div className="flex flex-col border border-zinc-100 rounded-xl overflow-hidden bg-white shadow-sm">
+                        
+                        {/* Section 1: Detailed Specifications Table */}
+                        <div className="border-b border-zinc-100">
+                            <button
+                                onClick={() => toggleAccordion("specs")}
+                                className="w-full flex items-center justify-between p-5 text-left font-bold uppercase tracking-wider text-xs text-zinc-800 hover:bg-zinc-50 transition-colors"
+                            >
+                                <span className="flex items-center gap-2.5">
+                                    <Award size={15} className="text-[#C9A14A]" /> Complete Setting Specifications
+                                </span>
+                                <span className="text-lg font-normal text-zinc-400">{openAccordion === "specs" ? "−" : "+"}</span>
+                            </button>
+                            {openAccordion === "specs" && (
+                                <div className="p-6 bg-zinc-50/50 transition-all">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                                        {[
+                                            { label: "Setting Style", val: setting.category },
+                                            { label: "Metal Selection", val: selectedMetal },
+                                            { label: "Selected Karat", val: selectedKarat ? `${selectedKarat} Gold` : "Platinum" },
+                                            { label: "Size Selected", val: `Size ${selectedSize} US` },
+                                            { label: "Supported Shapes", val: setting.supportedShapes ? JSON.parse(setting.supportedShapes).join(", ") : "All Shapes" },
+                                            { label: "Prong Style", val: "Four-Prong Classic" },
+                                            { label: "Width", val: "approx. 1.8mm to 2.2mm" },
+                                            { label: "Eco-Conscious", val: "100% Recycled Metal Sourced" },
+                                            { label: "Handcrafted In", val: "Zynora Artisan Atelier" },
+                                        ].map((item, idx) => (
+                                            <div key={idx} className="flex justify-between py-2 border-b border-zinc-200/50 text-xs">
+                                                <span className="text-zinc-400 font-semibold tracking-wider uppercase text-[10px]">{item.label}</span>
+                                                <span className="font-semibold text-zinc-800">{item.val}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Section 2: Ring Size Helper Guide */}
+                        <div className="border-b border-zinc-100">
+                            <button
+                                onClick={() => toggleAccordion("size")}
+                                className="w-full flex items-center justify-between p-5 text-left font-bold uppercase tracking-wider text-xs text-zinc-800 hover:bg-zinc-50 transition-colors"
+                            >
+                                <span className="flex items-center gap-2.5">
+                                    <Eye size={15} className="text-[#C9A14A]" /> Ring Size Helper &amp; Tips
+                                </span>
+                                <span className="text-lg font-normal text-zinc-400">{openAccordion === "size" ? "−" : "+"}</span>
+                            </button>
+                            {openAccordion === "size" && (
+                                <div className="p-6 bg-zinc-50/50 text-zinc-600 space-y-4">
+                                    <p className="text-xs leading-relaxed">
+                                        Choosing the correct size is crucial for comfort and wear. We provide sizes from US 2 to US 12, including quarter and half sizes.
+                                    </p>
+                                    <div className="bg-[#FAF8F4] p-4 rounded-lg border border-[#C9A14A]/10">
+                                        <p className="text-[10px] uppercase font-bold text-[#C9A14A] tracking-widest mb-1.5">Sizing Tips:</p>
+                                        <ul className="list-disc pl-4 space-y-1.5 text-xs text-zinc-500">
+                                            <li>Our hands tend to swell slightly when warm or at the end of the day. Measure your size in the evening for the best fit.</li>
+                                            <li>Wide bands (over 4mm) fit tighter than thinner bands. Order a half size up for wider band styles.</li>
+                                            <li>If the ring size is a surprise, measure the inner diameter of a ring she currently wears on the correct finger.</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Section 3: Lifetime Warranty */}
+                        <div className="border-b border-zinc-100">
+                            <button
+                                onClick={() => toggleAccordion("warranty")}
+                                className="w-full flex items-center justify-between p-5 text-left font-bold uppercase tracking-wider text-xs text-zinc-800 hover:bg-zinc-50 transition-colors"
+                            >
+                                <span className="flex items-center gap-2.5">
+                                    <ShieldCheck size={15} className="text-[#C9A14A]" /> {ZYNORA_WARRANTY.title}
+                                </span>
+                                <span className="text-lg font-normal text-zinc-400">{openAccordion === "warranty" ? "−" : "+"}</span>
+                            </button>
+                            {openAccordion === "warranty" && (
+                                <div className="p-6 bg-zinc-50/50 text-zinc-600 text-xs leading-relaxed space-y-4">
+                                    <p>{ZYNORA_WARRANTY.description}</p>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                                        {ZYNORA_WARRANTY.highlights.map((h, idx) => (
+                                            <div key={idx} className="flex items-center gap-2 text-zinc-500">
+                                                <span className="text-[#C9A14A] font-bold">✓</span> {h}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Section 4: Shipping & Returns */}
+                        <div className="border-b border-zinc-100">
+                            <button
+                                onClick={() => toggleAccordion("shipping")}
+                                className="w-full flex items-center justify-between p-5 text-left font-bold uppercase tracking-wider text-xs text-zinc-800 hover:bg-zinc-50 transition-colors"
+                            >
+                                <span className="flex items-center gap-2.5">
+                                    <Truck size={15} className="text-[#C9A14A]" /> {ZYNORA_SHIPPING.title}
+                                </span>
+                                <span className="text-lg font-normal text-zinc-400">{openAccordion === "shipping" ? "−" : "+"}</span>
+                            </button>
+                            {openAccordion === "shipping" && (
+                                <div className="p-6 bg-zinc-50/50 text-zinc-600 text-xs leading-relaxed space-y-3">
+                                    <p>{ZYNORA_SHIPPING.description}</p>
+                                    <p className="font-bold text-zinc-800">{ZYNORA_SHIPPING.returns}</p>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Section 5: Sustainability */}
+                        <div className="border-b border-zinc-100">
+                            <button
+                                onClick={() => toggleAccordion("eco")}
+                                className="w-full flex items-center justify-between p-5 text-left font-bold uppercase tracking-wider text-xs text-zinc-800 hover:bg-zinc-50 transition-colors"
+                            >
+                                <span className="flex items-center gap-2.5">
+                                    <Sparkles size={15} className="text-[#C9A14A]" /> {ZYNORA_SUSTAINABILITY.title}
+                                </span>
+                                <span className="text-lg font-normal text-zinc-400">{openAccordion === "eco" ? "−" : "+"}</span>
+                            </button>
+                            {openAccordion === "eco" && (
+                                <div className="p-6 bg-zinc-50/50 text-zinc-600 text-xs leading-relaxed space-y-3">
+                                    <p>{ZYNORA_SUSTAINABILITY.description}</p>
+                                    <p className="font-semibold text-zinc-500 italic">{ZYNORA_SUSTAINABILITY.carbonNeutral}</p>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Section 6: FAQs */}
                         <div>
-                            <p className="text-[10px] font-bold uppercase tracking-widest text-white/30 mb-2">Description</p>
-                            <p className="text-sm text-white/60 leading-relaxed">{setting.description}</p>
-                        </div>
-
-                        <div className="flex flex-wrap gap-2">
-                            {images.length > 0 && (
-                                <span className="px-3 py-1 bg-white/6 rounded-full text-[9px] text-white/40 uppercase tracking-widest font-bold">
-                                    {images.length} Photo{images.length > 1 ? "s" : ""}
+                            <button
+                                onClick={() => toggleAccordion("faq")}
+                                className="w-full flex items-center justify-between p-5 text-left font-bold uppercase tracking-wider text-xs text-zinc-800 hover:bg-zinc-50 transition-colors"
+                            >
+                                <span className="flex items-center gap-2.5">
+                                    <HelpCircle size={15} className="text-[#C9A14A]" /> Frequently Asked Questions
                                 </span>
-                            )}
-                            {videoUrl && (
-                                <span className="px-3 py-1 bg-white/6 rounded-full text-[9px] text-white/40 uppercase tracking-widest font-bold flex items-center gap-1">
-                                    <Play size={8} /> Video
-                                </span>
-                            )}
-                            {modelUrl ? (
-                                <span className="px-3 py-1 bg-[#D6B25E]/10 border border-[#D6B25E]/20 rounded-full text-[9px] text-[#D6B25E] uppercase tracking-widest font-bold flex items-center gap-1">
-                                    <Box size={8} /> 3D Model
-                                </span>
-                            ) : (
-                                <span className="px-3 py-1 bg-white/4 rounded-full text-[9px] text-white/25 uppercase tracking-widest font-bold">No 3D Model</span>
+                                <span className="text-lg font-normal text-zinc-400">{openAccordion === "faq" ? "−" : "+"}</span>
+                            </button>
+                            {openAccordion === "faq" && (
+                                <div className="p-6 bg-zinc-50/50 text-zinc-600 space-y-5">
+                                    {ZYNORA_FAQ.map((faq, idx) => (
+                                        <div key={idx} className="space-y-1.5">
+                                            <h4 className="font-bold text-zinc-800 text-xs tracking-wide">Q: {faq.question}</h4>
+                                            <p className="text-zinc-500 text-xs leading-relaxed pl-3 border-l-2 border-zinc-200">{faq.answer}</p>
+                                        </div>
+                                    ))}
+                                </div>
                             )}
                         </div>
+                    </div>
+                </div>
 
-                        <div className="border-t border-white/8" />
-
-                        <button
-                            onClick={handleChoose}
-                            className={`w-full py-4 text-sm uppercase tracking-[0.18em] font-bold transition-all duration-300 flex items-center justify-center gap-2 ${
-                                isSelected
-                                    ? "bg-[#D6B25E] text-[#0B0B0C] hover:bg-[#E3C67C]"
-                                    : "bg-white text-[#0B0B0C] hover:bg-[#D6B25E]"
-                            }`}
-                        >
-                            {isSelected && <Check size={15} />}
-                            {isSelected ? "Selected — Continue to Review" : "Choose This Setting"}
-                        </button>
-
-                        <Link href="/customizer/step-2-setting" className="text-center text-[11px] uppercase tracking-widest text-white/25 hover:text-white/60 transition-colors font-bold">
-                            ← View All Settings
-                        </Link>
-
-                        <div className="border border-white/6 rounded-xl p-4 flex flex-col gap-2.5 text-[11px] text-white/35">
-                            <div className="flex items-center gap-2"><span className="text-[#D6B25E]">✓</span> Free shipping &amp; returns</div>
-                            <div className="flex items-center gap-2"><span className="text-[#D6B25E]">✓</span> Lifetime craftsmanship warranty</div>
-                            <div className="flex items-center gap-2"><span className="text-[#D6B25E]">✓</span> Certified conflict-free diamonds</div>
-                        </div>
+                {/* ── Related Education Content ───────────────── */}
+                <div className="mt-16 lg:mt-24 border-t border-zinc-100 pt-12 lg:pt-16">
+                    <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-[#C9A14A] block mb-2">Education Guides</span>
+                    <h2 className="text-2xl font-serif text-zinc-900 tracking-wide mb-8">Zynora Luxe Ring Education</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {ZYNORA_EDUCATION.map((edu, idx) => (
+                            <Link key={idx} href={edu.link} className="group bg-zinc-50 p-6 rounded-xl border border-zinc-100 flex flex-col justify-between hover:bg-white hover:shadow-md hover:border-[#C9A14A]/25 transition-all duration-300">
+                                <div>
+                                    <span className="text-[9px] uppercase tracking-widest text-[#C9A14A] font-bold block mb-2">{edu.readTime}</span>
+                                    <h3 className="font-bold text-sm text-zinc-800 group-hover:text-[#C9A14A] transition-colors mb-2">{edu.title}</h3>
+                                    <p className="text-xs text-zinc-500 leading-relaxed mb-4">{edu.description}</p>
+                                </div>
+                                <span className="text-[10px] uppercase font-bold tracking-widest text-zinc-400 group-hover:text-zinc-800 transition-colors flex items-center gap-1 mt-2">
+                                    Read Article <ChevronRight size={10} />
+                                </span>
+                            </Link>
+                        ))}
                     </div>
                 </div>
             </div>

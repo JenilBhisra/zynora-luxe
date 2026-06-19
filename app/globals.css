@@ -1585,22 +1585,51 @@ html {
   color: #666666 !important;
 }
 
-/* Keep white text inside primary buttons/badges/alerts that should remain dark or gold */
-.bg-\[\#D6B25E\] .text-\[\#0B0B0C\],
-.bg-gold-gradient .text-white,
+/* Keep white text inside primary buttons/badges/alerts that should remain dark */
 .btn-primary .text-white,
 .bg-primary .text-white,
-.btn-gold-hover .text-white,
 .text-white-force,
-button[type="submit"] .text-white,
-.bg-\[\#C9A14A\] .text-white,
+button[type="submit"] .text-white {
+  color: #FFFFFF !important;
+}
+
+/* Force dark/black text inside gold elements for contrast/accessibility */
+.bg-\[\#D6B25E\],
+.bg-\[\#D6B25E\] span,
+.bg-\[\#D6B25E\] p,
+.bg-\[\#D6B25E\] div,
+.bg-\[\#D6B25E\] .text-\[\#0B0B0C\],
+.bg-\[\#C9A14A\],
 .bg-\[\#C9A14A\] span,
 .bg-\[\#C9A14A\] p,
 .bg-\[\#C9A14A\] div,
+.bg-gold-gradient,
+.bg-gold-gradient span,
+.bg-gold-gradient p,
+.bg-gold-gradient div,
+.btn-gold-hover,
 .btn-gold-hover span,
 .btn-gold-hover p,
 .btn-gold-hover div {
-  color: #FFFFFF !important;
+  color: #0B0B0C !important;
+}
+
+/* Accessible disabled/loading button states */
+button:disabled,
+button[disabled],
+button:disabled span,
+button[disabled] span,
+button:disabled p,
+button[disabled] p,
+button:disabled div,
+button[disabled] div {
+  background-color: #F4F4F5 !important;
+  background: #F4F4F5 !important;
+  color: #A1A1AA !important;
+  border-color: #E4E4E7 !important;
+  cursor: not-allowed !important;
+  box-shadow: none !important;
+  transform: none !important;
 }
 
 /* Link underline color update to Gold */

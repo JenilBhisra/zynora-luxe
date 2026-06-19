@@ -102,7 +102,7 @@ export default function Step2SettingPage() {
                             {/* Image Container — click navigates to detail page */}
                             <div
                                 className="relative aspect-[4/5] w-full bg-black/20 mb-5 overflow-hidden flex items-center justify-center p-6 rounded-[16px] cursor-pointer"
-                                onClick={() => router.push(`/setting/${setting.id}`)}
+                                onClick={() => router.push(`/setting/${setting.id}?mode=customizer`)}
                                 title="Click to view details"
                             >
                                 {imgSrc ? (

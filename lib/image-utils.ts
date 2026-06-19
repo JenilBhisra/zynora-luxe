@@ -24,15 +24,11 @@ const FALLBACK_POOL: Record<ImageFallbackType, string[]> = {
         "https://images.unsplash.com/photo-1543295204-8e6d3f3b7d66?auto=format&fit=crop&w=1400&q=80",
         "/products/ring-2.jpg",
         "/products/earrings-1.jpg",
-        "/uploads/settings/krishnadimond-1773660849787-133950517.jpeg",
     ],
     diamond: [
         "https://images.unsplash.com/photo-1615655114865-4cc97325775f?auto=format&fit=crop&w=1400&q=80",
         "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&w=1400&q=80",
         "/products/loose-diamond.jpg",
-        "/uploads/diamonds/diamond-1774253879693-464841660.webp",
-        "/uploads/diamonds/diamond-1774255142521-767660395.webp",
-        "/uploads/diamonds/krishnadimond-1774248617191-180418439.jpeg",
     ],
     jewelry: [
         "https://images.unsplash.com/photo-1617038220319-276d3cfab638?auto=format&fit=crop&w=1400&q=80",
@@ -40,16 +36,12 @@ const FALLBACK_POOL: Record<ImageFallbackType, string[]> = {
         "https://images.unsplash.com/photo-1535632787350-4e68ef0ac584?auto=format&fit=crop&w=1400&q=80",
         "/products/earrings-1.jpg",
         "/products/ring-2.jpg",
-        "/uploads/settings/krishnadimond-1773663691552-321665899.jpeg",
     ],
     setting: [
         "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&w=1400&q=80",
         "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=1400&q=80",
         "/products/ring-2.jpg",
         "/products/earrings-1.jpg",
-        "/uploads/settings/krishnadimond-1773660849787-133950517.jpeg",
-        "/uploads/settings/krishnadimond-1773663691552-321665899.jpeg",
-        "/uploads/settings/WhatsAppImage2026-03-23at1.49.02PM-1774253971857-987595614.jpeg",
     ],
     generic: [
         "https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=1400&q=80",
@@ -57,7 +49,6 @@ const FALLBACK_POOL: Record<ImageFallbackType, string[]> = {
         "/products/ring-2.jpg",
         "/products/earrings-1.jpg",
         "/products/loose-diamond.jpg",
-        "/uploads/diamonds/diamond-1774253879693-464841660.webp",
     ],
 };
 

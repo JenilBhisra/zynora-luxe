@@ -41,6 +41,11 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'tse1.mm.bing.net',
       },
+      {
+        // Cloudinary CDN — serves all uploaded images with f_auto,q_auto optimization
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+      },
     ],
   },
 };

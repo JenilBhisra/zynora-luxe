@@ -268,16 +268,138 @@ function OBJModel({ url, positionOffset = [0, 0, 0], isRing, metal }: { url: str
     );
 }
 
-function ModelNode({ url, positionOffset = [0, 0, 0], isRing, metal }: { url: string; positionOffset?: [number, number, number]; isRing: boolean; metal: MetalConfig }) {
-    useEffect(() => {
-        console.log("[RingViewer] Loading 3D model:", url);
-    }, [url]);
-
-    const isObj = url.toLowerCase().endsWith(".obj");
-    if (isObj) {
-        return <OBJModel url={url} positionOffset={positionOffset} isRing={isRing} metal={metal} />;
+// Clean model URL to strip f_auto,q_auto if present in raw path
+function cleanModelUrl(rawUrl: string): string {
+    if (!rawUrl) return "";
+    let u = rawUrl;
+    if (u.includes("/raw/upload/f_auto,q_auto/")) {
+        u = u.replace("/raw/upload/f_auto,q_auto/", "/raw/upload/");
     }
-    return <GLTFModel url={url} positionOffset={positionOffset} isRing={isRing} metal={metal} />;
+    if (u.includes("/raw/upload/") && (u.includes("f_auto") || u.includes("q_auto"))) {
+        u = u.replace(/\/raw\/upload\/[^/]+\//, "/raw/upload/");
+    }
+    return u;
+}
+
+function ModelNode({ url, positionOffset = [0, 0, 0], isRing, metal }: { url: string; positionOffset?: [number, number, number]; isRing: boolean; metal: MetalConfig }) {
+    const cleanedUrl = cleanModelUrl(url);
+    const cleanPath = cleanedUrl.split('?')[0].split('#')[0].toLowerCase();
+    
+    // Guess format synchronously if possible
+    const getSynchronousFormat = (): "obj" | "gltf" | null => {
+        if (cleanPath.endsWith(".obj")) return "obj";
+        if (cleanPath.endsWith(".gltf") || cleanPath.endsWith(".glb")) return "gltf";
+        return null; // Ambiguous, needs async check
+    };
+
+    const [format, setFormat] = useState<"obj" | "gltf" | null>(getSynchronousFormat());
+    const [isDetecting, setIsDetecting] = useState(getSynchronousFormat() === null);
+    const [hasFlipped, setHasFlipped] = useState(false);
+
+    useEffect(() => {
+        let active = true;
+        const syncFormat = getSynchronousFormat();
+        if (syncFormat !== null) {
+            setFormat(syncFormat);
+            setIsDetecting(false);
+            return;
+        }
+
+        setIsDetecting(true);
+        const detect = async () => {
+            try {
+                const response = await fetch(cleanedUrl);
+                if (!active) return;
+                if (!response.ok) {
+                    setFormat("gltf");
+                    setIsDetecting(false);
+                    return;
+                }
+
+                const reader = response.body?.getReader();
+                if (!reader) {
+                    const text = await response.text();
+                    if (!active) return;
+                    const trimmed = text.trim();
+                    if (trimmed.startsWith("{") || trimmed.startsWith("glTF")) {
+                        setFormat("gltf");
+                    } else {
+                        setFormat("obj");
+                    }
+                    setIsDetecting(false);
+                    return;
+                }
+
+                const { value } = await reader.read();
+                reader.cancel();
+
+                if (!active) return;
+                if (!value) {
+                    setFormat("gltf");
+                    setIsDetecting(false);
+                    return;
+                }
+
+                const decoder = new TextDecoder("utf-8");
+                const chunk = decoder.decode(value);
+                const trimmed = chunk.trim();
+
+                if (chunk.startsWith("glTF") || trimmed.startsWith("{")) {
+                    setFormat("gltf");
+                } else {
+                    setFormat("obj");
+                }
+            } catch (err) {
+                console.error("[RingViewer] Async format check failed, defaulting to gltf:", err);
+                if (active) {
+                    setFormat("gltf");
+                }
+            } finally {
+                if (active) {
+                    setIsDetecting(false);
+                }
+            }
+        };
+
+        detect();
+
+        return () => {
+            active = false;
+        };
+    }, [cleanedUrl]);
+
+    useEffect(() => {
+        if (format) {
+            console.log(`[RingViewer] Loading 3D model (${format}):`, cleanedUrl);
+        }
+    }, [cleanedUrl, format]);
+
+    const handleError = (error: any) => {
+        console.warn(`[RingViewer] Failed to load 3D model as ${format}, attempting fallback...`, error);
+        if (!hasFlipped && format) {
+            setFormat(format === "obj" ? "gltf" : "obj");
+            setHasFlipped(true);
+        }
+    };
+
+    if (isDetecting || !format) {
+        return <LoadingState />;
+    }
+
+    const element = format === "obj" 
+        ? <OBJModel url={cleanedUrl} positionOffset={positionOffset} isRing={isRing} metal={metal} />
+        : <GLTFModel url={cleanedUrl} positionOffset={positionOffset} isRing={isRing} metal={metal} />;
+
+    return (
+        <ErrorBoundary
+            key={format}
+            fallbackRender={({ error }) => <ModelFallback error={error} />}
+            onError={handleError}
+            resetKeys={[format]}
+        >
+            {element}
+        </ErrorBoundary>
+    );
 }
 
 function ModelFallback({ error }: { error?: unknown }) {

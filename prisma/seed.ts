@@ -32,10 +32,11 @@ async function main() {
 
     console.log('Seeding Realistic Categories...');
     const categories = [
-        { name: 'Engagement Rings', slug: 'engagement-rings', description: 'Timeless symbols of your eternal love.', imageUrl: IMAGES.ring1 },
-        { name: 'Wedding Bands', slug: 'wedding-bands', description: 'Classic bands to celebrate your union.', imageUrl: IMAGES.ring3 },
-        { name: 'Necklaces', slug: 'necklaces', description: 'Elegant pendants and diamond necklaces.', imageUrl: IMAGES.necklace1 },
+        { name: 'Engagement Ring', slug: 'engagement-ring', description: 'Timeless symbols of your eternal love.', imageUrl: IMAGES.ring1 },
+        { name: 'Pendant', slug: 'pendant', description: 'Exquisite diamond pendants and charms.', imageUrl: IMAGES.necklace1 },
+        { name: 'Bracelet and Watch', slug: 'bracelet-and-watch', description: 'Stunning tennis bracelets and luxury timepieces.', imageUrl: IMAGES.ring3 },
         { name: 'Earrings', slug: 'earrings', description: 'Brilliant studs and drop earrings.', imageUrl: IMAGES.earrings1 },
+        { name: 'Necklace', slug: 'necklace', description: 'Elegant diamond necklaces and chokers.', imageUrl: IMAGES.necklace2 },
     ];
 
     const createdCategories = [];
@@ -44,8 +45,8 @@ async function main() {
         createdCategories.push(c);
     }
 
-    const engagementCategory = createdCategories.find(c => c.slug === 'engagement-rings')!;
-    const necklaceCategory = createdCategories.find(c => c.slug === 'necklaces')!;
+    const engagementCategory = createdCategories.find(c => c.slug === 'engagement-ring')!;
+    const necklaceCategory = createdCategories.find(c => c.slug === 'necklace')!;
     const earringsCategory = createdCategories.find(c => c.slug === 'earrings')!;
 
     console.log('Seeding Realistic Products...');

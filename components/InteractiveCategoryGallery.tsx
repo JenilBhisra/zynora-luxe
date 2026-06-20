@@ -6,46 +6,39 @@ import { VisualEditButton } from "./VisualEditButton";
 
 const CATEGORIES = [
     {
-        id: "engagement-rings",
-        title: "Engagement Rings",
-        href: "/shop?category=engagement-rings",
-        assetKey: "category-engagement-rings",
+        id: "engagement-ring",
+        title: "Engagement Ring",
+        href: "/shop/engagement-ring",
+        assetKey: "category-engagement-ring",
         defaultImage: "https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=600&q=80"
     },
     {
-        id: "womens-wedding-rings",
-        title: "Women's Wedding Rings",
-        href: "/shop?category=wedding-bands",
-        assetKey: "category-womens-wedding-rings",
-        defaultImage: "https://images.unsplash.com/photo-1543294001-f7cd5d7fb516?auto=format&fit=crop&w=600&q=80"
+        id: "pendant",
+        title: "Pendant",
+        href: "/shop/pendant",
+        assetKey: "category-pendant",
+        defaultImage: "https://images.unsplash.com/photo-1599643477877-530eb83abc8e?auto=format&fit=crop&w=600&q=80"
     },
     {
-        id: "mens-wedding-rings",
-        title: "Men's Wedding Rings",
-        href: "/shop?category=wedding-bands",
-        assetKey: "category-mens-wedding-rings",
-        defaultImage: "https://images.unsplash.com/photo-1606760227091-3dd870d97f1d?auto=format&fit=crop&w=600&q=80"
-    },
-    {
-        id: "gemstone-rings",
-        title: "Gemstone Rings",
-        href: "/shop?category=rings",
-        assetKey: "category-gemstone-rings",
-        defaultImage: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=600&q=80"
+        id: "bracelet-and-watch",
+        title: "Bracelet and Watch",
+        href: "/shop/bracelet-and-watch",
+        assetKey: "category-bracelet-and-watch",
+        defaultImage: "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?auto=format&fit=crop&w=600&q=80"
     },
     {
         id: "earrings",
         title: "Earrings",
-        href: "/shop?category=earrings",
+        href: "/shop/earrings",
         assetKey: "category-earrings",
         defaultImage: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=600&q=80"
     },
     {
-        id: "necklaces",
-        title: "Necklaces",
-        href: "/shop?category=necklaces",
-        assetKey: "category-necklaces",
-        defaultImage: "https://images.unsplash.com/photo-1599643477877-530eb83abc8e?auto=format&fit=crop&w=600&q=80"
+        id: "necklace",
+        title: "Necklace",
+        href: "/shop/necklace",
+        assetKey: "category-necklace",
+        defaultImage: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=600&q=80"
     }
 ];
 
@@ -62,14 +55,14 @@ export function InteractiveCategoryGallery({ customImages = {}, isAdmin = false 
                 <div className="mb-12 md:mb-16 text-center md:text-left">
                     <h2 className="text-[32px] md:text-[44px] font-serif text-[#1A1A1A] mb-4 font-semibold tracking-wide">
                         Shop Jewelry by Category
-                    </h2>
+                     </h2>
                     <p className="text-[#666666] text-[15px] md:text-[17px] font-light max-w-2xl">
                         Thoughtfully designed collections for life's most meaningful moments.
                     </p>
                 </div>
 
-                {/* Desktop Category Row: Single horizontal row of 6 categories */}
-                <div className="hidden md:grid grid-cols-6 gap-6">
+                {/* Desktop Category Row: Single horizontal row of 5 categories */}
+                <div className="hidden md:grid grid-cols-5 gap-6">
                     {CATEGORIES.map((cat) => {
                         const activeImage = customImages[cat.assetKey] || cat.defaultImage;
                         return (

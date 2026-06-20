@@ -408,12 +408,11 @@ export function AdminStudio({ isAdmin }: AdminStudioProps) {
         { key: "scroll-scene-4", label: "Scroll Scene \u2013 Frame 4", defaultUrl: "/products/ring-2.jpg", group: "Journey Scroll Scene" },
         { key: "scroll-scene-5", label: "Scroll Scene \u2013 Frame 5", defaultUrl: "/products/ring-2.jpg", group: "Journey Scroll Scene" },
         // Category Gallery
-        { key: "category-engagement-rings",     label: "Category \u2013 Engagement Rings",      defaultUrl: "https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=600&q=80", group: "Category Gallery" },
-        { key: "category-womens-wedding-rings", label: "Category \u2013 Women's Wedding Rings",  defaultUrl: "https://images.unsplash.com/photo-1543294001-f7cd5d7fb516?auto=format&fit=crop&w=600&q=80", group: "Category Gallery" },
-        { key: "category-mens-wedding-rings",   label: "Category \u2013 Men's Wedding Rings",   defaultUrl: "https://images.unsplash.com/photo-1606760227091-3dd870d97f1d?auto=format&fit=crop&w=600&q=80", group: "Category Gallery" },
-        { key: "category-gemstone-rings",       label: "Category \u2013 Gemstone Rings",        defaultUrl: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=600&q=80", group: "Category Gallery" },
+        { key: "category-engagement-ring",     label: "Category \u2013 Engagement Ring",      defaultUrl: "https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&w=600&q=80", group: "Category Gallery" },
+        { key: "category-pendant",             label: "Category \u2013 Pendant",              defaultUrl: "https://images.unsplash.com/photo-1599643477877-530eb83abc8e?auto=format&fit=crop&w=600&q=80", group: "Category Gallery" },
+        { key: "category-bracelet-and-watch",  label: "Category \u2013 Bracelet and Watch",   defaultUrl: "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?auto=format&fit=crop&w=600&q=80", group: "Category Gallery" },
         { key: "category-earrings",             label: "Category \u2013 Earrings",              defaultUrl: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=600&q=80", group: "Category Gallery" },
-        { key: "category-necklaces",            label: "Category \u2013 Necklaces",             defaultUrl: "https://images.unsplash.com/photo-1599643477877-530eb83abc8e?auto=format&fit=crop&w=600&q=80", group: "Category Gallery" },
+        { key: "category-necklace",             label: "Category \u2013 Necklace",              defaultUrl: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=600&q=80", group: "Category Gallery" },
         // Diamond Shape Section
         { key: "diamond-shape-main-image",              label: "Diamond Shape Section \u2013 Default Main Image",            defaultUrl: "/products/ring-2.jpg",        group: "Diamond Shape Section" },
         { key: "diamond-shape-hover-oval",              label: "Diamond Shape Section \u2013 Oval Hover Image",              defaultUrl: "/products/loose-diamond.jpg", group: "Diamond Shape Section" },

@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     keywords: [
         "ZYNORA LUXE",
         "diamond jewelry",
-        "engagement rings",
+        "Engagement Ring",
         "custom ring design",
         "certified diamonds",
         "luxury jewelry",

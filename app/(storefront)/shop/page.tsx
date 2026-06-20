@@ -8,12 +8,11 @@ import { selectCardImage } from "@/lib/image-utils";
 const prisma = new PrismaClient();
 
 const categoriesList = [
-    { name: "Engagement Rings", slug: "engagement-rings", fallback: "ring-2.jpg" },
-    { name: "Necklaces", slug: "necklaces", fallback: "necklace.jpg" },
+    { name: "Engagement Ring", slug: "engagement-ring", fallback: "ring-2.jpg" },
+    { name: "Pendant", slug: "pendant", fallback: "pendant.jpg" },
+    { name: "Bracelet and Watch", slug: "bracelet-and-watch", fallback: "bracelet.jpg" },
     { name: "Earrings", slug: "earrings", fallback: "earrings-1.jpg" },
-    { name: "Pendants", slug: "pendants", fallback: "pendant.jpg" },
-    { name: "Bracelets", slug: "bracelets", fallback: "bracelet.jpg" },
-    { name: "Wedding Bands", slug: "wedding-bands", fallback: "wedding-band.jpg" }
+    { name: "Necklace", slug: "necklace", fallback: "necklace.jpg" }
 ];
 
 export const dynamic = "force-dynamic";

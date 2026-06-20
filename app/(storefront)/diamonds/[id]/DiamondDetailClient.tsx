@@ -67,10 +67,10 @@ export default function DiamondDetailClient({ diamond }: { diamond: any }) {
 
     const mediaItems: MediaItem[] = useMemo(() => {
         const items: MediaItem[] = [];
-        if (modelUrl) items.push({ type: "3d" });
+        if (modelUrl || diamond.shape) items.push({ type: "3d" });
         items.push({ type: "photo", src: imageSrc });
         return items;
-    }, [imageSrc, modelUrl]);
+    }, [imageSrc, modelUrl, diamond.shape]);
 
     const [activeIdx, setActiveIdx] = useState(0);
     const activeItem = mediaItems[activeIdx] ?? null;
@@ -134,99 +134,48 @@ export default function DiamondDetailClient({ diamond }: { diamond: any }) {
 
             {/* ── Main Detail Content Grid ───────────────────── */}
             <div className="max-w-7xl mx-auto px-4 md:px-8 py-8 md:py-16">
-                <div className="grid grid-cols-1 lg:grid-cols-[80px_1fr_420px] gap-6 lg:gap-12 items-start">
+                <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 items-start">
 
-                    {/* ── Col 1: Vertical Thumbnail Strip (Desktop) ─────── */}
-                    <div className="hidden lg:flex flex-col gap-3">
-                        {mediaItems.map((item, i) => (
-                            <button
-                                key={i}
-                                onClick={() => setActiveIdx(i)}
-                                className={`relative w-[80px] h-[80px] rounded-lg overflow-hidden flex-shrink-0 flex items-center justify-center transition-all border ${
-                                    i === activeIdx
-                                        ? "border-[#C9A14A] ring-1 ring-[#C9A14A]/30 shadow-md bg-zinc-50"
-                                        : "border-zinc-200 hover:border-zinc-400 bg-white"
-                                }`}
-                            >
-                                {item.type === "photo" && (
-                                    <SmartImage src={imageSrc} alt="" fill fallbackType="diamond" imageKey={`thumb-${diamond.id}`} className="object-contain p-1" />
-                                )}
-                                {item.type === "3d" && (
-                                    <div className="flex flex-col items-center gap-1 justify-center text-[#C9A14A]">
-                                        <Box size={18} />
-                                        <span className="text-[8px] uppercase tracking-wider font-bold">3D</span>
-                                    </div>
-                                )}
-                            </button>
-                        ))}
-                    </div>
-
-                    {/* ── Col 2: Premium Media Area ───────────────────── */}
-                    <div className="flex flex-col gap-4">
-                        <div
-                            className="relative w-full rounded-xl overflow-hidden bg-zinc-50 border border-zinc-100 shadow-sm"
-                            style={{ aspectRatio: "1 / 1" }}
-                        >
-                            {activeItem?.type === "photo" && (
-                                <SmartImage
-                                    key={activeIdx}
-                                    src={(activeItem as any).src}
-                                    alt={`${diamond.shape} Diamond`}
-                                    fill
-                                    fallbackType="diamond"
-                                    imageKey={`main-${diamond.id}`}
-                                    className="object-contain p-6 md:p-12 transition-opacity duration-300"
-                                />
-                            )}
-                            {activeItem?.type === "3d" && modelUrl && (
-                                <>
-                                    <ModelCanvas url={modelUrl} />
-                                    <p className="absolute bottom-4 left-4 right-4 text-center text-[9px] text-zinc-400 uppercase tracking-widest pointer-events-none">
-                                        Drag to rotate · Scroll to zoom
-                                    </p>
-                                </>
-                            )}
-                            {!activeItem && (
-                                <div className="flex items-center justify-center h-full text-zinc-300 text-sm">No media available</div>
-                            )}
-                            
-                            {/* Prev/Next Navigation Overlay */}
-                            {mediaItems.length > 1 && (
-                                <>
-                                    <button onClick={prev} className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/95 hover:bg-white shadow-md text-zinc-800 rounded-full flex items-center justify-center transition-all border border-zinc-100 hover:scale-105 active:scale-95" aria-label="Previous image">
-                                        <ChevronLeft size={18} />
-                                    </button>
-                                    <button onClick={next} className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/95 hover:bg-white shadow-md text-zinc-800 rounded-full flex items-center justify-center transition-all border border-zinc-100 hover:scale-105 active:scale-95" aria-label="Next image">
-                                        <ChevronRight size={18} />
-                                    </button>
-                                </>
-                            )}
-                        </div>
-
-                        {/* Mobile Thumbnail Row */}
-                        <div className="flex lg:hidden gap-2 overflow-x-auto py-2 scrollbar-thin">
-                            {mediaItems.map((item, i) => (
-                                <button
-                                    key={i}
-                                    onClick={() => setActiveIdx(i)}
-                                    className={`relative flex-shrink-0 w-16 h-16 rounded-lg border overflow-hidden flex items-center justify-center bg-white transition-all ${
-                                        i === activeIdx ? "border-[#C9A14A] ring-1 ring-[#C9A14A]/30" : "border-zinc-200"
+                    {/* Left: Gallery (Brilliant Earth 2-column Grid) */}
+                    <div className="w-full lg:w-[68%] flex flex-col gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
+                            {mediaItems.map((item, idx) => (
+                                <div
+                                    key={idx}
+                                    className={`relative aspect-[4/3] w-full overflow-hidden bg-[#FAF8F4] border border-zinc-100 rounded-[14px] flex items-center justify-center p-2 group ${
+                                        mediaItems.length === 1 || (mediaItems.length % 2 !== 0 && idx === 0) ? "md:col-span-2" : ""
                                     }`}
                                 >
-                                    {item.type === "photo" && <SmartImage src={imageSrc} alt="" fill fallbackType="diamond" imageKey={`mobile-thumb-${diamond.id}`} className="object-contain p-1" />}
-                                    {item.type === "3d" && <Box size={16} className="text-[#C9A14A]" />}
-                                </button>
+                                    {item.type === "photo" && (
+                                        <SmartImage
+                                            src={(item as any).src}
+                                            alt={`${diamond.shape} Diamond`}
+                                            fill
+                                            fallbackType="diamond"
+                                            imageKey={`grid-${diamond.id}-${idx}`}
+                                            className="object-contain p-4 transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+                                        />
+                                    )}
+                                    {item.type === "3d" && (
+                                        <div className="relative w-full h-full">
+                                            <ModelCanvas url={diamond.modelUrl} shape={diamond.shape} />
+                                            <p className="absolute bottom-3 left-3 right-3 text-center text-[8px] text-zinc-400 uppercase tracking-widest pointer-events-none">
+                                                Drag to rotate · Scroll to zoom
+                                            </p>
+                                        </div>
+                                    )}
+                                </div>
                             ))}
                         </div>
                     </div>
 
-                    {/* ── Col 3: Details Panel ──────────────────────── */}
-                    <div className="flex flex-col gap-6 lg:sticky lg:top-24">
+                    {/* Right: Details Panel */}
+                    <div className="w-full lg:w-[32%] flex flex-col gap-6">
                         <div>
                             <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-[#C9A14A] mb-1">
                                 <Sparkles size={11} /> Conflict-Free Certified
                             </p>
-                            <h1 className="text-xl md:text-2xl font-serif font-medium text-zinc-900 tracking-wide mb-1.5">
+                            <h1 className="text-2xl md:text-3xl lg:text-[34px] font-serif font-medium text-zinc-900 tracking-wide mb-1.5">
                                 {diamond.caratWeight.toFixed(2)} Carat {diamond.shape} Diamond
                             </h1>
                             <p className="text-xs text-zinc-500 font-medium tracking-wide">
@@ -254,7 +203,7 @@ export default function DiamondDetailClient({ diamond }: { diamond: any }) {
                         <button
                             onClick={handleAction}
                             disabled={diamond.stockStatus === "SOLD"}
-                            className={`w-full py-4 text-xs font-bold uppercase tracking-[0.2em] rounded-lg transition-all duration-300 flex items-center justify-center gap-2 border shadow-sm ${
+                            className={`w-full py-4 text-[14px] font-bold uppercase tracking-[0.2em] rounded-lg transition-all duration-300 flex items-center justify-center gap-2 border shadow-sm ${
                                 diamond.stockStatus === "SOLD"
                                     ? "bg-zinc-100 text-zinc-400 border-zinc-200 cursor-not-allowed"
                                     : isSelected && isCustomizerMode

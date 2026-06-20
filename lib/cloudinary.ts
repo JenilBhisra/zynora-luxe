@@ -100,9 +100,14 @@ export async function uploadToCloudinary(
     const folder = getCloudinaryFolder(uploadType);
 
     // Sanitise filename to create a stable public_id
+    const extMatch = filename.match(/\.[^/.]+$/);
+    const ext = extMatch ? extMatch[0].toLowerCase() : "";
     const baseName   = filename.replace(/[^a-zA-Z0-9.\-_]/g, "").replace(/\.[^/.]+$/, "");
     const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-    const publicId   = `${folder}/${baseName}-${uniqueSuffix}`;
+    let publicId   = `${folder}/${baseName}-${uniqueSuffix}`;
+    if (resourceType === "raw") {
+        publicId += ext;
+    }
 
     return new Promise((resolve, reject) => {
         const uploadStream = cloudinary.uploader.upload_stream(
@@ -246,6 +251,8 @@ export function extractPublicIdFromUrl(url?: string | null): string | null {
 export function buildOptimizedUrl(secureUrl: string): string {
     if (!secureUrl || !isCloudinaryUrl(secureUrl)) return secureUrl;
     if (secureUrl.includes("f_auto") || secureUrl.includes("q_auto")) return secureUrl;
+    // Do not optimize raw files (like .obj, .gltf, .glb)
+    if (secureUrl.includes("/raw/upload/")) return secureUrl;
 
     return secureUrl.replace("/upload/", "/upload/f_auto,q_auto/");
 }

@@ -39,7 +39,7 @@ export default function SettingsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen pt-24 bg-[#0B0B0C] flex items-center justify-center">
+      <div className="min-h-screen pt-24 bg-black flex items-center justify-center">
         <Loader2 className="w-8 h-8 rounded-full border-t-2 border-[#D6B25E] animate-spin text-[#D6B25E]" />
       </div>
     );
@@ -196,7 +196,7 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0B0B0C] pt-24 pb-12 text-zinc-100">
+    <div className="min-h-screen bg-black pt-24 pb-12 text-zinc-100">
       <div className="container-custom max-w-3xl mx-auto px-4">
         {/* Back navigation */}
         <div className="mb-6">

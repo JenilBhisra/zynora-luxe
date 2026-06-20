@@ -196,95 +196,57 @@ export default function ProductClient({ product }: { product: any }) {
                 <span className="text-zinc-900">{product.name}</span>
             </div>
 
-            <div className="container-custom flex flex-col lg:flex-row gap-12 mb-24 relative">
-                {/* Left: Gallery (Sticky) */}
-                <section className="flex-[1.2] lg:max-w-[55%] lg:sticky lg:top-28 lg:h-[calc(100vh-140px)] flex flex-col">
-                    <FadeIn className="luxury-shell aspect-[4/5] lg:flex-1 relative overflow-hidden mb-6 group rounded-[22px]">
-                        {activeMedia ? (
-                            activeMedia.type === "image" ? (
+            <div className="container-custom flex flex-col lg:flex-row gap-8 lg:gap-12 mb-24 relative">
+                {/* Left: Gallery (Brilliant Earth 2-column Grid) */}
+                <section className="w-full lg:w-[68%] flex flex-col gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
+                        {mediaItems.map((item, idx) => (
+                            <FadeIn 
+                                key={`${item.src}-${idx}`} 
+                                className={`relative aspect-[4/3] w-full overflow-hidden bg-[#FAF8F4] border border-zinc-100 rounded-[14px] flex items-center justify-center p-2 group ${
+                                    mediaItems.length === 1 || (mediaItems.length % 2 !== 0 && idx === 0) ? "md:col-span-2" : ""
+                                }`}
+                            >
+                                {item.type === "image" ? (
+                                    <SmartImage
+                                        src={item.src}
+                                        alt={product.name}
+                                        fill
+                                        fallbackType={imageFallbackType}
+                                        imageKey={`${product.id}:grid:${idx}`}
+                                        className="object-contain p-4 transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+                                    />
+                                ) : (
+                                    <video
+                                        src={item.src}
+                                        className="w-full h-full object-contain p-2"
+                                        controls
+                                        preload="metadata"
+                                        playsInline
+                                    />
+                                )}
+                            </FadeIn>
+                        ))}
+                        {mediaItems.length === 0 && (
+                            <div className="relative aspect-[4/3] w-full overflow-hidden bg-[#FAF8F4] border border-zinc-100 rounded-[14px] flex items-center justify-center col-span-2">
                                 <SmartImage
-                                    src={activeMedia.src}
+                                    src=""
                                     alt={product.name}
                                     fill
                                     fallbackType={imageFallbackType}
-                                    imageKey={`${product.id}:${activeMediaIndex}`}
-                                    className="object-cover transition-transform duration-[1.2s] ease-out group-hover:scale-[1.03]"
+                                    imageKey={product.id}
+                                    className="object-contain p-4"
                                 />
-                            ) : (
-                                <video
-                                    src={activeMedia.src}
-                                    className="w-full h-full object-cover"
-                                    controls
-                                    preload="metadata"
-                                    playsInline
-                                />
-                            )
-                        ) : (
-                            <SmartImage
-                                src={""}
-                                alt={product.name}
-                                fill
-                                fallbackType={imageFallbackType}
-                                imageKey={product.id}
-                                className="object-cover"
-                            />
-                        )}
-
-                        {mediaItems.length > 1 && (
-                            <>
-                                <button
-                                    onClick={goToPrevMedia}
-                                    className="absolute left-3 top-1/2 -translate-y-1/2 z-20 bg-black/55 hover:bg-black/75 text-white p-2.5 rounded-full shadow transition-colors"
-                                    aria-label="Previous media"
-                                >
-                                    <ChevronLeft size={18} />
-                                </button>
-                                <button
-                                    onClick={goToNextMedia}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 z-20 bg-black/55 hover:bg-black/75 text-white p-2.5 rounded-full shadow transition-colors"
-                                    aria-label="Next media"
-                                >
-                                    <ChevronRight size={18} />
-                                </button>
-                            </>
-                        )}
-
-                        {mediaItems.length > 0 && (
-                            <div className="absolute bottom-3 right-3 z-20 bg-black/70 text-white text-[10px] uppercase tracking-widest font-bold px-3 py-1.5 rounded-full">
-                                {activeMediaIndex + 1} / {mediaItems.length}
                             </div>
                         )}
-                    </FadeIn>
-
-                    {mediaItems.length > 0 && (
-                        <FadeIn delay={0.1} className="flex gap-4 overflow-x-auto pb-2 custom-scrollbar">
-                            {mediaItems.map((item, i) => (
-                                <button
-                                    key={`${item.src}-${i}`}
-                                    onClick={() => setActiveMediaIndex(i)}
-                                    className={`w-[100px] h-[100px] shrink-0 relative rounded-[14px] overflow-hidden transition-all duration-300 ${activeMediaIndex === i ? "ring-1 ring-[#C9A14A] opacity-100" : "bg-zinc-100 opacity-70 hover:opacity-100"}`}
-                                >
-                                    {item.type === "image" ? (
-                                        <SmartImage src={item.src} alt="thumbnail" fill fallbackType={imageFallbackType} imageKey={`${product.id}:thumb:${i}`} className="object-cover" />
-                                    ) : (
-                                        <>
-                                            <video src={item.src} className="w-full h-full object-cover" muted playsInline preload="metadata" />
-                                            <div className="absolute inset-0 bg-black/35 flex items-center justify-center">
-                                                <Play size={18} className="text-white" fill="currentColor" />
-                                            </div>
-                                        </>
-                                    )}
-                                </button>
-                            ))}
-                        </FadeIn>
-                    )}
+                    </div>
                 </section>
 
                 {/* Right: Details (Scrollable Flow) */}
-                <section className="flex-1 lg:max-w-[45%] pt-4 flex flex-col">
+                <section className="w-full lg:w-[32%] pt-4 flex flex-col">
                     <FadeIn delay={0.2}>
                         <span className="text-xs tracking-[0.34em] font-medium text-[#C9A14A] uppercase mb-3 block">Product Detail</span>
-                        <h1 className="mb-6 max-w-[640px]">
+                        <h1 className="text-2xl md:text-3xl lg:text-[34px] font-serif font-medium text-zinc-900 tracking-wide mb-6 max-w-[640px]">
                             {product.name}
                         </h1>
 
@@ -364,8 +326,8 @@ export default function ProductClient({ product }: { product: any }) {
                             </div>
                         ) : null}
 
-                        {/* Sticky Add to Cart Actions */}
-                        <div className="flex flex-col gap-4 sticky bottom-10 z-40 luxury-panel p-4 border border-zinc-200 shadow-md rounded-[20px] bg-white/90 backdrop-blur-md">
+                        {/* Add to Cart Actions (Normal scrolling) */}
+                        <div className="flex flex-col gap-4 z-40 luxury-panel p-4 border border-zinc-200 shadow-md rounded-[20px] bg-white/90 backdrop-blur-md">
                             <Button fullWidth onClick={handleAddToCart} disabled={product.stockCount <= 0} className="py-4 text-[14px] tracking-[0.1em] bg-[#C9A14A] text-white border-[#C9A14A] hover:bg-black hover:border-black disabled:opacity-50 disabled:cursor-not-allowed">
                                 {product.stockCount <= 0 ? "OUT OF STOCK" : "ADD TO CART"}
                             </Button>

@@ -20,7 +20,7 @@ export default function AccountPage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen pt-24 bg-[#0B0B0C] flex items-center justify-center">
+            <div className="min-h-screen pt-24 bg-black flex items-center justify-center">
                 <div className="w-8 h-8 rounded-full border-t-2 border-[#D6B25E] animate-spin"></div>
             </div>
         );
@@ -42,7 +42,7 @@ export default function AccountPage() {
     };
 
     return (
-        <div className="min-h-screen bg-[#0B0B0C] pt-24 pb-12">
+        <div className="min-h-screen bg-black pt-24 pb-12">
             <div className="container-custom max-w-4xl mx-auto">
                 <div className="mb-10 text-center md:text-left">
                     <h1 className="text-3xl md:text-4xl font-heading text-white mb-2">My Account</h1>

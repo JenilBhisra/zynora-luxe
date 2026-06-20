@@ -9,12 +9,11 @@ import { ProductListClient } from "./components/ProductListClient";
 const prisma = new PrismaClient();
 
 const categoriesList = [
-    { name: "Engagement Rings", slug: "engagement-rings" },
-    { name: "Necklaces", slug: "necklaces" },
+    { name: "Engagement Ring", slug: "engagement-ring" },
+    { name: "Pendant", slug: "pendant" },
+    { name: "Bracelet and Watch", slug: "bracelet-and-watch" },
     { name: "Earrings", slug: "earrings" },
-    { name: "Pendants", slug: "pendants" },
-    { name: "Bracelets", slug: "bracelets" },
-    { name: "Wedding Bands", slug: "wedding-bands" }
+    { name: "Necklace", slug: "necklace" }
 ];
 
 export const dynamic = "force-dynamic";

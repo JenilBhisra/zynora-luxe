@@ -134,23 +134,23 @@ export default function Step4ReviewPage() {
     };
 
     return (
-        <div className="animate-in fade-in duration-700 max-w-3xl mx-auto mb-20 text-white">
-            <h2 className="text-[28px] font-medium text-white mb-10 text-center block">Review Your Ring</h2>
+        <div className="animate-in fade-in duration-700 max-w-3xl mx-auto mb-20 text-zinc-900">
+            <h2 className="text-[28px] font-medium text-zinc-900 mb-10 text-center block">Review Your Ring</h2>
 
             <div className="luxury-shell p-8 md:p-10 border border-zinc-100 rounded-[22px]">
 
                 {/* Text Summary */}
                 <div className="border-b border-zinc-150 pb-10 mb-10">
-                    <span className="text-[10px] font-medium uppercase tracking-[0.28em] text-white/50 mb-3 block">
+                    <span className="text-[10px] font-medium uppercase tracking-[0.28em] text-[#C9A14A] mb-3 block">
                         Your Masterpiece
                     </span>
-                    <h3 className="text-[24px] font-medium text-white mb-4">
+                    <h3 className="text-[24px] font-medium text-zinc-900 mb-4">
                         {setting.name}
                     </h3>
-                    <p className="text-white/65 mb-6 text-[14px] leading-relaxed font-normal">
-                        Crafted in <strong className="text-white font-medium">{metalType}</strong>, starring a stunning <strong className="text-white font-medium">{diamond.caratWeight} Carat {diamond.cut} cut, {diamond.color} color, {diamond.clarity} clarity {diamond.shape}</strong> diamond.
+                    <p className="text-zinc-600 mb-6 text-[14px] leading-relaxed font-normal">
+                        Crafted in <strong className="text-zinc-900 font-medium">{metalType}</strong>, starring a stunning <strong className="text-zinc-900 font-medium">{diamond.caratWeight} Carat {diamond.cut} cut, {diamond.color} color, {diamond.clarity} clarity {diamond.shape}</strong> diamond.
                     </p>
-                    <div className="text-[32px] font-medium text-white mt-8">
+                    <div className="text-[32px] font-medium text-zinc-900 mt-8">
                         {formatPrice(totalPrice)}
                     </div>
                     {ringKarat && (
@@ -159,7 +159,7 @@ export default function Step4ReviewPage() {
                                 {ringKarat} Gold
                             </span>
                             {ringSize && (
-                                <span className="inline-flex items-center gap-1.5 bg-white/6 border border-white/12 text-white/70 text-[10px] font-bold uppercase tracking-widest px-3 py-1">
+                                <span className="inline-flex items-center gap-1.5 bg-zinc-50 border border-zinc-200 text-zinc-655 text-[10px] font-bold uppercase tracking-widest px-3 py-1">
                                     Size {ringSize} US
                                 </span>
                             )}
@@ -199,9 +199,9 @@ export default function Step4ReviewPage() {
                         </svg>
                     </div>
                     <div>
-                        <h5 className="font-medium text-white tracking-[0.28em] uppercase text-[10px] mb-2">Made to Order</h5>
-                        <p className="text-white/65 text-[14px] leading-relaxed font-normal">
-                            Your bespoke ring will be handcrafted to perfection. Estimated delivery in <strong className="text-white font-medium">3-4 weeks</strong> from order date.
+                        <h5 className="font-medium text-[#C9A14A] tracking-[0.28em] uppercase text-[10px] mb-2">Made to Order</h5>
+                        <p className="text-zinc-500 text-[14px] leading-relaxed font-normal">
+                            Your bespoke ring will be handcrafted to perfection. Estimated delivery in <strong className="text-zinc-900 font-medium">3-4 weeks</strong> from order date.
                         </p>
                     </div>
                 </div>
@@ -210,7 +210,7 @@ export default function Step4ReviewPage() {
                 <div className="flex flex-col md:flex-row justify-between items-center gap-4 pt-8 border-t border-zinc-150">
                     <button
                         onClick={() => router.push("/customizer/step-1-diamond")}
-                        className="text-zinc-400 hover:text-zinc-800 text-xs font-bold uppercase tracking-widest transition-colors w-full md:w-auto text-left"
+                        className="text-zinc-400 hover:text-zinc-800 text-[14px] font-bold uppercase tracking-widest transition-colors w-full md:w-auto text-left"
                     >
                         Back to Diamond
                     </button>
@@ -218,7 +218,7 @@ export default function Step4ReviewPage() {
                         <button
                             onClick={handleAddToCart}
                             disabled={isAdded || isPurchasing}
-                            className={`w-full sm:w-auto px-8 py-4 rounded-none text-xs font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-3 border ${isAdded ? 'bg-[#C9A14A] border-[#C9A14A] text-white' : 'bg-transparent text-zinc-700 border-zinc-300 hover:bg-zinc-50'
+                            className={`w-full sm:w-auto px-8 py-4 rounded-none text-[14px] font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-3 border ${isAdded ? 'bg-[#C9A14A] border-[#C9A14A] text-white' : 'bg-transparent text-zinc-700 border-zinc-300 hover:bg-zinc-50'
                                 }`}
                         >
                             {isAdded ? (
@@ -235,7 +235,7 @@ export default function Step4ReviewPage() {
                         <button
                             onClick={handleProceedToPurchase}
                             disabled={isAdded || isPurchasing}
-                            className="w-full sm:w-auto px-10 py-4 rounded-none text-xs font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-3 bg-[#C9A14A] text-white hover:bg-black hover:shadow-[0_0_20px_rgba(201,161,74,0.18)] hover:-translate-y-0.5"
+                            className="w-full sm:w-auto px-10 py-4 rounded-none text-[14px] font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-3 bg-[#C9A14A] text-white hover:bg-black hover:shadow-[0_0_20px_rgba(201,161,74,0.18)] hover:-translate-y-0.5"
                         >
                             {isPurchasing ? (
                                 <span className="flex items-center gap-2">

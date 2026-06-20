@@ -153,10 +153,10 @@ async function HomeContent({ isAdmin, assetsMap }: { isAdmin: boolean; assetsMap
                         <span className="block text-[10px] md:text-[11px] uppercase tracking-[0.34em] text-[#C9A14A] mb-5 reveal-step-1">
                             {assetsMap["text:journey-kicker"] || "The Custom Journey"}
                         </span>
-                        <h2 className="text-[42px] md:text-[58px] leading-[1] mb-6 text-[#1A1A1A] reveal-step-2">
+                        <h2 className="text-[24px] md:text-[32px] leading-[1.1] mb-6 text-[#1A1A1A] reveal-step-2">
                             {assetsMap["text:journey-headline"] || "Create a ring as rare as the moment it marks"}
                         </h2>
-                        <p className="text-[#666666] text-[16px] md:text-[18px] leading-[1.9] mb-10 max-w-[540px] reveal-step-3">
+                        <p className="text-[#666666] text-[15px] md:text-[16px] leading-[1.7] mb-10 max-w-[540px] reveal-step-3">
                             {assetsMap["text:journey-body"] || "Design with certified stones, refined settings, and precious metals. Every step is deliberate, calm, and built for an effortless experience."}
                         </p>
                         <div className="grid grid-cols-3 gap-3 mb-10">
@@ -211,7 +211,7 @@ async function HomeContent({ isAdmin, assetsMap }: { isAdmin: boolean; assetsMap
                     )}
                     <FadeIn className="mb-12 md:mb-16 max-w-2xl reveal-step-1">
                         <span className="block text-[10px] md:text-[11px] uppercase tracking-[0.34em] text-[#C9A14A] mb-4">Featured Collection</span>
-                        <h2 className="text-[36px] md:text-[52px] leading-[1.02] text-[#1A1A1A] reveal-step-2">
+                        <h2 className="text-[24px] md:text-[32px] leading-[1.1] text-[#1A1A1A] reveal-step-2">
                             {assetsMap["text:featured-heading"] || "Signature pieces, hand-selected"}
                         </h2>
                     </FadeIn>
@@ -256,10 +256,10 @@ async function HomeContent({ isAdmin, assetsMap }: { isAdmin: boolean; assetsMap
                 <div className="container-custom grid gap-8 lg:grid-cols-2 items-stretch">
                     <FadeIn className="bg-[#FAF8F4] border border-[#EAEAEA] rounded-[22px] p-8 md:p-10 reveal-step-1">
                         <span className="block text-[10px] md:text-[11px] uppercase tracking-[0.34em] text-[#C9A14A] mb-4">Why Choose Us</span>
-                        <h2 className="text-[34px] md:text-[46px] leading-[1.05] text-[#1A1A1A] mb-6 reveal-step-2">
+                        <h2 className="text-[24px] md:text-[32px] leading-[1.1] text-[#1A1A1A] mb-6 reveal-step-2">
                             {assetsMap["text:trust-heading"] || "Designed with certainty, delivered with care"}
                         </h2>
-                        <p className="text-[#666666] leading-[1.9] text-[16px] md:text-[17px] max-w-xl mb-8 reveal-step-3">
+                        <p className="text-[#666666] leading-[1.7] text-[15px] md:text-[16px] max-w-xl mb-8 reveal-step-3">
                             {assetsMap["text:trust-body"] || "Premium jewelry deserves a presentation that feels equally assured. Certified sourcing, insured delivery, and personal assistance guide every order."}
                         </p>
                         <div className="grid sm:grid-cols-3 gap-4">
@@ -304,10 +304,10 @@ async function HomeContent({ isAdmin, assetsMap }: { isAdmin: boolean; assetsMap
                 <div className="container-custom text-center max-w-4xl mx-auto">
                     <FadeIn className="reveal-step-1">
                         <span className="block text-[10px] md:text-[11px] uppercase tracking-[0.34em] text-[#C9A14A] mb-5">Your Journey Starts Here</span>
-                        <h2 className="text-[38px] md:text-[60px] leading-[1.02] text-[#1A1A1A] mb-6 reveal-step-2">
+                        <h2 className="text-[24px] md:text-[32px] leading-[1.1] text-[#1A1A1A] mb-6 reveal-step-2">
                             {assetsMap["text:cta-heading"] || "Three ways to find your perfect piece"}
                         </h2>
-                        <p className="text-[#666666] text-[16px] md:text-[18px] leading-[1.9] max-w-2xl mx-auto mb-12 reveal-step-3">
+                        <p className="text-[#666666] text-[15px] md:text-[16px] leading-[1.7] max-w-2xl mx-auto mb-12 reveal-step-3">
                             {assetsMap["text:cta-body"] || "Whether you're creating a custom ring, exploring certified diamonds, or browsing signature pieces, we've designed a calm, intentional journey for you."}
                         </p>
                     </FadeIn>
@@ -341,8 +341,8 @@ async function HomeContent({ isAdmin, assetsMap }: { isAdmin: boolean; assetsMap
                                 <Link href={item.href}>
                                     <div className="bg-[#FAF8F4] border border-[#EAEAEA] hover:border-[#C9A14A]/40 rounded-[22px] p-8 h-full flex flex-col justify-between cursor-pointer premium-hover-lift">
                                         <div>
-                                            <div className="text-[48px] font-serif text-[#C9A14A] mb-4 font-light">{item.step}</div>
-                                            <h3 className="text-[22px] font-medium text-[#1A1A1A] mb-3">{item.title}</h3>
+                                            <div className="text-[36px] font-serif text-[#C9A14A] mb-3 font-light">{item.step}</div>
+                                            <h3 className="text-[18px] font-medium text-[#1A1A1A] mb-3">{item.title}</h3>
                                             <p className="text-[#666666] text-[15px] leading-relaxed">{item.description}</p>
                                         </div>
                                         <div className="mt-8 pt-6 border-t border-[#EAEAEA]">

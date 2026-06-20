@@ -7,7 +7,7 @@ import { SmartImage } from "@/components/SmartImage";
 import { ArrowRight } from "lucide-react";
 import { selectCardImage } from "@/lib/image-utils";
 
-const CATEGORIES = ["Bracelet", "Ring", "Necklace", "Earrings", "Other Jewelry"];
+const CATEGORIES = ["Engagement Ring", "Pendant", "Bracelet and Watch", "Earrings", "Necklace"];
 
 interface Product {
     id: string;
@@ -23,46 +23,60 @@ interface InteractiveCategoryShowcaseProps {
 }
 
 const FALLBACKS: Record<string, any[]> = {
-    "Bracelet": [
+    "Bracelet and Watch": [
         { id: "f-b1", name: "Classic Tennis Bracelet", slug: "shop", price: 155000, fallbackImg: "https://images.unsplash.com/photo-1611591437281-460bfbe1220a?auto=format&fit=crop&w=800&q=80" },
         { id: "f-b2", name: "Diamond Line Bracelet", slug: "shop", price: 210000, fallbackImg: "https://images.unsplash.com/photo-1573408301145-b98c4af01158?auto=format&fit=crop&w=800&q=80" },
-        { id: "f-b3", name: "Vintage Bangle", slug: "shop", price: 95000, fallbackImg: "https://images.unsplash.com/photo-1606760227091-3dd870d97f1d?auto=format&fit=crop&w=800&q=80" },
+        { id: "f-b3", name: "Luxury Watch", slug: "shop", price: 450000, fallbackImg: "https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?auto=format&fit=crop&w=800&q=80" },
     ],
-    "Ring": [
+    "Engagement Ring": [
         { id: "f-r1", name: "Solitaire Promise Ring", slug: "shop", price: 125000, fallbackImg: "https://images.unsplash.com/photo-1605100804763-247f6c9533f0?auto=format&fit=crop&w=800&q=80" },
         { id: "f-r2", name: "Eternity Band", slug: "shop", price: 85000, fallbackImg: "https://images.unsplash.com/photo-1543294001-f7cd5d7fb516?auto=format&fit=crop&w=800&q=80" },
         { id: "f-r3", name: "Sapphire Halo Ring", slug: "shop", price: 175000, fallbackImg: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&w=800&q=80" },
     ],
+    "Pendant": [
+        { id: "f-p1", name: "Diamond Solitaire Pendant", slug: "shop", price: 65000, fallbackImg: "https://images.unsplash.com/photo-1599643477877-530eb83abc8e?auto=format&fit=crop&w=800&q=80" },
+        { id: "f-p2", name: "Teardrop Pearl Pendant", slug: "shop", price: 45000, fallbackImg: "https://images.unsplash.com/photo-1601121141461-9d6647bca1ed?auto=format&fit=crop&w=800&q=80" },
+        { id: "f-p3", name: "Vintage Floral Pendant", slug: "shop", price: 78000, fallbackImg: "https://images.unsplash.com/photo-1681926618485-3bc677ebd53f?auto=format&fit=crop&w=800&q=80" },
+    ],
     "Necklace": [
-        { id: "f-n1", name: "Diamond Pendant", slug: "shop", price: 65000, fallbackImg: "https://images.unsplash.com/photo-1599643477877-530eb83abc8e?auto=format&fit=crop&w=800&q=80" },
-        { id: "f-n2", name: "Pearl Strand", slug: "shop", price: 110000, fallbackImg: "https://images.unsplash.com/photo-1681926618485-3bc677ebd53f?auto=format&fit=crop&w=800&q=80" },
-        { id: "f-n3", name: "Vintage Locket", slug: "shop", price: 45000, fallbackImg: "https://images.unsplash.com/photo-1601121141461-9d6647bca1ed?auto=format&fit=crop&w=800&q=80" },
+        { id: "f-n1", name: "Rivière Tennis Necklace", slug: "shop", price: 450000, fallbackImg: "https://images.unsplash.com/photo-1599643477877-530eb83abc8e?auto=format&fit=crop&w=800&q=80" },
+        { id: "f-n2", name: "Pearl Strand Necklace", slug: "shop", price: 110000, fallbackImg: "https://images.unsplash.com/photo-1681926618485-3bc677ebd53f?auto=format&fit=crop&w=800&q=80" },
+        { id: "f-n3", name: "Cascade Choker", slug: "shop", price: 185000, fallbackImg: "https://images.unsplash.com/photo-1601121141461-9d6647bca1ed?auto=format&fit=crop&w=800&q=80" },
     ],
     "Earrings": [
         { id: "f-e1", name: "Diamond Studs", slug: "shop", price: 145000, fallbackImg: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=800&q=80" },
         { id: "f-e2", name: "Drop Earrings", slug: "shop", price: 195000, fallbackImg: "https://images.unsplash.com/photo-1629224316810-9d8805b95e76?auto=format&fit=crop&w=800&q=80" },
         { id: "f-e3", name: "Hoop Statement", slug: "shop", price: 65000, fallbackImg: "https://images.unsplash.com/photo-1616422285623-14df61788775?auto=format&fit=crop&w=800&q=80" },
     ],
-    "Other Jewelry": [
-        { id: "f-o1", name: "Gold Brooch", slug: "shop", price: 55000, fallbackImg: "https://images.unsplash.com/photo-1588444650733-d0767b753cb8?auto=format&fit=crop&w=800&q=80" },
-        { id: "f-o2", name: "Luxury Watch", slug: "shop", price: 450000, fallbackImg: "https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?auto=format&fit=crop&w=800&q=80" },
-        { id: "f-o3", name: "Cufflinks", slug: "shop", price: 35000, fallbackImg: "https://images.unsplash.com/photo-1603561596112-0a120531bdba?auto=format&fit=crop&w=800&q=80" },
-    ],
 };
 
 function getCategoryProducts(category: string, products: Product[]) {
     const matches = products.filter(p => {
         const catName = p.category?.name?.toLowerCase() || "";
-        const searchName = category.toLowerCase().replace("other jewelry", "other");
-        if (searchName === "other jewelry" || searchName === "other") {
-            return !["bracelet", "ring", "necklace", "earrings", "pendant"].some(c => catName.includes(c));
+        const prodName = p.name.toLowerCase();
+        const searchName = category.toLowerCase();
+        
+        if (searchName === "engagement ring") {
+            return catName.includes("engagement") || catName.includes("ring") || prodName.includes("ring") || prodName.includes("solitaire") || prodName.includes("band");
         }
-        return catName.includes(searchName) || p.name.toLowerCase().includes(searchName);
+        if (searchName === "pendant") {
+            return catName.includes("pendant") || prodName.includes("pendant");
+        }
+        if (searchName === "bracelet and watch") {
+            return catName.includes("bracelet") || catName.includes("watch") || prodName.includes("bracelet") || prodName.includes("watch") || prodName.includes("bangle");
+        }
+        if (searchName === "earrings") {
+            return catName.includes("earring") || prodName.includes("earring") || prodName.includes("stud");
+        }
+        if (searchName === "necklace") {
+            return catName.includes("necklace") || prodName.includes("necklace") || prodName.includes("chain");
+        }
+        return catName.includes(searchName) || prodName.includes(searchName);
     });
 
     const items = [...matches];
-    const fallbackList = FALLBACKS[category] || FALLBACKS["Other Jewelry"];
-    while (items.length < 3) {
+    const fallbackList = FALLBACKS[category] || [];
+    while (items.length < 3 && fallbackList.length > 0) {
         items.push(fallbackList[items.length % fallbackList.length]);
     }
     

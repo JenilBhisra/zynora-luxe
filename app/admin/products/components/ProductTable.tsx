@@ -194,8 +194,18 @@ export function ProductTable({ initialProducts, categories }: { initialProducts:
                     </div>
 
                     <div><label className="block text-xs font-bold uppercase tracking-widest text-gray-600 mb-2">Category</label>
-                        <select required className="w-full bg-gray-50 border rounded-none p-3 text-sm text-[#111111] outline-none focus:border-[#111111] border-gray-200 transition-colors" value={formData.categoryId} onChange={e => setFormData({ ...formData, categoryId: e.target.value })}>
-                            {categories.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
+                        <select 
+                            required 
+                            className="w-full bg-white border border-gray-200 rounded-none p-3 text-sm text-[#111111] outline-none focus:border-[#111111] transition-colors cursor-pointer" 
+                            style={{ minHeight: "44px", WebkitAppearance: "menulist", appearance: "menulist" }}
+                            value={formData.categoryId} 
+                            onChange={e => setFormData({ ...formData, categoryId: e.target.value })}
+                        >
+                            {categories.map(c => (
+                                <option key={c.id} value={c.name} className="bg-white text-[#111111]">
+                                    {c.name}
+                                </option>
+                            ))}
                         </select>
                     </div>
                     <div><label className="block text-xs font-bold uppercase tracking-widest text-gray-600 mb-2">Metal/Material</label>

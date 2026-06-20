@@ -11,7 +11,7 @@ export default function Step1DiamondPage() {
                 <p className="text-sm text-zinc-500 font-normal max-w-[560px] mx-auto">Select the perfect center stone to begin your custom ring journey.</p>
             </AnimatedSection>
 
-            <AnimatedSection as="div" className="luxury-shell rounded-[24px]" delay={0.08}>
+            <AnimatedSection as="div" className="w-full" delay={0.08}>
                 <DiamondSearchClient customizerMode={true} />
             </AnimatedSection>
         </div>

@@ -6,6 +6,7 @@ import { SmartImage } from "@/components/SmartImage";
 import { FadeIn } from "@/components/FadeIn";
 import { selectCardImage } from "@/lib/image-utils";
 import { Button } from "@/components/Button";
+import { toast } from "sonner";
 
 interface Product {
     id: string;
@@ -42,7 +43,6 @@ export function ProductListClient({
     const loadMoreProducts = async () => {
         if (isLoading) return;
         setIsLoading(true);
-
         try {
             const nextPage = page + 1;
             const response = await fetch(
@@ -53,7 +53,6 @@ export function ProductListClient({
                 if (data.success && data.products) {
                     const newProducts = data.products.map((p: any) => ({
                         ...p,
-                        // Convert parsed images array back to string to remain compatible with selectCardImage signature
                         images: Array.isArray(p.images) ? JSON.stringify(p.images) : p.images,
                     }));
                     setProducts((prev) => [...prev, ...newProducts]);
@@ -71,7 +70,7 @@ export function ProductListClient({
 
     return (
         <div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-10">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-8 lg:gap-10">
                 {products.map((product, i) => {
                     const image = selectCardImage(
                         product.images,
@@ -82,7 +81,6 @@ export function ProductListClient({
                         product.slug || product.name
                     );
 
-                    // Determine display price: show lowest karat price if set
                     let displayPrice = product.price;
                     let showFrom = false;
                     try {
@@ -99,8 +97,8 @@ export function ProductListClient({
                     return (
                         <FadeIn key={product.id} delay={(i % 8) * 0.05} className="group cursor-pointer">
                             <Link href={`/product/${product.slug}`} className="block h-full">
-                                <div className="h-full flex flex-col luxury-shell premium-hover-lift rounded-[22px] overflow-hidden bg-white border border-zinc-100 shadow-sm">
-                                    <div className="relative aspect-[4/5] overflow-hidden bg-zinc-50 mb-5 border-b border-zinc-100">
+                                <div className="h-full flex flex-col rounded-none md:rounded-[4px] overflow-hidden bg-white border-0 md:border border-zinc-150/85 shadow-none hover:shadow-sm transition-all duration-300">
+                                    <div className="relative aspect-[4/5] overflow-hidden bg-zinc-50 mb-3 border-b border-zinc-100/50 rounded-none md:rounded-[4px]">
                                         <SmartImage
                                             src={image}
                                             alt={product.name}
@@ -109,18 +107,43 @@ export function ProductListClient({
                                             className="object-cover image-zoom-reveal transition-transform duration-700 ease-out group-hover:scale-[1.08]"
                                             priority={i < 4}
                                         />
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/5 to-transparent opacity-40" />
-                                        <span className="absolute top-4 right-4 text-[9px] uppercase tracking-[0.24em] font-bold text-[#C9A14A] opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-white/90 px-2.5 py-1 rounded-full shadow-sm">
+                                        
+                                        {/* Small Badge Top-Left */}
+                                        {i % 4 === 1 && (
+                                            <span className="absolute top-2 left-2 z-10 text-[7px] tracking-wider uppercase font-bold text-white bg-[#C9A14A] px-1.5 py-0.5 rounded-none">
+                                                Award Winning
+                                            </span>
+                                        )}
+                                        {i % 4 === 3 && (
+                                            <span className="absolute top-2 left-2 z-10 text-[7px] tracking-wider uppercase font-bold text-zinc-800 bg-zinc-100 px-1.5 py-0.5 rounded-none">
+                                                Most Loved
+                                            </span>
+                                        )}
+
+                                        {/* Heart Icon Top-Right */}
+                                        <button
+                                            className="absolute top-2 right-2 z-10 text-zinc-400 hover:text-red-500 transition-colors p-1"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                e.preventDefault();
+                                                toast.success("Added to wishlist!");
+                                            }}
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-heart"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+                                        </button>
+
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/5 to-transparent opacity-40 md:block hidden" />
+                                        <span className="absolute top-4 right-4 text-[9px] uppercase tracking-[0.24em] font-bold text-[#C9A14A] opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-white/90 px-2.5 py-1 rounded-full shadow-sm md:block hidden">
                                             View Details
                                         </span>
                                     </div>
-                                    <div className="text-center pb-5 px-4">
-                                        <h3 className="text-[16px] md:text-[17px] font-medium text-zinc-900 mb-2 line-clamp-1 group-hover:text-[#C9A14A] transition-colors duration-500 font-serif">
+                                    <div className="text-center pb-3 px-2">
+                                        <h3 className="text-xs md:text-sm font-medium text-zinc-900 mb-1 line-clamp-1 group-hover:text-[#C9A14A] transition-colors duration-500 font-serif">
                                             {product.name}
                                         </h3>
-                                        <p className="text-[14px] text-zinc-600 font-semibold">
+                                        <p className="text-[11px] md:text-xs text-zinc-600 font-semibold">
                                             {showFrom && (
-                                                <span className="text-[10px] text-zinc-400 uppercase tracking-widest mr-1">
+                                                <span className="text-[9px] text-zinc-400 uppercase tracking-widest mr-1">
                                                     From
                                                 </span>
                                             )}
@@ -138,11 +161,11 @@ export function ProductListClient({
                     Array.from({ length: limit }).map((_, idx) => (
                         <div
                             key={`skeleton-${idx}`}
-                            className="animate-pulse flex flex-col overflow-hidden luxury-shell rounded-[22px] p-4 border border-zinc-100 bg-white shadow-sm"
+                            className="animate-pulse flex flex-col bg-white border border-zinc-100 rounded-none md:rounded-[4px] p-2 md:p-4"
                         >
-                            <div className="aspect-[4/5] bg-zinc-100 mb-5 relative overflow-hidden rounded-[16px]" />
-                            <div className="h-4 bg-zinc-200 w-2/3 mb-2 mx-auto" />
-                            <div className="h-4 bg-zinc-100 w-1/3 mb-5 mx-auto" />
+                            <div className="aspect-[4/5] bg-zinc-100 mb-3 relative overflow-hidden rounded-none md:rounded-[4px]" />
+                            <div className="h-3 bg-zinc-200 w-2/3 mb-2 mx-auto" />
+                            <div className="h-3 bg-zinc-100 w-1/3 mb-4 mx-auto" />
                         </div>
                     ))}
             </div>

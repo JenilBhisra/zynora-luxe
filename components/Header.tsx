@@ -87,7 +87,7 @@ export function Header() {
         };
     }, []);
 
-    if (pathname?.startsWith("/admin") || isCustomizerMode) {
+    if (pathname?.startsWith("/admin")) {
         return null;
     }
 

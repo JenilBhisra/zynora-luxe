@@ -440,7 +440,17 @@ export function DiamondTable({ initialDiamonds }: { initialDiamonds: any[] }) {
                                 <div>
                                     <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-600 mb-2">Shape</label>
                                     <select className="w-full bg-gray-50 border border-gray-200 rounded-none p-3 text-sm text-[#111111] outline-none focus:border-[#111111]" value={formData.shape} onChange={e => setFormData({ ...formData, shape: e.target.value })}>
-                                        <option>Round</option><option>Oval</option><option>Princess</option><option>Emerald</option><option>Cushion</option>
+                                        <option>Round</option>
+                                        <option>Oval</option>
+                                        <option>Emerald</option>
+                                        <option>Cushion</option>
+                                        <option>Elongated Cushion</option>
+                                        <option>Pear</option>
+                                        <option>Radiant</option>
+                                        <option>Princess</option>
+                                        <option>Marquise</option>
+                                        <option>Asscher</option>
+                                        <option>Heart</option>
                                     </select>
                                 </div>
                                 <div>

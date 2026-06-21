@@ -19,7 +19,7 @@ import { uploadToCloudinary, deleteByUrl } from "@/lib/cloudinary";
 export const maxDuration = 60;
 
 // ── Valid upload categories ───────────────────────────────────────────────────
-const ALLOWED_TYPES = ["diamonds", "settings", "products", "homepage"] as const;
+const ALLOWED_TYPES = ["diamonds", "settings", "products", "homepage", "shapes"] as const;
 type UploadType = typeof ALLOWED_TYPES[number];
 
 const ALLOWED_KINDS = ["image", "video", "model"] as const;

@@ -68,11 +68,11 @@ export default async function ShopCategoryPage() {
                                         fill 
                                         className="object-cover transition-transform duration-1000 ease-out group-hover:scale-[1.08] filter group-hover:brightness-110" 
                                     />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-[#0B0B0C]/90 via-[#0B0B0C]/20 to-transparent transition-opacity duration-700 opacity-90 group-hover:opacity-100" />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent transition-opacity duration-700 opacity-90 group-hover:opacity-100" />
                                     
-                                    <div className="absolute bottom-0 left-0 w-full p-8 flex flex-col items-center text-center transform transition-transform duration-700 translate-y-4 group-hover:translate-y-0">
-                                        <h3 className="text-3xl md:text-4xl font-heading text-white mb-3 group-hover:text-[#C9A14A] transition-colors duration-500">{cat.name}</h3>
-                                        <span className="text-[10px] uppercase tracking-[0.3em] font-bold text-white/60 group-hover:text-white/90 transition-colors flex items-center gap-2">
+                                    <div className="absolute bottom-0 left-0 w-full p-8 flex flex-col items-center text-center">
+                                        <h3 className="text-3xl md:text-4xl font-heading !text-[#FFF8EA] mb-3 group-hover:!text-[#C9A14A] transition-colors duration-500" style={{ textShadow: "0 2px 12px rgba(0,0,0,0.45)" }}>{cat.name}</h3>
+                                        <span className="text-[10px] uppercase tracking-[0.3em] font-bold !text-[#D6B45A] group-hover:!text-white transition-colors flex items-center gap-2" style={{ textShadow: "0 2px 12px rgba(0,0,0,0.45)" }}>
                                             Explore <span className="text-[#C9A14A]">→</span>
                                         </span>
                                     </div>

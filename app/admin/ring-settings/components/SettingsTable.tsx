@@ -23,7 +23,7 @@ export function SettingsTable({ initialSettings }: { initialSettings: any[] }) {
     const [modelFile, setModelFile] = useState<File | null>(null);
     const [modelName, setModelName] = useState<string>("");
     const [isUploading, setIsUploading] = useState(false);
-    const DIAMOND_SHAPES = ["Round", "Oval", "Princess", "Emerald", "Cushion"];
+    const DIAMOND_SHAPES = ["Round", "Oval", "Emerald", "Cushion", "Elongated Cushion", "Pear", "Radiant", "Princess", "Marquise", "Asscher", "Heart"];
     const [supportedShapes, setSupportedShapes] = useState<string[]>([]);
 
     const [formData, setFormData] = useState({

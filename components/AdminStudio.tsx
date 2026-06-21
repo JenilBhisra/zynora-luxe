@@ -128,7 +128,7 @@ function TextFieldRow({ field, initialValue, hasOverride, isSaving, onSave }: Te
 export function AdminStudio({ isAdmin }: AdminStudioProps) {
     const [isEditMode, setIsEditMode] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
-    const [activeTab, setActiveTab] = useState<"homepage" | "diamonds" | "settings" | "text">("homepage");
+    const [activeTab, setActiveTab] = useState<"homepage" | "diamonds" | "settings" | "text" | "shapes">("homepage");
     const [isUploading, setIsUploading] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(0);
     const router = useRouter();
@@ -145,6 +145,12 @@ export function AdminStudio({ isAdmin }: AdminStudioProps) {
     
     const [selectedDiamond, setSelectedDiamond] = useState<Diamond | null>(null);
     const [selectedSetting, setSelectedSetting] = useState<Setting | null>(null);
+
+    // Shapes management state
+    const [shapes, setShapes] = useState<any[]>([]);
+    const [selectedShape, setSelectedShape] = useState<any | null>(null);
+    const [isSavingShape, setIsSavingShape] = useState(false);
+    const [uploadSubType, setUploadSubType] = useState<"thumbnail" | "preview" | null>(null);
 
     // Text content editor state
     const [textDrafts, setTextDrafts] = useState<Record<string, string>>({});
@@ -182,6 +188,14 @@ export function AdminStudio({ isAdmin }: AdminStudioProps) {
                 }
             })
             .catch(err => console.error("Error loading diamonds", err));
+
+        // Fetch shapes
+        fetch("/api/shapes")
+            .then(res => res.json())
+            .then(data => {
+                if (Array.isArray(data)) setShapes(data);
+            })
+            .catch(err => console.error("Error loading shapes", err));
     }, [isAdmin]);
 
     // Handle incoming visual/in-place edit triggers from the home page
@@ -248,9 +262,47 @@ export function AdminStudio({ isAdmin }: AdminStudioProps) {
         }
     };
 
+    const handleSaveShape = async (shapeData: any) => {
+        setIsSavingShape(true);
+        try {
+            const res = await fetch("/api/shapes", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(shapeData)
+            });
+            if (!res.ok) {
+                const errData = await res.json();
+                throw new Error(errData.error || "Save failed");
+            }
+            const saved = await res.json();
+            setShapes(prev => {
+                const exists = prev.some(s => s.id === saved.id);
+                if (exists) {
+                    return prev.map(s => s.id === saved.id ? saved : s).sort((a, b) => a.displayOrder - b.displayOrder);
+                } else {
+                    return [...prev, saved].sort((a, b) => a.displayOrder - b.displayOrder);
+                }
+            });
+            setSelectedShape(null);
+            toast.success(`Shape "${saved.name}" saved successfully!`, {
+                style: { background: "#0B0B0C", border: "1px solid #D6B25E", color: "#fff" }
+            });
+            router.refresh();
+        } catch (err: any) {
+            toast.error(err.message || "Failed to save shape.");
+        } finally {
+            setIsSavingShape(false);
+        }
+    };
+
     if (!isAdmin) return null;
 
-    const handleUploadClick = () => {
+    const handleUploadClick = (subType?: "thumbnail" | "preview" | React.MouseEvent) => {
+        if (subType && typeof subType === "string") {
+            setUploadSubType(subType);
+        } else {
+            setUploadSubType(null);
+        }
         fileInputRef.current?.click();
     };
 
@@ -279,6 +331,7 @@ export function AdminStudio({ isAdmin }: AdminStudioProps) {
             if (activeTab === "diamonds") uploadType = "diamonds";
             if (activeTab === "settings") uploadType = "settings";
             if (activeTab === "homepage") uploadType = "homepage";
+            if (activeTab === "shapes") uploadType = "shapes";
             
             formData.append("type", uploadType);
             formData.append("kind", "image");
@@ -291,8 +344,16 @@ export function AdminStudio({ isAdmin }: AdminStudioProps) {
                 prevUrl = selectedDiamond.imageUrl;
             } else if (activeTab === "settings" && selectedSetting?.imageUrl) {
                 prevUrl = selectedSetting.imageUrl;
+            } else if (activeTab === "shapes" && selectedShape) {
+                if (uploadSubType === "thumbnail") {
+                    prevUrl = selectedShape.thumbnailImageUrl || selectedShape.imageUrl || "";
+                } else if (uploadSubType === "preview") {
+                    prevUrl = selectedShape.previewImageUrl || "";
+                } else {
+                    prevUrl = selectedShape.imageUrl || "";
+                }
             }
-            if (prevUrl && prevUrl.startsWith("/uploads/")) {
+            if (prevUrl && (prevUrl.startsWith("/uploads/") || prevUrl.includes("res.cloudinary.com"))) {
                 formData.append("previousUrl", prevUrl);
             }
 
@@ -366,6 +427,31 @@ export function AdminStudio({ isAdmin }: AdminStudioProps) {
                     style: { background: "#0B0B0C", border: "1px solid #D6B25E", color: "#fff" }
                 });
                 router.refresh();
+            } else if (activeTab === "shapes" && selectedShape) {
+                // Save shape image update based on uploadSubType
+                const payload = { ...selectedShape };
+                if (uploadSubType === "thumbnail") {
+                    payload.thumbnailImageUrl = uploadedUrl;
+                } else if (uploadSubType === "preview") {
+                    payload.previewImageUrl = uploadedUrl;
+                } else {
+                    payload.imageUrl = uploadedUrl;
+                }
+
+                const saveRes = await fetch("/api/shapes", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!saveRes.ok) throw new Error("Failed to update shape image.");
+                const updatedShape = await saveRes.json();
+                setSelectedShape(updatedShape);
+                setShapes(prev => prev.map(s => s.id === updatedShape.id ? updatedShape : s));
+                toast.success(`Photo updated for ${selectedShape.name} Shape!`, {
+                    style: { background: "#0B0B0C", border: "1px solid #D6B25E", color: "#fff" }
+                });
+                router.refresh();
             }
 
             setUploadProgress(100);
@@ -425,6 +511,7 @@ export function AdminStudio({ isAdmin }: AdminStudioProps) {
         { key: "diamond-shape-hover-cushion",           label: "Diamond Shape Section \u2013 Cushion Hover Image",           defaultUrl: "/products/loose-diamond.jpg", group: "Diamond Shape Section" },
         { key: "diamond-shape-hover-princess",          label: "Diamond Shape Section \u2013 Princess Hover Image",          defaultUrl: "/products/loose-diamond.jpg", group: "Diamond Shape Section" },
         { key: "diamond-shape-hover-asscher",           label: "Diamond Shape Section \u2013 Asscher Hover Image",           defaultUrl: "/products/loose-diamond.jpg", group: "Diamond Shape Section" },
+        { key: "diamond-shape-hover-heart",             label: "Diamond Shape Section \u2013 Heart Hover Image",             defaultUrl: "/products/loose-diamond.jpg", group: "Diamond Shape Section" },
         { key: "diamond-shape-icon-oval",               label: "Diamond Shape Section \u2013 Oval Shape Icon",               defaultUrl: "/products/loose-diamond.jpg", group: "Diamond Shape Section" },
         { key: "diamond-shape-icon-round",              label: "Diamond Shape Section \u2013 Round Shape Icon",              defaultUrl: "/products/loose-diamond.jpg", group: "Diamond Shape Section" },
         { key: "diamond-shape-icon-emerald",            label: "Diamond Shape Section \u2013 Emerald Shape Icon",            defaultUrl: "/products/loose-diamond.jpg", group: "Diamond Shape Section" },
@@ -435,6 +522,7 @@ export function AdminStudio({ isAdmin }: AdminStudioProps) {
         { key: "diamond-shape-icon-cushion",            label: "Diamond Shape Section \u2013 Cushion Shape Icon",            defaultUrl: "/products/loose-diamond.jpg", group: "Diamond Shape Section" },
         { key: "diamond-shape-icon-princess",           label: "Diamond Shape Section \u2013 Princess Shape Icon",           defaultUrl: "/products/loose-diamond.jpg", group: "Diamond Shape Section" },
         { key: "diamond-shape-icon-asscher",            label: "Diamond Shape Section \u2013 Asscher Shape Icon",            defaultUrl: "/products/loose-diamond.jpg", group: "Diamond Shape Section" },
+        { key: "diamond-shape-icon-heart",              label: "Diamond Shape Section \u2013 Heart Shape Icon",              defaultUrl: "/products/loose-diamond.jpg", group: "Diamond Shape Section" },
         // Featured Product Cards
         { key: "featured-product-1",     label: "Featured Product Card 1",              defaultUrl: "/products/ring-2.jpg", group: "Featured Products" },
         { key: "featured-product-2",     label: "Featured Product Card 2",              defaultUrl: "/products/ring-2.jpg", group: "Featured Products" },
@@ -514,6 +602,7 @@ export function AdminStudio({ isAdmin }: AdminStudioProps) {
                                     { id: "homepage", label: "Homepage Assets", icon: ImageIcon },
                                     { id: "diamonds", label: "Diamonds Inventory", icon: Sparkles },
                                     { id: "settings", label: "Ring Settings", icon: Settings },
+                                    { id: "shapes", label: "Shape Management", icon: Settings },
                                     { id: "text", label: "Text Content", icon: Edit3 },
                                 ].map(tab => {
                                     const Icon = tab.icon;
@@ -891,6 +980,263 @@ export function AdminStudio({ isAdmin }: AdminStudioProps) {
                                                         />
                                                     </div>
                                                 )}
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+
+                                {/* ── Shape Management Editor Tab ────────────────────────── */}
+                                {activeTab === "shapes" && (
+                                    <div className="space-y-6">
+                                        <div className="flex items-center justify-between">
+                                            <span className="block text-[10px] uppercase tracking-widest text-white/50">Shapes Directory ({shapes.length} items)</span>
+                                            {!selectedShape && (
+                                                <button
+                                                    onClick={() => setSelectedShape({ name: "", slug: "", imageUrl: "", isActive: true, displayOrder: shapes.length + 1 })}
+                                                    className="px-3 py-1.5 rounded-md bg-[#D6B25E] text-[#0B0B0C] hover:bg-[#E3C67C] transition-all font-bold uppercase tracking-wider text-[9px]"
+                                                >
+                                                    + Add Shape
+                                                </button>
+                                            )}
+                                        </div>
+
+                                        {!selectedShape ? (
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[420px] overflow-y-auto custom-scrollbar border border-white/6 rounded-xl bg-white/2 p-3">
+                                                {shapes.map((shape) => (
+                                                    <button
+                                                        key={shape.id || shape.name}
+                                                        onClick={() => setSelectedShape({ ...shape })}
+                                                        className="flex items-center gap-3 p-3 rounded-lg border border-white/5 bg-white/3 hover:border-white/12 hover:bg-white/5 text-left transition-all"
+                                                    >
+                                                        <div className="w-12 h-12 bg-black border border-white/10 rounded-full overflow-hidden flex-shrink-0 flex items-center justify-center relative">
+                                                            {(shape.thumbnailImageUrl || shape.imageUrl) ? (
+                                                                // eslint-disable-next-line @next/next/no-img-element
+                                                                <img src={shape.thumbnailImageUrl || shape.imageUrl} alt={shape.name} className="w-full h-full object-cover" />
+                                                            ) : (
+                                                                <span className="text-[10px] text-white/40">No Image</span>
+                                                            )}
+                                                        </div>
+                                                        <div className="overflow-hidden flex-1">
+                                                            <h4 className="text-[12px] font-medium text-white truncate flex items-center gap-2">
+                                                                {shape.name}
+                                                                {!shape.isActive && (
+                                                                    <span className="text-[7px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-red-950 text-red-400 font-bold">Inactive</span>
+                                                                )}
+                                                            </h4>
+                                                            <p className="text-[9px] text-white/40 mt-0.5 truncate">slug: {shape.slug} | order: {shape.displayOrder}</p>
+                                                        </div>
+                                                        <ChevronRight size={13} className="text-white/20 ml-auto" />
+                                                    </button>
+                                                ))}
+                                                {shapes.length === 0 && (
+                                                    <div className="col-span-2 py-8 text-center text-white/40 text-[12px]">
+                                                        No shapes configured. Click Add Shape to start.
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ) : (
+                                            // Shape Selected (Edit/Create view)
+                                            <div className="border border-white/10 rounded-2xl bg-[#09090A]/80 p-5 relative overflow-hidden space-y-4">
+                                                <div className="flex items-center justify-between pb-3 border-b border-white/5">
+                                                    <span className="block text-[10px] uppercase tracking-widest text-[#D6B25E] font-bold">
+                                                        {selectedShape.id ? "Edit Shape Parameters" : "Create New Shape"}
+                                                    </span>
+                                                    <button
+                                                        onClick={() => setSelectedShape(null)}
+                                                        className="text-[10px] uppercase tracking-widest text-[#D6B25E] hover:text-[#E3C67C] font-bold transition-colors"
+                                                    >
+                                                        ← Back to List
+                                                    </button>
+                                                </div>
+
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 pt-3">
+                                                    {/* Thumbnail Image Zone */}
+                                                    <div className="flex gap-4 items-center p-3 border border-white/5 rounded-xl bg-white/2">
+                                                        <div className="relative w-16 h-16 rounded-full bg-black border border-white/6 overflow-hidden flex items-center justify-center flex-shrink-0">
+                                                            {(selectedShape.thumbnailImageUrl || selectedShape.imageUrl) ? (
+                                                                // eslint-disable-next-line @next/next/no-img-element
+                                                                <img
+                                                                    src={selectedShape.thumbnailImageUrl || selectedShape.imageUrl}
+                                                                    alt="Thumbnail"
+                                                                    className="w-full h-full object-cover"
+                                                                />
+                                                            ) : (
+                                                                <div className="text-center text-white/30">
+                                                                    <span className="text-[8px] uppercase tracking-wider block">No Icon</span>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                        <div className="flex-1 min-w-0">
+                                                            <p className="text-[10px] text-white/60 font-semibold uppercase tracking-wider">Thumbnail Icon</p>
+                                                            <p className="text-[9px] text-white/30 mt-0.5 leading-normal truncate">For filter grids (120x120px)</p>
+                                                            {selectedShape.id && (
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => handleUploadClick("thumbnail")}
+                                                                    disabled={isUploading}
+                                                                    className="mt-2 flex items-center gap-1.5 px-3 py-1.5 rounded bg-white/5 hover:bg-white/10 border border-white/10 text-white transition-all font-semibold uppercase tracking-wider text-[8px]"
+                                                                >
+                                                                    {isUploading && uploadSubType === "thumbnail" ? (
+                                                                        <>
+                                                                            <Loader2 size={9} className="animate-spin" />
+                                                                            <span>Uploading...</span>
+                                                                        </>
+                                                                    ) : (
+                                                                        <>
+                                                                            <UploadCloud size={9} />
+                                                                            <span>Upload Icon</span>
+                                                                        </>
+                                                                    )}
+                                                                </button>
+                                                            )}
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Large Preview Image Zone */}
+                                                    <div className="flex gap-4 items-center p-3 border border-white/5 rounded-xl bg-white/2">
+                                                        <div className="relative w-16 h-16 rounded-lg bg-black border border-white/6 overflow-hidden flex items-center justify-center flex-shrink-0">
+                                                            {selectedShape.previewImageUrl ? (
+                                                                // eslint-disable-next-line @next/next/no-img-element
+                                                                <img
+                                                                    src={selectedShape.previewImageUrl}
+                                                                    alt="Large Preview"
+                                                                    className="w-full h-full object-cover"
+                                                                />
+                                                            ) : (
+                                                                <div className="text-center text-white/30">
+                                                                    <span className="text-[8px] uppercase tracking-wider block">No Preview</span>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                        <div className="flex-1 min-w-0">
+                                                            <p className="text-[10px] text-white/60 font-semibold uppercase tracking-wider">Homepage Preview</p>
+                                                            <p className="text-[9px] text-white/30 mt-0.5 leading-normal truncate">For homepage grid (600x600px)</p>
+                                                            {selectedShape.id && (
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => handleUploadClick("preview")}
+                                                                    disabled={isUploading}
+                                                                    className="mt-2 flex items-center gap-1.5 px-3 py-1.5 rounded bg-white/5 hover:bg-white/10 border border-white/10 text-white transition-all font-semibold uppercase tracking-wider text-[8px]"
+                                                                >
+                                                                    {isUploading && uploadSubType === "preview" ? (
+                                                                        <>
+                                                                            <Loader2 size={9} className="animate-spin" />
+                                                                            <span>Uploading...</span>
+                                                                        </>
+                                                                    ) : (
+                                                                        <>
+                                                                            <UploadCloud size={9} />
+                                                                            <span>Upload Preview</span>
+                                                                        </>
+                                                                    )}
+                                                                </button>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-3">
+                                                    <div>
+                                                        <label className="block text-[10px] uppercase tracking-wider text-white/60 mb-1.5">Shape Name</label>
+                                                        <input
+                                                            type="text"
+                                                            value={selectedShape.name}
+                                                            onChange={e => {
+                                                                const name = e.target.value;
+                                                                // auto-slug
+                                                                const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+                                                                setSelectedShape({ ...selectedShape, name, slug });
+                                                            }}
+                                                            className="w-full bg-white/4 border border-white/10 rounded-lg p-2.5 text-[12px] text-white placeholder-white/20 focus:outline-none focus:border-[#D6B25E]/60 transition-all"
+                                                            placeholder="e.g. Round"
+                                                        />
+                                                    </div>
+
+                                                    <div>
+                                                        <label className="block text-[10px] uppercase tracking-wider text-white/60 mb-1.5">Slug</label>
+                                                        <input
+                                                            type="text"
+                                                            value={selectedShape.slug}
+                                                            onChange={e => setSelectedShape({ ...selectedShape, slug: e.target.value })}
+                                                            className="w-full bg-white/4 border border-white/10 rounded-lg p-2.5 text-[12px] text-white placeholder-white/20 focus:outline-none focus:border-[#D6B25E]/60 transition-all"
+                                                            placeholder="e.g. round"
+                                                        />
+                                                    </div>
+
+                                                    <div>
+                                                        <label className="block text-[10px] uppercase tracking-wider text-white/60 mb-1.5">Thumbnail Image URL (Icon)</label>
+                                                        <input
+                                                            type="text"
+                                                            value={selectedShape.thumbnailImageUrl || ""}
+                                                            onChange={e => setSelectedShape({ ...selectedShape, thumbnailImageUrl: e.target.value })}
+                                                            className="w-full bg-white/4 border border-white/10 rounded-lg p-2.5 text-[12px] text-white placeholder-white/20 focus:outline-none focus:border-[#D6B25E]/60 transition-all"
+                                                            placeholder="https://example.com/thumbnail.png"
+                                                        />
+                                                    </div>
+
+                                                    <div>
+                                                        <label className="block text-[10px] uppercase tracking-wider text-white/60 mb-1.5">Large Preview Image URL</label>
+                                                        <input
+                                                            type="text"
+                                                            value={selectedShape.previewImageUrl || ""}
+                                                            onChange={e => setSelectedShape({ ...selectedShape, previewImageUrl: e.target.value })}
+                                                            className="w-full bg-white/4 border border-white/10 rounded-lg p-2.5 text-[12px] text-white placeholder-white/20 focus:outline-none focus:border-[#D6B25E]/60 transition-all"
+                                                            placeholder="https://example.com/preview.png"
+                                                        />
+                                                    </div>
+
+                                                    <div>
+                                                        <label className="block text-[10px] uppercase tracking-wider text-white/60 mb-1.5">Legacy Image URL (Optional Fallback)</label>
+                                                        <input
+                                                            type="text"
+                                                            value={selectedShape.imageUrl || ""}
+                                                            onChange={e => setSelectedShape({ ...selectedShape, imageUrl: e.target.value })}
+                                                            className="w-full bg-white/4 border border-white/10 rounded-lg p-2.5 text-[12px] text-white placeholder-white/20 focus:outline-none focus:border-[#D6B25E]/60 transition-all"
+                                                            placeholder="https://example.com/shape.png"
+                                                        />
+                                                    </div>
+
+                                                    <div>
+                                                        <label className="block text-[10px] uppercase tracking-wider text-white/60 mb-1.5">Display Order</label>
+                                                        <input
+                                                            type="number"
+                                                            value={selectedShape.displayOrder}
+                                                            onChange={e => setSelectedShape({ ...selectedShape, displayOrder: parseInt(e.target.value) || 0 })}
+                                                            className="w-full bg-white/4 border border-white/10 rounded-lg p-2.5 text-[12px] text-white placeholder-white/20 focus:outline-none focus:border-[#D6B25E]/60 transition-all"
+                                                        />
+                                                    </div>
+                                                </div>
+
+                                                <div className="flex items-center gap-3 pt-2">
+                                                    <label className="flex items-center gap-2 text-[11px] text-white/80 cursor-pointer">
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={selectedShape.isActive}
+                                                            onChange={e => setSelectedShape({ ...selectedShape, isActive: e.target.checked })}
+                                                            className="rounded border-white/10 bg-white/4 text-[#D6B25E] focus:ring-0 focus:ring-offset-0 focus:outline-none w-3.5 h-3.5"
+                                                        />
+                                                        <span>Active shape (visible in storefront filters)</span>
+                                                    </label>
+                                                </div>
+
+                                                <div className="flex items-center justify-end gap-2.5 pt-4 border-t border-white/5">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setSelectedShape(null)}
+                                                        className="px-4 py-2 rounded-lg border border-white/10 text-white/80 hover:text-white text-[11px]"
+                                                    >
+                                                        Cancel
+                                                    </button>
+                                                    <button
+                                                        type="button"
+                                                        disabled={isSavingShape || !selectedShape.name || !selectedShape.slug}
+                                                        onClick={() => handleSaveShape(selectedShape)}
+                                                        className="flex items-center gap-1.5 px-5 py-2.5 rounded-lg bg-[#D6B25E] text-[#0B0B0C] hover:bg-[#E3C67C] transition-all font-semibold uppercase tracking-wider text-[10px] disabled:opacity-50"
+                                                    >
+                                                        {isSavingShape ? <Loader2 size={11} className="animate-spin" /> : <Check size={11} />}
+                                                        <span>Save Shape</span>
+                                                    </button>
+                                                </div>
                                             </div>
                                         )}
                                     </div>

@@ -1,22 +1,23 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { SmartImage } from "./SmartImage";
 import { VisualEditButton } from "./VisualEditButton";
 
 // Each shape: explicit id, iconKey, hoverKey — zero index-based mapping
 const DIAMOND_SHAPES = [
-    { id: "oval",              label: "Oval",              iconKey: "diamond-shape-icon-oval",              hoverKey: "diamond-shape-hover-oval",              href: "/diamonds?shape=oval" },
-    { id: "round",             label: "Round",             iconKey: "diamond-shape-icon-round",             hoverKey: "diamond-shape-hover-round",             href: "/diamonds?shape=round" },
-    { id: "emerald",           label: "Emerald",           iconKey: "diamond-shape-icon-emerald",           hoverKey: "diamond-shape-hover-emerald",           href: "/diamonds?shape=emerald" },
-    { id: "marquise",          label: "Marquise",          iconKey: "diamond-shape-icon-marquise",          hoverKey: "diamond-shape-hover-marquise",          href: "/diamonds?shape=marquise" },
-    { id: "radiant",           label: "Radiant",           iconKey: "diamond-shape-icon-radiant",           hoverKey: "diamond-shape-hover-radiant",           href: "/diamonds?shape=radiant" },
-    { id: "pear",              label: "Pear",              iconKey: "diamond-shape-icon-pear",              hoverKey: "diamond-shape-hover-pear",              href: "/diamonds?shape=pear" },
-    { id: "elongated-cushion", label: "Elongated Cushion", iconKey: "diamond-shape-icon-elongated-cushion", hoverKey: "diamond-shape-hover-elongated-cushion", href: "/diamonds?shape=elongated-cushion" },
-    { id: "cushion",           label: "Cushion",           iconKey: "diamond-shape-icon-cushion",           hoverKey: "diamond-shape-hover-cushion",           href: "/diamonds?shape=cushion" },
-    { id: "princess",          label: "Princess",          iconKey: "diamond-shape-icon-princess",          hoverKey: "diamond-shape-hover-princess",          href: "/diamonds?shape=princess" },
-    { id: "asscher",           label: "Asscher",           iconKey: "diamond-shape-icon-asscher",           hoverKey: "diamond-shape-hover-asscher",           href: "/diamonds?shape=asscher" },
+    { id: "oval",              label: "Oval",              iconKey: "diamond-shape-icon-oval",              hoverKey: "diamond-shape-hover-oval",              href: "/customizer/step-1-diamond?shape=oval" },
+    { id: "round",             label: "Round",             iconKey: "diamond-shape-icon-round",             hoverKey: "diamond-shape-hover-round",             href: "/customizer/step-1-diamond?shape=round" },
+    { id: "emerald",           label: "Emerald",           iconKey: "diamond-shape-icon-emerald",           hoverKey: "diamond-shape-hover-emerald",           href: "/customizer/step-1-diamond?shape=emerald" },
+    { id: "marquise",          label: "Marquise",          iconKey: "diamond-shape-icon-marquise",          hoverKey: "diamond-shape-hover-marquise",          href: "/customizer/step-1-diamond?shape=marquise" },
+    { id: "radiant",           label: "Radiant",           iconKey: "diamond-shape-icon-radiant",           hoverKey: "diamond-shape-hover-radiant",           href: "/customizer/step-1-diamond?shape=radiant" },
+    { id: "pear",              label: "Pear",              iconKey: "diamond-shape-icon-pear",              hoverKey: "diamond-shape-hover-pear",              href: "/customizer/step-1-diamond?shape=pear" },
+    { id: "cushion",           label: "Cushion",           iconKey: "diamond-shape-icon-cushion",           hoverKey: "diamond-shape-hover-cushion",           href: "/customizer/step-1-diamond?shape=cushion" },
+    { id: "heart",             label: "Heart",             iconKey: "diamond-shape-icon-heart",             hoverKey: "diamond-shape-hover-heart",             href: "/customizer/step-1-diamond?shape=heart" },
+    { id: "princess",          label: "Princess",          iconKey: "diamond-shape-icon-princess",          hoverKey: "diamond-shape-hover-princess",          href: "/customizer/step-1-diamond?shape=princess" },
+    { id: "asscher",           label: "Asscher",           iconKey: "diamond-shape-icon-asscher",           hoverKey: "diamond-shape-hover-asscher",           href: "/customizer/step-1-diamond?shape=asscher" },
 ] as const;
 
 type ShapeId = typeof DIAMOND_SHAPES[number]["id"];
@@ -31,16 +32,35 @@ interface DiamondShapeSectionProps {
 }
 
 export function DiamondShapeSection({ customImages = {}, isAdmin = false }: DiamondShapeSectionProps) {
-    const [hoveredShapeId, setHoveredShapeId] = useState<ShapeId | null>(null);
+    const router = useRouter();
+    const [selectedShapeId, setSelectedShapeId] = useState<ShapeId>("oval");
+    const [dbShapes, setDbShapes] = useState<any[]>([]);
+
+    const handleShapeHover = (shapeId: ShapeId) => {
+        console.log("Hovered shape:", shapeId);
+        setSelectedShapeId(shapeId);
+    };
+
+    console.log("Selected shape:", selectedShapeId);
+
+    useEffect(() => {
+        const fetchShapes = async () => {
+            try {
+                const res = await fetch("/api/shapes");
+                if (res.ok) {
+                    const data = await res.json();
+                    // Filter to keep only active shapes and exclude elongated-cushion shape
+                    const active = data.filter((s: any) => s.isActive && s.slug !== "elongated-cushion");
+                    setDbShapes(active);
+                }
+            } catch (err) {
+                console.error("Failed to load shapes from DB", err);
+            }
+        };
+        fetchShapes();
+    }, []);
 
     const defaultMainImage = customImages[DEFAULT_MAIN_KEY] || DEFAULT_MAIN_IMAGE;
-
-    // The CURRENT hover image src — explicit key lookup, zero index math
-    const hoveredShape     = hoveredShapeId ? DIAMOND_SHAPES.find(s => s.id === hoveredShapeId) : null;
-    const hoveredHoverSrc  = hoveredShape ? (customImages[hoveredShape.hoverKey] || null) : null;
-
-    // Only show the overlay when a custom hover image is actually available
-    const showHoverOverlay = !!(hoveredShapeId && hoveredHoverSrc);
 
     return (
         <section
@@ -63,32 +83,23 @@ export function DiamondShapeSection({ customImages = {}, isAdmin = false }: Diam
                             <span style={{ fontStyle: "italic" }}>by Shape</span>
                         </h2>
 
-                        {/* Image container — two layers for smooth crossfade */}
+                        {/* Image container — multi-layer absolute crossfade for instant hovers */}
                         <div
-                            className="relative w-full overflow-hidden"
-                            style={{ maxWidth: "520px", aspectRatio: "1/1" }}
+                            className="relative w-full aspect-square overflow-hidden bg-white"
+                            style={{ maxWidth: "520px" }}
                         >
                             {/* Admin: edit default main image */}
-                            {isAdmin && !hoveredShapeId && (
+                            {isAdmin && (
                                 <div className="absolute top-3 left-3 z-30">
                                     <VisualEditButton type="homepage" assetKey={DEFAULT_MAIN_KEY} />
                                 </div>
                             )}
-                            {/* Admin: edit the hovered shape's hover image */}
-                            {isAdmin && hoveredShape && (
-                                <div className="absolute top-3 left-3 z-30">
-                                    <VisualEditButton type="homepage" assetKey={hoveredShape.hoverKey} />
-                                </div>
-                            )}
 
-                            {/*
-                             * LAYER 1 — Default image, always visible underneath.
-                             * Never unmounts. No key change. Smooth.
-                             */}
-                            <div className="absolute inset-0">
+                            {/* Base fallback image */}
+                            <div className="absolute inset-0" style={{ opacity: selectedShapeId ? 0 : 1, zIndex: 1 }}>
                                 <SmartImage
                                     src={defaultMainImage}
-                                    alt="Diamond Shape"
+                                    alt="Diamond Shape Default"
                                     fill
                                     fallbackType="jewelry"
                                     className="object-contain"
@@ -97,84 +108,69 @@ export function DiamondShapeSection({ customImages = {}, isAdmin = false }: Diam
                                 />
                             </div>
 
-                            {/*
-                             * LAYER 2 — ONE hover overlay per hovered shape.
-                             * Only shown when a custom image exists for that shape.
-                             * Fades in with CSS opacity transition.
-                             * No 10-layer stacking. No index. Explicit key lookup.
-                             *
-                             * Oval hover    → customImages["diamond-shape-hover-oval"]
-                             * Round hover   → customImages["diamond-shape-hover-round"]
-                             * Emerald hover → customImages["diamond-shape-hover-emerald"]
-                             * ...etc
-                             */}
-                            <div
-                                className="absolute inset-0"
-                                style={{
-                                    opacity: showHoverOverlay ? 1 : 0,
-                                    transition: "opacity 0.45s ease",
-                                    pointerEvents: "none",
-                                }}
-                            >
-                                {hoveredHoverSrc && (
-                                    <SmartImage
-                                        src={hoveredHoverSrc}
-                                        alt={hoveredShape?.label ?? "Diamond"}
-                                        fill
-                                        fallbackType="jewelry"
-                                        className="object-contain"
-                                        sizes="(max-width:1440px) 40vw, 576px"
-                                    />
-                                )}
-                            </div>
+                            {/* Render a dedicated absolute overlay per shape for ZERO hover lag */}
+                            {DIAMOND_SHAPES.map(shape => {
+                                const dbShape = dbShapes.find(s => s.slug === shape.id);
+                                const largeImageSrc = dbShape?.previewImageUrl || customImages[shape.id] || customImages[shape.hoverKey] || "/products/loose-diamond.jpg";
 
-                            {/*
-                             * VISUAL HOVER INDICATOR — gold ring + scale pulse on the image
-                             * container itself, so the user sees feedback even before
-                             * custom images are uploaded.
-                             */}
-                            <div
-                                className="absolute inset-0 rounded pointer-events-none"
-                                style={{
-                                    boxShadow: hoveredShapeId
-                                        ? "inset 0 0 0 2px #C9A14A"
-                                        : "inset 0 0 0 0px transparent",
-                                    transition: "box-shadow 0.3s ease",
-                                }}
-                            />
+                                return (
+                                    <div
+                                        key={shape.id}
+                                        className="absolute inset-0 transition-opacity duration-150 ease-out"
+                                        style={{
+                                            opacity: selectedShapeId === shape.id ? 1 : 0,
+                                            zIndex: selectedShapeId === shape.id ? 2 : 1,
+                                            pointerEvents: "none",
+                                        }}
+                                    >
+                                        <SmartImage
+                                            src={largeImageSrc}
+                                            alt={`${shape.label} Shape Preview`}
+                                            fill
+                                            fallbackType="jewelry"
+                                            className="object-contain"
+                                            sizes="(max-width:1440px) 40vw, 576px"
+                                            priority={shape.id === "oval"}
+                                        />
+                                    </div>
+                                );
+                            })}
                         </div>
                     </div>
 
-                    {/* Right 60%: 5 × 2 shape grid */}
-                    <div className="flex-1" style={{ width: "60%" }}>
-                        <div
-                            className="grid"
-                            style={{ gridTemplateColumns: "repeat(5, 1fr)", rowGap: "32px", columnGap: "16px" }}
-                        >
+                    {/* Right 60%: Shape grid (Exactly 5 columns for 5+5 shapes) */}
+                    <div 
+                        className="flex-1" 
+                        style={{ width: "60%" }}
+                        onMouseLeave={() => setSelectedShapeId("oval")}
+                    >
+                        <div className="grid grid-cols-5 gap-x-4 gap-y-8">
                             {DIAMOND_SHAPES.map(shape => {
-                                const iconSrc  = customImages[shape.iconKey] || DEFAULT_ICON_IMAGE;
-                                const isHovered = hoveredShapeId === shape.id;
+                                const dbShape = dbShapes.find(s => s.slug === shape.id);
+                                const iconSrc = dbShape?.thumbnailImageUrl || customImages[shape.iconKey] || DEFAULT_ICON_IMAGE;
+                                const isSelected = selectedShapeId === shape.id;
 
                                 return (
-                                    <Link
+                                    <button
                                         key={shape.id}
-                                        href={shape.href}
-                                        className="flex flex-col items-center gap-3 cursor-pointer"
-                                        onMouseEnter={() => setHoveredShapeId(shape.id)}
-                                        onMouseLeave={() => setHoveredShapeId(null)}
+                                        type="button"
+                                        onMouseEnter={() => handleShapeHover(shape.id)}
+                                        onFocus={() => handleShapeHover(shape.id)}
+                                        onClick={() => router.push(`/customizer/step-1-diamond?shape=${shape.id}`)}
+                                        className="flex flex-col items-center gap-3 cursor-pointer border-none bg-transparent p-0 outline-none w-full"
                                         style={{ textDecoration: "none" }}
                                     >
-                                        {/* Icon wrapper — scale + gold ring on hover */}
+                                        {/* Icon wrapper — scale + plain background with NO border and NO background color */}
                                         <div
                                             className="relative flex items-center justify-center"
                                             style={{
                                                 width: "90px",
                                                 height: "90px",
-                                                borderRadius: "50%",
-                                                border: isHovered ? "2px solid #C9A14A" : "2px solid transparent",
-                                                transform: isHovered ? "scale(1.12)" : "scale(1)",
-                                                transition: "transform 0.3s ease, border-color 0.3s ease",
-                                                backgroundColor: isHovered ? "#FDF9F2" : "transparent",
+                                                borderRadius: "0px",
+                                                border: "1px solid transparent",
+                                                transform: isSelected ? "scale(1.08)" : "scale(1)",
+                                                transition: "transform 0.3s ease",
+                                                backgroundColor: "transparent",
                                             }}
                                         >
                                             <div className="relative" style={{ width: "64px", height: "64px" }}>
@@ -189,19 +185,19 @@ export function DiamondShapeSection({ customImages = {}, isAdmin = false }: Diam
                                             </div>
 
                                             {/* Admin edit button for icon */}
-                                            {isAdmin && isHovered && (
+                                            {isAdmin && isSelected && (
                                                 <div className="absolute top-0 left-0 z-20" style={{ transform: "scale(0.75)", transformOrigin: "top left" }}>
                                                     <VisualEditButton type="homepage" assetKey={shape.iconKey} />
                                                 </div>
                                             )}
                                         </div>
 
-                                        {/* Label — gold on hover */}
+                                        {/* Label — minimal active color state */}
                                         <span
                                             style={{
                                                 fontSize: "15px",
-                                                color: isHovered ? "#C9A14A" : "#1A1A1A",
-                                                fontWeight: isHovered ? 500 : 400,
+                                                color: isSelected ? "#111" : "#666",
+                                                fontWeight: isSelected ? 500 : 400,
                                                 lineHeight: 1.3,
                                                 transition: "color 0.3s ease, font-weight 0.3s ease",
                                                 textAlign: "center",
@@ -209,19 +205,7 @@ export function DiamondShapeSection({ customImages = {}, isAdmin = false }: Diam
                                         >
                                             {shape.label}
                                         </span>
-
-                                        {/* Gold underline indicator */}
-                                        <div
-                                            style={{
-                                                height: "2px",
-                                                width: isHovered ? "32px" : "0px",
-                                                backgroundColor: "#C9A14A",
-                                                borderRadius: "1px",
-                                                transition: "width 0.3s ease",
-                                                marginTop: "-8px",
-                                            }}
-                                        />
-                                    </Link>
+                                    </button>
                                 );
                             })}
                         </div>
@@ -238,71 +222,53 @@ export function DiamondShapeSection({ customImages = {}, isAdmin = false }: Diam
                         <span style={{ fontStyle: "italic" }}>by Shape</span>
                     </h2>
 
-                    {/* Horizontal finger-swipe slider */}
-                    <div
-                        style={{
-                            overflowX: "auto",
-                            scrollbarWidth: "none",
-                            msOverflowStyle: "none",
-                            WebkitOverflowScrolling: "touch",
-                            scrollSnapType: "x mandatory",
-                            paddingBottom: "8px",
-                            marginLeft: "-24px",
-                            marginRight: "-24px",
-                            paddingLeft: "20px",
-                            paddingRight: "20px",
-                        }}
-                    >
-                        <style>{`.ds-mobile::-webkit-scrollbar{display:none}`}</style>
-                        <div
-                            className="ds-mobile flex"
-                            style={{ gap: "28px", width: "max-content" }}
-                        >
-                            {DIAMOND_SHAPES.map(shape => {
-                                const iconSrc = customImages[shape.iconKey] || DEFAULT_ICON_IMAGE;
-                                return (
-                                    <Link
-                                        key={shape.id}
-                                        href={shape.href}
-                                        className="flex flex-col items-center flex-shrink-0"
-                                        style={{
-                                            minWidth: "72px",
-                                            flex: "0 0 auto",
-                                            scrollSnapAlign: "center",
-                                            textAlign: "center",
-                                            textDecoration: "none",
-                                        }}
-                                    >
-                                        <div className="relative" style={{ width: "64px", height: "64px" }}>
+                    {/* 3-column Grid for mobile shapes layout */}
+                    <div className="grid grid-cols-3 gap-x-4 gap-y-6 text-center">
+                        {DIAMOND_SHAPES.map(shape => {
+                            const dbShape = dbShapes.find(s => s.slug === shape.id);
+                            const iconSrc = dbShape?.thumbnailImageUrl || customImages[shape.iconKey] || DEFAULT_ICON_IMAGE;
+                            return (
+                                <button
+                                    key={shape.id}
+                                    type="button"
+                                    onClick={() => {
+                                        setSelectedShapeId(shape.id);
+                                        router.push(shape.href);
+                                    }}
+                                    className="flex flex-col items-center border-none bg-transparent p-0 outline-none w-full"
+                                    style={{ textDecoration: "none" }}
+                                >
+                                    <div className="relative flex items-center justify-center" style={{ width: "72px", height: "72px" }}>
+                                        <div className="relative" style={{ width: "54px", height: "54px" }}>
                                             <SmartImage
                                                 src={iconSrc}
                                                 alt={shape.label}
                                                 fill
                                                 fallbackType="diamond"
                                                 className="object-contain"
-                                                sizes="64px"
+                                                sizes="54px"
                                             />
-                                            {isAdmin && (
-                                                <div className="absolute top-0 left-0 z-20" style={{ transform: "scale(0.7)", transformOrigin: "top left" }}>
-                                                    <VisualEditButton type="homepage" assetKey={shape.iconKey} />
-                                                </div>
-                                            )}
                                         </div>
-                                        <span
-                                            style={{
-                                                fontSize: "12px",
-                                                marginTop: "8px",
-                                                color: "#1A1A1A",
-                                                whiteSpace: "nowrap",
-                                                display: "block",
-                                            }}
-                                        >
-                                            {shape.label}
-                                        </span>
-                                    </Link>
-                                );
-                            })}
-                        </div>
+                                        {isAdmin && (
+                                            <div className="absolute top-0 left-0 z-20" style={{ transform: "scale(0.7)", transformOrigin: "top left" }}>
+                                                <VisualEditButton type="homepage" assetKey={shape.iconKey} />
+                                            </div>
+                                        )}
+                                    </div>
+                                    <span
+                                        style={{
+                                            fontSize: "12px",
+                                            marginTop: "6px",
+                                            color: "#1A1A1A",
+                                            whiteSpace: "nowrap",
+                                            display: "block",
+                                        }}
+                                    >
+                                        {shape.label}
+                                    </span>
+                                </button>
+                            );
+                        })}
                     </div>
                 </div>
 

@@ -1,11 +1,11 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense, useMemo } from "react";
 import { DualRangeSlider } from "@/components/DualRangeSlider";
 import { Button } from "@/components/Button";
 import { Skeleton } from "@/components/Skeleton";
 import type { Diamond } from "@prisma/client";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCustomizerStore } from "@/lib/customizer-store";
 import { toast } from "sonner";
@@ -24,8 +24,18 @@ const formatPrice = (value: number) => {
     }).format(value);
 };
 
-export function DiamondSearchClient({ customizerMode = false }: { customizerMode?: boolean }) {
+export function DiamondSearchClient(props: { customizerMode?: boolean }) {
+    return (
+        <Suspense fallback={<div className="py-24 flex items-center justify-center text-zinc-400 font-serif tracking-[0.2em] text-xs uppercase animate-pulse">Loading Diamond Search...</div>}>
+            <DiamondSearchClientContent {...props} />
+        </Suspense>
+    );
+}
+
+function DiamondSearchClientContent({ customizerMode = false }: { customizerMode?: boolean }) {
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const pathname = usePathname();
     const setDiamondStore = useCustomizerStore((state) => state.setDiamond);
 
     // Data States
@@ -34,7 +44,10 @@ export function DiamondSearchClient({ customizerMode = false }: { customizerMode
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [page, setPage] = useState<number>(1);
     const [totalPages, setTotalPages] = useState<number>(1);
-    const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);    // Filter States
+    const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
+    const [isUrlSynced, setIsUrlSynced] = useState<boolean>(false);
+    
+    // Filter States
     const [priceRange, setPriceRange] = useState<[number, number]>([10000, 2000000]);
     const [caratRange, setCaratRange] = useState<[number, number]>([0.2, 10]);
 
@@ -44,14 +57,92 @@ export function DiamondSearchClient({ customizerMode = false }: { customizerMode
     const [selectedColors, setSelectedColors] = useState<string[]>([]);
     const [selectedCerts, setSelectedCerts] = useState<string[]>([]);
     const [selectedOrigin, setSelectedOrigin] = useState<"Natural" | "Lab Grown">("Natural");
+    const [dbShapes, setDbShapes] = useState<any[]>([]);
 
     // Filter Options
-    const shapes = ['Round', 'Oval', 'Princess', 'Emerald', 'Cushion', 'Pear', 'Radiant'];
     const cuts = ['Excellent', 'Very Good', 'Good'];
     const clarities = ['IF', 'VVS1', 'VVS2', 'VS1', 'VS2', 'SI1', 'SI2'];
     const colors = ['D', 'E', 'F', 'G', 'H', 'I', 'J'];
     const certs = ['GIA', 'IGI'];
     const usedDiamondImages = new Set<string>();
+
+    const fallbackShapes = useMemo(() => ["Round", "Oval", "Emerald", "Cushion", "Elongated Cushion", "Pear", "Radiant", "Princess", "Marquise", "Asscher", "Heart"], []);
+    const shapesToRender = useMemo(() => {
+        return dbShapes.length > 0
+            ? dbShapes.filter(s => s.isActive)
+            : fallbackShapes.map((name, idx) => ({
+                id: `fallback-${name}`,
+                name,
+                slug: name.toLowerCase().replace(/\s+/g, '-'),
+                imageUrl: null,
+                isActive: true,
+                displayOrder: idx + 1
+            }));
+    }, [dbShapes, fallbackShapes]);
+
+    useEffect(() => {
+        const fetchShapes = async () => {
+            try {
+                const res = await fetch("/api/shapes");
+                if (res.ok) {
+                    const data = await res.json();
+                    setDbShapes(data);
+                }
+            } catch (err) {
+                console.error("Failed to load shapes API", err);
+            }
+        };
+        fetchShapes();
+    }, []);
+
+    // Sync shape parameter from URL on mount and browser back/forward buttons
+    useEffect(() => {
+        const syncFromUrl = () => {
+            const params = new URLSearchParams(window.location.search);
+            const shape = params.get("shape");
+            if (shape) {
+                const matched = fallbackShapes.find(name => name.toLowerCase().replace(/\s+/g, '-') === shape);
+                if (matched) {
+                    setSelectedShapes(prev => {
+                        if (prev.length === 1 && prev[0] === matched) return prev;
+                        return [matched];
+                    });
+                    setIsUrlSynced(true);
+                    return;
+                }
+            }
+            setSelectedShapes(prev => prev.length > 0 ? [] : prev);
+            setIsUrlSynced(true);
+        };
+
+        syncFromUrl();
+
+        window.addEventListener("popstate", syncFromUrl);
+        return () => window.removeEventListener("popstate", syncFromUrl);
+    }, [fallbackShapes]);
+
+    // Sync selected shapes state back to URL parameter
+    useEffect(() => {
+        if (!isUrlSynced) return;
+
+        const params = new URLSearchParams(window.location.search);
+        if (selectedShapes.length === 1) {
+            const shapeName = selectedShapes[0];
+            const found = shapesToRender.find(s => s.name === shapeName);
+            const slug = found ? found.slug : shapeName.toLowerCase().replace(/\s+/g, '-');
+            
+            if (params.get("shape") !== slug) {
+                params.set("shape", slug);
+                router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+            }
+        } else {
+            if (params.has("shape")) {
+                params.delete("shape");
+                const newSearch = params.toString();
+                router.replace(`${pathname}${newSearch ? `?${newSearch}` : ""}`, { scroll: false });
+            }
+        }
+    }, [selectedShapes, pathname, router, shapesToRender, isUrlSynced]);
 
     useEffect(() => {
         const fetchDiamonds = async () => {
@@ -108,7 +199,8 @@ export function DiamondSearchClient({ customizerMode = false }: { customizerMode
         if (customizerMode) {
             setDiamondStore(diamond);
             toast.success("Diamond Selected! Now choose your ring setting.");
-            router.push('/customizer/step-2-setting');
+            const shapeSlug = diamond.shape.toLowerCase().replace(/\s+/g, '-');
+            router.push(`/customizer/step-2-setting?shape=${shapeSlug}`);
         } else {
             router.push('/ring-settings');
         }
@@ -208,32 +300,44 @@ export function DiamondSearchClient({ customizerMode = false }: { customizerMode
             {/* Shape Icons Grid */}
             <div className="pb-5 border-b border-zinc-200">
                 <p className="text-[13px] md:text-[14px] font-semibold text-zinc-900 tracking-wide mb-3 uppercase">Diamond Shape</p>
-                <div className="grid grid-cols-3 gap-2">
-                    {shapes.map((shape) => {
-                        const isSelected = selectedShapes.includes(shape);
+                <div className="grid grid-cols-4 md:grid-cols-3 gap-x-2 gap-y-3">
+                    {shapesToRender.map((shape) => {
+                        const isSelected = selectedShapes.includes(shape.name);
                         return (
                             <button
-                                key={shape}
+                                key={shape.name}
                                 onClick={() => {
-                                    toggleFilter(setSelectedShapes, shapes, shape);
+                                    toggleFilter(setSelectedShapes, shapesToRender.map(s => s.name), shape.name);
                                     setPage(1);
                                 }}
-                                className={`flex flex-col items-center justify-center p-2.5 border transition-all rounded-none ${
-                                    isSelected
-                                        ? "bg-zinc-50 border-zinc-900 text-zinc-900 font-semibold"
-                                        : "bg-white border-zinc-200 text-zinc-400 hover:border-zinc-400 hover:text-zinc-800"
-                                }`}
+                                className="flex flex-col items-center group cursor-pointer"
                             >
-                                <div className="mb-1.5 text-zinc-700">
-                                    {shape === "Round" && <RoundIcon />}
-                                    {shape === "Oval" && <OvalIcon />}
-                                    {shape === "Princess" && <PrincessIcon />}
-                                    {shape === "Emerald" && <EmeraldIcon />}
-                                    {shape === "Cushion" && <CushionIcon />}
-                                    {shape === "Pear" && <PearIcon />}
-                                    {shape === "Radiant" && <RadiantIcon />}
+                                <div className={`w-12 h-12 rounded-full bg-zinc-50 flex items-center justify-center transition-all ${
+                                    isSelected
+                                        ? "border-2 border-zinc-900 shadow-sm"
+                                        : "border border-zinc-200 group-hover:border-zinc-400"
+                                }`}>
+                                    {shape.thumbnailImageUrl || shape.imageUrl ? (
+                                        <img src={shape.thumbnailImageUrl || shape.imageUrl} alt={shape.name} className="w-8 h-8 object-contain rounded-full" />
+                                    ) : (
+                                        <div className="text-zinc-600">
+                                            {shape.name === "Round" && <RoundIcon />}
+                                            {shape.name === "Oval" && <OvalIcon />}
+                                            {shape.name === "Princess" && <PrincessIcon />}
+                                            {shape.name === "Emerald" && <EmeraldIcon />}
+                                            {shape.name === "Cushion" && <CushionIcon />}
+                                            {shape.name === "Elongated Cushion" && <CushionIcon />}
+                                            {shape.name === "Pear" && <PearIcon />}
+                                            {shape.name === "Radiant" && <RadiantIcon />}
+                                            {shape.name === "Marquise" && <MarquiseIcon />}
+                                            {shape.name === "Asscher" && <AsscherIcon />}
+                                            {shape.name === "Heart" && <HeartIcon />}
+                                        </div>
+                                    )}
                                 </div>
-                                <span className="text-[10px] uppercase tracking-wider font-medium">{shape}</span>
+                                <span className="text-[10px] mt-1.5 text-zinc-500 font-medium group-hover:text-zinc-800 transition-colors text-center truncate max-w-full leading-tight">
+                                    {shape.name}
+                                </span>
                             </button>
                         );
                     })}
@@ -445,8 +549,8 @@ export function DiamondSearchClient({ customizerMode = false }: { customizerMode
                 </div>
 
                 {/* ── DESKTOP: Left Sidebar (25% - 28% width) ── */}
-                <aside className="hidden lg:block w-[26%] flex-shrink-0 border-r border-zinc-200 pr-8 pb-10">
-                    <div className="sticky top-32 h-[calc(100vh-180px)] overflow-y-auto pr-2 custom-scrollbar">
+                <aside className="hidden lg:block w-[26%] flex-shrink-0 border-r border-zinc-200 pr-8 pb-10 lg:sticky lg:top-[120px] self-start">
+                    <div className="space-y-6">
                         {FilterPanelContent}
                     </div>
                 </aside>
@@ -534,7 +638,7 @@ export function DiamondSearchClient({ customizerMode = false }: { customizerMode
                                                 {/* Product Title & Info below image */}
                                                 <div className="w-full text-left px-1 z-10 mb-2">
                                                     <Link href={`/diamonds/${diamond.id}${customizerMode ? '?mode=customizer' : ''}`}>
-                                                        <h3 className="font-serif font-medium text-zinc-900 text-sm md:text-[16px] mb-1.5 leading-tight hover:text-[#C9A14A] transition-colors">
+                                                        <h3 className="font-sans font-medium text-zinc-800 text-[13px] md:text-[15px] mb-1.5 leading-tight hover:text-[#C9A14A] transition-colors">
                                                             {diamond.caratWeight.toFixed(2)} ct. {diamond.shape} Diamond
                                                         </h3>
                                                     </Link>
@@ -699,6 +803,36 @@ function RadiantIcon() {
             <path d="M5 3h14l2 2v14l-2 2H5l-2-2V5z" />
             <path d="M3 6h18M3 18h18M6 3v18M18 3v18" />
             <path d="M12 8l-4 4 4 4 4-4z" />
+        </svg>
+    );
+}
+
+function MarquiseIcon() {
+    return (
+        <svg className="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
+            <path d="M12 2c-4 5-4 15 0 20 4-5 4-15 0-20z" />
+            <path d="M12 2v20M7 12h10" />
+            <path d="M12 7l-3 5 3 5 3-5z" />
+        </svg>
+    );
+}
+
+function AsscherIcon() {
+    return (
+        <svg className="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
+            <path d="M7 3h10l4 4v10l-4 4H7l-4-4V7z" />
+            <path d="M9 5h6l2.5 2.5v7L15 19H9l-2.5-2.5v-7z" />
+            <path d="M11 7h2v10h-2z" />
+            <path d="M3 7l4-4M21 7l-4-4M3 17l4 4M21 17l-4 4" />
+        </svg>
+    );
+}
+
+function HeartIcon() {
+    return (
+        <svg className="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
+            <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+            <path d="M12 5v14M6.5 9h11" />
         </svg>
     );
 }

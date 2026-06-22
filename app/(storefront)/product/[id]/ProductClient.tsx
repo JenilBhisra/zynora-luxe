@@ -127,11 +127,91 @@ export default function ProductClient({ product }: { product: any }) {
     const karatPricesMap: Record<string, number> = (() => {
         try { return JSON.parse(product.karatPrices || "{}"); } catch { return {}; }
     })();
-    const availableKarats = (["9K", "14K", "18K", "22K"] as const).filter(k => karatPricesMap[k] !== undefined);
-    const [selectedKarat, setSelectedKarat] = useState<string | null>(availableKarats[0] ?? null);
-    const displayPrice = selectedKarat && karatPricesMap[selectedKarat] !== undefined
-        ? karatPricesMap[selectedKarat]
-        : product.price;
+
+    const enabledMetals = product.availableMetals 
+        ? product.availableMetals.split(",").map((m: string) => m.trim().toLowerCase()) 
+        : ["gold"];
+
+    const enabledFinishes: string[] = [];
+    if (enabledMetals.includes("gold") || enabledMetals.length === 0) {
+        enabledFinishes.push("Yellow Gold", "White Gold", "Rose Gold");
+    }
+    if (enabledMetals.includes("silver")) {
+        enabledFinishes.push("Silver");
+    }
+    if (enabledMetals.includes("platinum")) {
+        enabledFinishes.push("Platinum");
+    }
+    if (enabledFinishes.length === 0) {
+        enabledFinishes.push("Yellow Gold", "White Gold", "Rose Gold");
+    }
+
+    const initialFinish = enabledFinishes.find(f => {
+        const pmt = (product.metalType || "").toLowerCase();
+        if (pmt.includes("yellow")) return f === "Yellow Gold";
+        if (pmt.includes("white")) return f === "White Gold";
+        if (pmt.includes("rose")) return f === "Rose Gold";
+        if (pmt.includes("silver")) return f === "Silver";
+        if (pmt.includes("platinum")) return f === "Platinum";
+        return false;
+    }) || enabledFinishes[0];
+
+    const [selectedFinish, setSelectedFinish] = useState<string>(initialFinish);
+
+    const allPossibleKarats = ["10K", "14K", "18K", "22K"] as const;
+    const definedKarats = allPossibleKarats.filter(k => karatPricesMap[k] !== undefined && karatPricesMap[k] !== null);
+    const availableKarats = definedKarats.length > 0 ? definedKarats : allPossibleKarats;
+
+    const [selectedKarat, setSelectedKarat] = useState<string>(availableKarats[0] || "18K");
+
+    const isGold = ["Yellow Gold", "White Gold", "Rose Gold"].includes(selectedFinish);
+
+    const getDisplayPrice = () => {
+        if (isGold) {
+            if (selectedKarat && karatPricesMap[selectedKarat] !== undefined && karatPricesMap[selectedKarat] !== null && karatPricesMap[selectedKarat] > 0) {
+                return karatPricesMap[selectedKarat];
+            }
+            if (product.goldPrice !== null && product.goldPrice !== undefined && product.goldPrice > 0) {
+                return product.goldPrice;
+            }
+            return product.price || 0;
+        } else if (selectedFinish === "Silver") {
+            if (product.silverPrice !== null && product.silverPrice !== undefined && product.silverPrice > 0) {
+                return product.silverPrice;
+            }
+            return product.price || 0;
+        } else if (selectedFinish === "Platinum") {
+            if (product.platinumPrice !== null && product.platinumPrice !== undefined && product.platinumPrice > 0) {
+                return product.platinumPrice;
+            }
+            return product.price || 0;
+        }
+        return product.price || 0;
+    };
+    const displayPrice = getDisplayPrice();
+
+    const finalMetalType = isGold ? `${selectedKarat} ${selectedFinish}` : selectedFinish;
+
+    useEffect(() => {
+        setMetalType(finalMetalType);
+    }, [finalMetalType]);
+
+    const getAvailableOptions = () => {
+        const options: string[] = [];
+        if (enabledMetals.includes("gold") || enabledMetals.length === 0) {
+            availableKarats.forEach(k => {
+                options.push(`${k} Yellow Gold`, `${k} White Gold`, `${k} Rose Gold`);
+            });
+        }
+        if (enabledMetals.includes("silver")) {
+            options.push("Silver");
+        }
+        if (enabledMetals.includes("platinum")) {
+            options.push("Platinum");
+        }
+        return options;
+    };
+    const availableOptions = getAvailableOptions();
 
     let parsedMedia: string[] = [];
     try {
@@ -176,7 +256,8 @@ export default function ProductClient({ product }: { product: any }) {
             name: product.name,
             price: displayPrice,
             quantity: 1,
-            image: activeImage
+            image: activeImage,
+            metalType: finalMetalType
         });
     };
 
@@ -187,6 +268,7 @@ export default function ProductClient({ product }: { product: any }) {
             price: displayPrice,
             quantity: 1,
             image: activeImage,
+            metalType: finalMetalType
         };
 
         if (!user) {
@@ -345,8 +427,25 @@ export default function ProductClient({ product }: { product: any }) {
 
                         {/* Selectors */}
                         <div className="flex flex-col gap-6 mb-10">
-                            {/* Karat Selector */}
-                            {availableKarats.length > 0 && (
+                            {/* Metal Finish Selector */}
+                            <div className="w-full">
+                                <label className="block text-[11px] md:text-[12px] tracking-[0.34em] font-medium text-zinc-500 uppercase mb-3">Select Metal Finish</label>
+                                <div className="relative">
+                                    <select 
+                                        value={selectedFinish}
+                                        onChange={(e) => setSelectedFinish(e.target.value)}
+                                        className="w-full p-4 rounded-none border border-zinc-200 bg-white text-zinc-900 appearance-none focus:outline-none focus:border-[#C9A14A] transition-colors cursor-pointer text-[14px]"
+                                    >
+                                        {enabledFinishes.map((finish) => (
+                                            <option key={finish} value={finish}>{finish}</option>
+                                        ))}
+                                    </select>
+                                    <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none" size={16} />
+                                </div>
+                            </div>
+
+                            {/* Gold Karat Selector */}
+                            {isGold && availableKarats.length > 0 && (
                                 <div className="w-full">
                                     <label className="block text-[11px] md:text-[12px] tracking-[0.34em] font-medium text-zinc-500 uppercase mb-3">Select Gold Karat</label>
                                     <div className="flex flex-wrap gap-3">
@@ -361,29 +460,18 @@ export default function ProductClient({ product }: { product: any }) {
                                                 }`}
                                             >
                                                 {k}
-                                                <span className={`block text-[10px] font-medium mt-0.5 ${
-                                                    selectedKarat === k ? "text-white/85" : "text-zinc-400"
-                                                }`}>
-                                                    ₹{karatPricesMap[k].toLocaleString("en-IN")}
-                                                </span>
+                                                {karatPricesMap[k] !== undefined && karatPricesMap[k] !== null && karatPricesMap[k] > 0 && (
+                                                    <span className={`block text-[10px] font-medium mt-0.5 ${
+                                                        selectedKarat === k ? "text-white/85" : "text-zinc-400"
+                                                    }`}>
+                                                        ₹{karatPricesMap[k].toLocaleString("en-IN")}
+                                                    </span>
+                                                )}
                                             </button>
                                         ))}
                                     </div>
                                 </div>
                             )}
-                            {/* Metal Selector */}
-                            <div className="w-full">
-                                <label className="block text-[11px] md:text-[12px] tracking-[0.34em] font-medium text-zinc-500 uppercase mb-3">Select Metal Finish</label>
-                                <div className="relative">
-                                    <select className="w-full p-4 rounded-none border border-zinc-200 bg-white text-zinc-900 appearance-none focus:outline-none focus:border-[#C9A14A] transition-colors cursor-pointer text-[14px]">
-                                        <option>{product.metalType}</option>
-                                        <option>18K Yellow Gold</option>
-                                        <option>18K Rose Gold</option>
-                                        <option>Platinum 950</option>
-                                    </select>
-                                    <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none" size={16} />
-                                </div>
-                            </div>
                         </div>
 
                         {/* Delivery Info */}
@@ -473,7 +561,10 @@ export default function ProductClient({ product }: { product: any }) {
                                     { label: "Clarity", val: product.diamond?.clarity || "VVS1" },
                                     { label: "Color", val: product.diamond?.color || "E - F" },
                                     { label: "Certification", val: product.diamond?.certification || "GIA / IGI Certified" },
-                                    { label: "Gold Purity", val: product.metalType },
+                                    { 
+                                        label: isGold ? "Gold Purity" : "Metal Finish", 
+                                        val: finalMetalType 
+                                    },
                                 ].map((row, i) => (
                                     <FadeIn key={i} delay={i * 0.06}>
                                         <div className="border border-zinc-150 py-8 px-4 flex flex-col justify-center items-center text-center rounded-none md:rounded-[4px] cursor-pointer">
@@ -554,7 +645,7 @@ export default function ProductClient({ product }: { product: any }) {
                                             </div>
                                             <div>
                                                 <span className="text-xs text-zinc-500 block">Metal Purity:</span>
-                                                <span className="text-sm font-medium text-zinc-800">{selectedKarat || "18K"} {product.metalType || "Gold"}</span>
+                                                <span className="text-sm font-medium text-zinc-800">{finalMetalType}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -629,13 +720,9 @@ export default function ProductClient({ product }: { product: any }) {
                                                         onChange={(e) => setMetalType(e.target.value)}
                                                         className="w-full bg-zinc-50 border border-zinc-200 rounded-none md:rounded-[4px] p-3 text-sm text-zinc-900 focus:outline-none focus:border-[#C9A14A] transition-colors appearance-none cursor-pointer"
                                                     >
-                                                        <option value="18K White Gold">18K White Gold</option>
-                                                        <option value="18K Yellow Gold">18K Yellow Gold</option>
-                                                        <option value="18K Rose Gold">18K Rose Gold</option>
-                                                        <option value="14K White Gold">14K White Gold</option>
-                                                        <option value="14K Yellow Gold">14K Yellow Gold</option>
-                                                        <option value="14K Rose Gold">14K Rose Gold</option>
-                                                        <option value="Platinum 950">Platinum 950</option>
+                                                        {availableOptions.map((opt) => (
+                                                            <option key={opt} value={opt}>{opt}</option>
+                                                        ))}
                                                     </select>
                                                     <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none" size={14} />
                                                 </div>

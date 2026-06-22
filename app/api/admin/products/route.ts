@@ -119,6 +119,10 @@ export async function POST(req: Request) {
                 stockCount: parseInt(body.stockCount) || 1,
                 images: body.images || "[]",
                 karatPrices: body.karatPrices || "{}",
+                availableMetals: body.availableMetals || "",
+                goldPrice: body.goldPrice !== undefined && body.goldPrice !== null ? parseFloat(body.goldPrice) : null,
+                silverPrice: body.silverPrice !== undefined && body.silverPrice !== null ? parseFloat(body.silverPrice) : null,
+                platinumPrice: body.platinumPrice !== undefined && body.platinumPrice !== null ? parseFloat(body.platinumPrice) : null,
                 tags: body.tags || "",
                 extraKeywords: body.extraKeywords || "",
                 searchKeywords: searchKeywordsString,
@@ -162,6 +166,11 @@ export async function PATCH(req: Request) {
         if (body.images !== undefined) updateData.images = body.images;
         if (body.karatPrices !== undefined) updateData.karatPrices = body.karatPrices;
         
+        if (body.availableMetals !== undefined) updateData.availableMetals = body.availableMetals;
+        if (body.goldPrice !== undefined) updateData.goldPrice = body.goldPrice !== null ? parseFloat(body.goldPrice) : null;
+        if (body.silverPrice !== undefined) updateData.silverPrice = body.silverPrice !== null ? parseFloat(body.silverPrice) : null;
+        if (body.platinumPrice !== undefined) updateData.platinumPrice = body.platinumPrice !== null ? parseFloat(body.platinumPrice) : null;
+
         if (body.tags !== undefined) updateData.tags = body.tags;
         if (body.seoTitle !== undefined) updateData.seoTitle = body.seoTitle;
         if (body.seoDescription !== undefined) updateData.seoDescription = body.seoDescription;

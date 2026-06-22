@@ -49,6 +49,10 @@ export async function POST(req: Request) {
                 videoUrl: body.videoUrl || "",
                 modelUrl: normalizeSettingModelUrl(body.modelUrl),
                 karatPrices: body.karatPrices || "{}",
+                availableMetals: body.availableMetals || "",
+                goldPrice: body.goldPrice !== undefined && body.goldPrice !== null ? parseFloat(body.goldPrice) : null,
+                silverPrice: body.silverPrice !== undefined && body.silverPrice !== null ? parseFloat(body.silverPrice) : null,
+                platinumPrice: body.platinumPrice !== undefined && body.platinumPrice !== null ? parseFloat(body.platinumPrice) : null,
                 sizePrices: body.sizePrices || "{}",
                 supportedShapes: body.supportedShapes || "[]"
             }

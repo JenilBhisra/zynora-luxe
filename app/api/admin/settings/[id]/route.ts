@@ -41,6 +41,10 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
         if (body.videoUrl !== undefined) updateData.videoUrl = body.videoUrl;
         if (body.modelUrl !== undefined) updateData.modelUrl = normalizeSettingModelUrl(body.modelUrl);
         if (body.karatPrices !== undefined) updateData.karatPrices = body.karatPrices;
+        if (body.availableMetals !== undefined) updateData.availableMetals = body.availableMetals;
+        if (body.goldPrice !== undefined) updateData.goldPrice = body.goldPrice !== null ? parseFloat(body.goldPrice) : null;
+        if (body.silverPrice !== undefined) updateData.silverPrice = body.silverPrice !== null ? parseFloat(body.silverPrice) : null;
+        if (body.platinumPrice !== undefined) updateData.platinumPrice = body.platinumPrice !== null ? parseFloat(body.platinumPrice) : null;
         if (body.sizePrices !== undefined) updateData.sizePrices = body.sizePrices;
         if (body.supportedShapes !== undefined) updateData.supportedShapes = body.supportedShapes;
 

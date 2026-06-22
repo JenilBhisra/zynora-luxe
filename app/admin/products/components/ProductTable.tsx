@@ -25,17 +25,20 @@ export function ProductTable({ initialProducts, categories }: { initialProducts:
     const [formData, setFormData] = useState({
         name: "",
         description: "",
-        price: "",
         categoryId: categories[0]?.name || "Rings",
-        metalType: "18K Gold",
+        metalType: "Gold",
         stockCount: "1",
         tags: "",
         extraKeywords: "",
         seoTitle: "",
-        seoDescription: ""
+        seoDescription: "",
+        availableMetals: ["Gold"] as string[],
+        goldPrice: "",
+        silverPrice: "",
+        platinumPrice: "",
+        karatPrices: { "10K": "", "14K": "", "18K": "", "22K": "" }
     });
 
-    const [karatPrices, setKaratPrices] = useState({ "9K": "", "14K": "", "18K": "", "22K": "" });
     const [editingProduct, setEditingProduct] = useState<any | null>(null);
     const [editFormData, setEditFormData] = useState<any | null>(null);
 
@@ -140,14 +143,35 @@ export function ProductTable({ initialProducts, categories }: { initialProducts:
                 uploadedMediaUrls.push(uploadData.url);
             }
 
-            // Build karatPrices object — only include karats with a value entered
+            const availableMetalsStr = formData.availableMetals.join(",");
+            const silverVal = formData.availableMetals.includes("Silver") ? parseFloat(formData.silverPrice) || null : null;
+            const platVal = formData.availableMetals.includes("Platinum") ? parseFloat(formData.platinumPrice) || null : null;
+            
             const karatPricesObj: Record<string, number> = {};
-            for (const [k, v] of Object.entries(karatPrices)) {
-                if (v !== "") karatPricesObj[k] = parseFloat(v);
+            if (formData.availableMetals.includes("Gold")) {
+                for (const [k, v] of Object.entries(formData.karatPrices)) {
+                    if (v !== "") karatPricesObj[k] = parseFloat(v);
+                }
             }
 
+            const goldBase = karatPricesObj["18K"] ?? karatPricesObj["14K"] ?? karatPricesObj["10K"] ?? karatPricesObj["22K"] ?? null;
+            const basePrice = goldBase ?? silverVal ?? platVal ?? 0;
+
             const payload = {
-                ...formData,
+                name: formData.name,
+                description: formData.description,
+                price: basePrice,
+                categoryId: formData.categoryId,
+                metalType: formData.metalType,
+                stockCount: formData.stockCount,
+                tags: formData.tags,
+                extraKeywords: formData.extraKeywords,
+                seoTitle: formData.seoTitle,
+                seoDescription: formData.seoDescription,
+                availableMetals: availableMetalsStr,
+                goldPrice: goldBase,
+                silverPrice: silverVal,
+                platinumPrice: platVal,
                 images: JSON.stringify(uploadedMediaUrls),
                 karatPrices: JSON.stringify(karatPricesObj)
             };
@@ -163,10 +187,11 @@ export function ProductTable({ initialProducts, categories }: { initialProducts:
                 setProducts([data.product, ...products]);
                 setIsAdding(false);
                 setFormData({
-                    name: "", description: "", price: "", categoryId: categories[0]?.name || "Rings", metalType: "18K Gold", stockCount: "1",
-                    tags: "", extraKeywords: "", seoTitle: "", seoDescription: ""
+                    name: "", description: "", categoryId: categories[0]?.name || "Rings", metalType: "Gold", stockCount: "1",
+                    tags: "", extraKeywords: "", seoTitle: "", seoDescription: "",
+                    availableMetals: ["Gold"], goldPrice: "", silverPrice: "", platinumPrice: "",
+                    karatPrices: { "10K": "", "14K": "", "18K": "", "22K": "" }
                 });
-                setKaratPrices({ "9K": "", "14K": "", "18K": "", "22K": "" });
                 clearPendingMedia();
             } else {
                 toast.error(data.error || "Creation failed");
@@ -180,11 +205,15 @@ export function ProductTable({ initialProducts, categories }: { initialProducts:
 
     const startEdit = (product: any) => {
         setEditingProduct(product);
-        let kpObj = { "9K": "", "14K": "", "18K": "", "22K": "" };
+        const metalsList = product.availableMetals 
+            ? product.availableMetals.split(",").map((m: string) => m.trim())
+            : ["Gold"];
+
+        let kpObj = { "10K": "", "14K": "", "18K": "", "22K": "" };
         try {
             const parsed = JSON.parse(product.karatPrices || "{}");
             kpObj = {
-                "9K": parsed["9K"] !== undefined ? String(parsed["9K"]) : "",
+                "10K": parsed["10K"] !== undefined ? String(parsed["10K"]) : parsed["9K"] !== undefined ? String(parsed["9K"]) : "",
                 "14K": parsed["14K"] !== undefined ? String(parsed["14K"]) : "",
                 "18K": parsed["18K"] !== undefined ? String(parsed["18K"]) : "",
                 "22K": parsed["22K"] !== undefined ? String(parsed["22K"]) : "",
@@ -194,14 +223,17 @@ export function ProductTable({ initialProducts, categories }: { initialProducts:
         setEditFormData({
             name: product.name,
             description: product.description,
-            price: String(product.price),
             categoryId: product.category?.name || categories[0]?.name || "Rings",
-            metalType: product.metalType,
+            metalType: product.metalType || "Gold",
             stockCount: String(product.stockCount),
             tags: product.tags || "",
             extraKeywords: product.extraKeywords || "",
             seoTitle: product.seoTitle || "",
             seoDescription: product.seoDescription || "",
+            availableMetals: metalsList,
+            goldPrice: product.goldPrice !== null && product.goldPrice !== undefined ? String(product.goldPrice) : "",
+            silverPrice: product.silverPrice !== null && product.silverPrice !== undefined ? String(product.silverPrice) : "",
+            platinumPrice: product.platinumPrice !== null && product.platinumPrice !== undefined ? String(product.platinumPrice) : "",
             karatPrices: kpObj
         });
         setIsAdding(false);
@@ -212,15 +244,24 @@ export function ProductTable({ initialProducts, categories }: { initialProducts:
         try {
             setIsUploading(true);
 
+            const availableMetalsStr = editFormData.availableMetals.join(",");
+            const silverVal = editFormData.availableMetals.includes("Silver") ? parseFloat(editFormData.silverPrice) || null : null;
+            const platVal = editFormData.availableMetals.includes("Platinum") ? parseFloat(editFormData.platinumPrice) || null : null;
+            
             const karatPricesObj: Record<string, number> = {};
-            for (const [k, v] of Object.entries(editFormData.karatPrices)) {
-                if (v !== "") karatPricesObj[k] = parseFloat(v as string);
+            if (editFormData.availableMetals.includes("Gold")) {
+                for (const [k, v] of Object.entries(editFormData.karatPrices)) {
+                    if (v !== "") karatPricesObj[k] = parseFloat(v as string);
+                }
             }
+
+            const goldBase = karatPricesObj["18K"] ?? karatPricesObj["14K"] ?? karatPricesObj["10K"] ?? karatPricesObj["22K"] ?? null;
+            const basePrice = goldBase ?? silverVal ?? platVal ?? 0;
 
             const payload = {
                 name: editFormData.name,
                 description: editFormData.description,
-                price: parseFloat(editFormData.price),
+                price: basePrice,
                 categoryId: editFormData.categoryId,
                 metalType: editFormData.metalType,
                 stockCount: parseInt(editFormData.stockCount) || 1,
@@ -228,6 +269,10 @@ export function ProductTable({ initialProducts, categories }: { initialProducts:
                 extraKeywords: editFormData.extraKeywords,
                 seoTitle: editFormData.seoTitle,
                 seoDescription: editFormData.seoDescription,
+                availableMetals: availableMetalsStr,
+                goldPrice: goldBase,
+                silverPrice: silverVal,
+                platinumPrice: platVal,
                 karatPrices: JSON.stringify(karatPricesObj)
             };
 
@@ -289,10 +334,6 @@ export function ProductTable({ initialProducts, categories }: { initialProducts:
                     <div className="md:col-span-2"><label className="block text-xs font-bold uppercase tracking-widest text-gray-600 mb-2">Product Name</label>
                         <input required className="w-full bg-gray-50 border rounded-none p-3 text-sm text-[#111111] outline-none focus:border-[#111111] border-gray-200 transition-colors" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} />
                     </div>
-                    <div><label className="block text-xs font-bold uppercase tracking-widest text-gray-600 mb-2">Price (₹)</label>
-                        <input type="number" required className="w-full bg-gray-50 border rounded-none p-3 text-sm text-[#111111] outline-none focus:border-[#111111] border-gray-200 transition-colors" value={formData.price} onChange={e => setFormData({ ...formData, price: e.target.value })} />
-                    </div>
-
                     <div><label className="block text-xs font-bold uppercase tracking-widest text-gray-600 mb-2">Category</label>
                         <select 
                             required 
@@ -308,35 +349,89 @@ export function ProductTable({ initialProducts, categories }: { initialProducts:
                             ))}
                         </select>
                     </div>
-                    <div><label className="block text-xs font-bold uppercase tracking-widest text-gray-600 mb-2">Metal/Material</label>
+                    <div><label className="block text-xs font-bold uppercase tracking-widest text-gray-600 mb-2">Metal/Material Description</label>
                         <input required className="w-full bg-gray-50 border rounded-none p-3 text-sm text-[#111111] outline-none focus:border-[#111111] border-gray-200 transition-colors" value={formData.metalType} onChange={e => setFormData({ ...formData, metalType: e.target.value })} />
                     </div>
                     <div><label className="block text-xs font-bold uppercase tracking-widest text-gray-600 mb-2">Quantity (Stock)</label>
                         <input type="number" required min="0" className="w-full bg-gray-50 border rounded-none p-3 text-sm text-[#111111] outline-none focus:border-[#111111] border-gray-200 transition-colors" value={formData.stockCount} onChange={e => setFormData({ ...formData, stockCount: e.target.value })} />
                     </div>
 
-                    {/* Karat Pricing Section */}
+                    {/* Metal Checkboxes */}
                     <div className="md:col-span-3">
-                        <div className="border border-amber-100 bg-amber-50/60 rounded-none p-5">
+                        <label className="block text-xs font-bold uppercase tracking-widest text-gray-600 mb-2">Available Metals</label>
+                        <div className="flex gap-4">
+                            {["Gold", "Silver", "Platinum"].map((metal) => (
+                                <label key={metal} className="flex items-center gap-2 cursor-pointer bg-gray-50 border border-gray-200 px-4 py-2 hover:bg-gray-100 transition-colors">
+                                    <input
+                                        type="checkbox"
+                                        className="accent-[#111111]"
+                                        checked={formData.availableMetals.includes(metal)}
+                                        onChange={(e) => {
+                                            const next = e.target.checked
+                                                ? [...formData.availableMetals, metal]
+                                                : formData.availableMetals.filter((m: string) => m !== metal);
+                                            setFormData({ ...formData, availableMetals: next });
+                                        }}
+                                    />
+                                    <span className="text-sm font-medium text-gray-700">{metal}</span>
+                                </label>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Conditional Price Inputs */}
+                    {formData.availableMetals.includes("Gold") && (
+                        <div className="md:col-span-3 border border-amber-100 bg-amber-50/60 p-5">
                             <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-amber-700 mb-1">Gold Karat Pricing</p>
-                            <p className="text-[11px] text-amber-600/80 mb-4">Set per-karat prices. Leave blank to hide that karat from customers.</p>
+                            <p className="text-[11px] text-amber-600/80 mb-4">Set prices for the enabled Gold karats.</p>
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                {(["9K", "14K", "18K", "22K"] as const).map((k) => (
+                                {(["10K", "14K", "18K", "22K"] as const).map((k) => (
                                     <div key={k}>
-                                        <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-600 mb-2">{k} Gold (₹)</label>
+                                        <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-655 mb-2">{k} Gold (₹)</label>
                                         <input
                                             type="number"
                                             min="0"
                                             placeholder="e.g. 55000"
                                             className="w-full bg-white border rounded-none p-3 text-sm text-[#111111] outline-none focus:border-amber-400 border-amber-200 transition-colors"
-                                            value={karatPrices[k]}
-                                            onChange={e => setKaratPrices(prev => ({ ...prev, [k]: e.target.value }))}
+                                            value={formData.karatPrices[k] ?? ""}
+                                            onChange={e => setFormData({
+                                                ...formData,
+                                                karatPrices: { ...formData.karatPrices, [k]: e.target.value }
+                                            })}
                                         />
                                     </div>
                                 ))}
                             </div>
                         </div>
-                    </div>
+                    )}
+
+                    {formData.availableMetals.includes("Silver") && (
+                        <div className="md:col-span-1">
+                            <label className="block text-xs font-bold uppercase tracking-widest text-gray-600 mb-2">Silver Price (₹)</label>
+                            <input
+                                type="number"
+                                min="0"
+                                required
+                                className="w-full bg-gray-50 border rounded-none p-3 text-sm text-[#111111] outline-none focus:border-[#111111] border-gray-200 transition-colors"
+                                value={formData.silverPrice}
+                                onChange={e => setFormData({ ...formData, silverPrice: e.target.value })}
+                            />
+                        </div>
+                    )}
+
+                    {formData.availableMetals.includes("Platinum") && (
+                        <div className="md:col-span-1">
+                            <label className="block text-xs font-bold uppercase tracking-widest text-gray-600 mb-2">Platinum Price (₹)</label>
+                            <input
+                                type="number"
+                                min="0"
+                                required
+                                className="w-full bg-gray-50 border rounded-none p-3 text-sm text-[#111111] outline-none focus:border-[#111111] border-gray-200 transition-colors"
+                                value={formData.platinumPrice}
+                                onChange={e => setFormData({ ...formData, platinumPrice: e.target.value })}
+                            />
+                        </div>
+                    )}
 
                     <div className="md:col-span-3">
                         <label className="block text-xs font-bold uppercase tracking-widest text-gray-600 mb-3">Product Media</label>
@@ -489,10 +584,6 @@ export function ProductTable({ initialProducts, categories }: { initialProducts:
                     <div className="md:col-span-2"><label className="block text-xs font-bold uppercase tracking-widest text-gray-600 mb-2">Product Name</label>
                         <input required className="w-full bg-gray-50 border rounded-none p-3 text-sm text-[#111111] outline-none focus:border-[#111111] border-gray-200 transition-colors" value={editFormData.name} onChange={e => setEditFormData({ ...editFormData, name: e.target.value })} />
                     </div>
-                    <div><label className="block text-xs font-bold uppercase tracking-widest text-gray-600 mb-2">Price (₹)</label>
-                        <input type="number" required className="w-full bg-gray-50 border rounded-none p-3 text-sm text-[#111111] outline-none focus:border-[#111111] border-gray-200 transition-colors" value={editFormData.price} onChange={e => setEditFormData({ ...editFormData, price: e.target.value })} />
-                    </div>
-
                     <div><label className="block text-xs font-bold uppercase tracking-widest text-gray-600 mb-2">Category</label>
                         <select 
                             required 
@@ -508,38 +599,89 @@ export function ProductTable({ initialProducts, categories }: { initialProducts:
                             ))}
                         </select>
                     </div>
-                    <div><label className="block text-xs font-bold uppercase tracking-widest text-gray-600 mb-2">Metal/Material</label>
+                    <div><label className="block text-xs font-bold uppercase tracking-widest text-gray-600 mb-2">Metal/Material Description</label>
                         <input required className="w-full bg-gray-50 border rounded-none p-3 text-sm text-[#111111] outline-none focus:border-[#111111] border-gray-200 transition-colors" value={editFormData.metalType} onChange={e => setEditFormData({ ...editFormData, metalType: e.target.value })} />
                     </div>
                     <div><label className="block text-xs font-bold uppercase tracking-widest text-gray-600 mb-2">Quantity (Stock)</label>
                         <input type="number" required min="0" className="w-full bg-gray-50 border rounded-none p-3 text-sm text-[#111111] outline-none focus:border-[#111111] border-gray-200 transition-colors" value={editFormData.stockCount} onChange={e => setEditFormData({ ...editFormData, stockCount: e.target.value })} />
                     </div>
 
-                    {/* Karat Pricing Section */}
+                    {/* Metal Checkboxes */}
                     <div className="md:col-span-3">
-                        <div className="border border-amber-100 bg-amber-50/60 rounded-none p-5">
+                        <label className="block text-xs font-bold uppercase tracking-widest text-gray-600 mb-2">Available Metals</label>
+                        <div className="flex gap-4">
+                            {["Gold", "Silver", "Platinum"].map((metal) => (
+                                <label key={metal} className="flex items-center gap-2 cursor-pointer bg-gray-50 border border-gray-200 px-4 py-2 hover:bg-gray-100 transition-colors">
+                                    <input
+                                        type="checkbox"
+                                        className="accent-[#111111]"
+                                        checked={editFormData.availableMetals.includes(metal)}
+                                        onChange={(e) => {
+                                            const next = e.target.checked
+                                                ? [...editFormData.availableMetals, metal]
+                                                : editFormData.availableMetals.filter((m: string) => m !== metal);
+                                            setEditFormData({ ...editFormData, availableMetals: next });
+                                        }}
+                                    />
+                                    <span className="text-sm font-medium text-gray-700">{metal}</span>
+                                </label>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Conditional Price Inputs */}
+                    {editFormData.availableMetals.includes("Gold") && (
+                        <div className="md:col-span-3 border border-amber-100 bg-amber-50/60 p-5">
                             <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-amber-700 mb-1">Gold Karat Pricing</p>
-                            <p className="text-[11px] text-amber-600/80 mb-4">Set per-karat prices. Leave blank to hide that karat from customers.</p>
+                            <p className="text-[11px] text-amber-600/80 mb-4">Set prices for the enabled Gold karats.</p>
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                {(["9K", "14K", "18K", "22K"] as const).map((k) => (
+                                {(["10K", "14K", "18K", "22K"] as const).map((k) => (
                                     <div key={k}>
-                                        <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-600 mb-2">{k} Gold (₹)</label>
+                                        <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-655 mb-2">{k} Gold (₹)</label>
                                         <input
                                             type="number"
                                             min="0"
                                             placeholder="e.g. 55000"
                                             className="w-full bg-white border rounded-none p-3 text-sm text-[#111111] outline-none focus:border-amber-400 border-amber-200 transition-colors"
-                                            value={editFormData.karatPrices[k]}
-                                            onChange={e => setEditFormData((prev: any) => ({
-                                                ...prev,
-                                                karatPrices: { ...prev.karatPrices, [k]: e.target.value }
-                                            }))}
+                                            value={editFormData.karatPrices[k] ?? ""}
+                                            onChange={e => setEditFormData({
+                                                ...editFormData,
+                                                karatPrices: { ...editFormData.karatPrices, [k]: e.target.value }
+                                            })}
                                         />
                                     </div>
                                 ))}
                             </div>
                         </div>
-                    </div>
+                    )}
+
+                    {editFormData.availableMetals.includes("Silver") && (
+                        <div className="md:col-span-1">
+                            <label className="block text-xs font-bold uppercase tracking-widest text-gray-600 mb-2">Silver Price (₹)</label>
+                            <input
+                                type="number"
+                                min="0"
+                                required
+                                className="w-full bg-gray-50 border rounded-none p-3 text-sm text-[#111111] outline-none focus:border-[#111111] border-gray-200 transition-colors"
+                                value={editFormData.silverPrice}
+                                onChange={e => setEditFormData({ ...editFormData, silverPrice: e.target.value })}
+                            />
+                        </div>
+                    )}
+
+                    {editFormData.availableMetals.includes("Platinum") && (
+                        <div className="md:col-span-1">
+                            <label className="block text-xs font-bold uppercase tracking-widest text-gray-600 mb-2">Platinum Price (₹)</label>
+                            <input
+                                type="number"
+                                min="0"
+                                required
+                                className="w-full bg-gray-50 border rounded-none p-3 text-sm text-[#111111] outline-none focus:border-[#111111] border-gray-200 transition-colors"
+                                value={editFormData.platinumPrice}
+                                onChange={e => setEditFormData({ ...editFormData, platinumPrice: e.target.value })}
+                            />
+                        </div>
+                    )}
 
                     <div className="md:col-span-3"><label className="block text-xs font-bold uppercase tracking-widest text-gray-600 mb-2">Description</label>
                         <textarea required className="w-full bg-gray-50 border rounded-none p-3 text-sm text-[#111111] outline-none focus:border-[#111111] border-gray-200 transition-colors" rows={3} value={editFormData.description} onChange={e => setEditFormData({ ...editFormData, description: e.target.value })} />

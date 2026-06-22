@@ -35,17 +35,22 @@ export function SettingsTable({ initialSettings }: { initialSettings: any[] }) {
         imageUrl: "",
         images: "[]",
         videoUrl: "",
-        modelUrl: ""
+        modelUrl: "",
+        availableMetals: ["Gold"] as string[],
+        goldPrice: "",
+        silverPrice: "",
+        platinumPrice: ""
     });
 
-    const [karatPrices, setKaratPrices] = useState({ "9K": "", "14K": "", "18K": "", "22K": "" });
+    const [karatPrices, setKaratPrices] = useState({ "10K": "", "14K": "", "18K": "", "22K": "" });
 
     const RING_SIZES = ["2","2 1/4","2 1/2","2 3/4","3","3 1/4","3 1/2","3 3/4","4","4 1/4","4 1/2","4 3/4","5","5 1/4","5 1/2","5 3/4","6","6 1/4","6 1/2","6 3/4","7","7 1/4","7 1/2","7 3/4","8","8 1/4","8 1/2","8 3/4","9","9 1/4","9 1/2","9 3/4","10","10 1/4","10 1/2","10 3/4","11","11 1/4","11 1/2","11 3/4","12"];
-    const KARATS = ["9K", "14K", "18K", "22K"] as const;
-    const emptySizePricesForKarat = () => Object.fromEntries(RING_SIZES.map(s => [s, ""]));
-    const emptyKaratSizePrices = () => Object.fromEntries(KARATS.map(k => [k, emptySizePricesForKarat()])) as Record<string, Record<string, string>>;
-    const [karatSizePrices, setKaratSizePrices] = useState<Record<string, Record<string, string>>>(emptyKaratSizePrices());
-    const [activeSizeKarat, setActiveSizeKarat] = useState<string>("18K");
+    const SIZE_OPTIONS = ["10K", "14K", "18K", "22K", "silver", "platinum"] as const;
+    const emptySizePricesForOption = () => Object.fromEntries(RING_SIZES.map(s => [s, ""]));
+    const emptyOptionSizePrices = () => Object.fromEntries(SIZE_OPTIONS.map(o => [o, emptySizePricesForOption()])) as Record<string, Record<string, string>>;
+    
+    const [optionSizePrices, setOptionSizePrices] = useState<Record<string, Record<string, string>>>(emptyOptionSizePrices());
+    const [activeSizeOption, setActiveSizeOption] = useState<string>("18K");
 
     const openCreateModal = () => {
         setEditingSetting(null);
@@ -57,11 +62,25 @@ export function SettingsTable({ initialSettings }: { initialSettings: any[] }) {
         setExistingVideo(null);
         setModelFile(null);
         setModelName("");
-        setFormData({ name: "", description: "", price: "", category: "Solitaire", stockCount: "1", imageUrl: "", images: "[]", videoUrl: "", modelUrl: "" });
+        setFormData({
+            name: "",
+            description: "",
+            price: "",
+            category: "Solitaire",
+            stockCount: "1",
+            imageUrl: "",
+            images: "[]",
+            videoUrl: "",
+            modelUrl: "",
+            availableMetals: ["Gold"] as string[],
+            goldPrice: "",
+            silverPrice: "",
+            platinumPrice: ""
+        });
         setSupportedShapes([]);
-        setKaratPrices({ "9K": "", "14K": "", "18K": "", "22K": "" });
-        setKaratSizePrices(emptyKaratSizePrices());
-        setActiveSizeKarat("18K");
+        setKaratPrices({ "10K": "", "14K": "", "18K": "", "22K": "" });
+        setOptionSizePrices(emptyOptionSizePrices());
+        setActiveSizeOption("18K");
         setIsModalOpen(true);
     };
 
@@ -79,6 +98,11 @@ export function SettingsTable({ initialSettings }: { initialSettings: any[] }) {
         setExistingVideo(setting.videoUrl || null);
         setModelFile(null);
         setModelName(setting.modelUrl ? setting.modelUrl.split('/').pop() : "");
+
+        const metalsList = setting.availableMetals 
+            ? setting.availableMetals.split(",").map((m: string) => m.trim())
+            : ["Gold"];
+
         setFormData({
             name: setting.name,
             description: setting.description,
@@ -88,7 +112,11 @@ export function SettingsTable({ initialSettings }: { initialSettings: any[] }) {
             imageUrl: setting.imageUrl || "",
             images: setting.images || "[]",
             videoUrl: setting.videoUrl || "",
-            modelUrl: setting.modelUrl || ""
+            modelUrl: setting.modelUrl || "",
+            availableMetals: metalsList,
+            goldPrice: setting.goldPrice !== null && setting.goldPrice !== undefined ? String(setting.goldPrice) : "",
+            silverPrice: setting.silverPrice !== null && setting.silverPrice !== undefined ? String(setting.silverPrice) : "",
+            platinumPrice: setting.platinumPrice !== null && setting.platinumPrice !== undefined ? String(setting.platinumPrice) : ""
         });
         try {
             const shapes = JSON.parse(setting.supportedShapes || "[]");
@@ -100,35 +128,65 @@ export function SettingsTable({ initialSettings }: { initialSettings: any[] }) {
         try {
             const kp = JSON.parse(setting.karatPrices || "{}");
             setKaratPrices({
-                "9K": kp["9K"] !== undefined ? String(kp["9K"]) : "",
+                "10K": kp["10K"] !== undefined ? String(kp["10K"]) : kp["9K"] !== undefined ? String(kp["9K"]) : "",
                 "14K": kp["14K"] !== undefined ? String(kp["14K"]) : "",
                 "18K": kp["18K"] !== undefined ? String(kp["18K"]) : "",
                 "22K": kp["22K"] !== undefined ? String(kp["22K"]) : "",
             });
         } catch {
-            setKaratPrices({ "9K": "", "14K": "", "18K": "", "22K": "" });
+            setKaratPrices({ "10K": "", "14K": "", "18K": "", "22K": "" });
         }
-        // Prefill size prices from stored JSON (nested per-karat format)
+        // Prefill size prices from stored JSON
         try {
             const sp = JSON.parse(setting.sizePrices || "{}");
-            const filled = emptyKaratSizePrices();
-            // Support new nested format: { "9K": { "2": 42000 }, "18K": { "2": 48000 } }
-            // Old flat format { "2": 48000 } is treated as empty (admin re-enters per karat)
-            const isNested = KARATS.some(k => sp[k] !== undefined && typeof sp[k] === "object");
-            if (isNested) {
-                for (const k of KARATS) {
-                    if (sp[k] && typeof sp[k] === "object") {
+            const filled = emptyOptionSizePrices();
+            
+            // Check if sp has nested options: "10K", "14K", "18K", "22K", "9K", "silver", "platinum"
+            const hasNested = ["10K", "14K", "18K", "22K", "9K", "silver", "platinum"].some(
+                k => sp[k] !== undefined && typeof sp[k] === "object"
+            );
+            if (hasNested) {
+                // Read nested gold karats
+                for (const k of ["10K", "14K", "18K", "22K"]) {
+                    const lookupKey = k === "10K" && sp["9K"] !== undefined ? "9K" : k;
+                    if (sp[lookupKey] && typeof sp[lookupKey] === "object") {
                         for (const s of RING_SIZES) {
-                            if (sp[k][s] !== undefined) filled[k][s] = String(sp[k][s]);
+                            if (sp[lookupKey][s] !== undefined) filled[k][s] = String(sp[lookupKey][s]);
                         }
                     }
                 }
+                // Read nested silver
+                if (sp["silver"] && typeof sp["silver"] === "object") {
+                    for (const s of RING_SIZES) {
+                        if (sp["silver"][s] !== undefined) filled["silver"][s] = String(sp["silver"][s]);
+                    }
+                }
+                // Read nested platinum
+                if (sp["platinum"] && typeof sp["platinum"] === "object") {
+                    for (const s of RING_SIZES) {
+                        if (sp["platinum"][s] !== undefined) filled["platinum"][s] = String(sp["platinum"][s]);
+                    }
+                }
+            } else {
+                // Flat format is treated as 18K Gold pricing
+                for (const s of RING_SIZES) {
+                    if (sp[s] !== undefined) filled["18K"][s] = String(sp[s]);
+                }
             }
-            setKaratSizePrices(filled);
+            setOptionSizePrices(filled);
         } catch {
-            setKaratSizePrices(emptyKaratSizePrices());
+            setOptionSizePrices(emptyOptionSizePrices());
         }
-        setActiveSizeKarat("18K");
+
+        if (metalsList.includes("Gold")) {
+            setActiveSizeOption("18K");
+        } else if (metalsList.includes("Silver")) {
+            setActiveSizeOption("silver");
+        } else if (metalsList.includes("Platinum")) {
+            setActiveSizeOption("platinum");
+        } else {
+            setActiveSizeOption("18K");
+        }
         setIsModalOpen(true);
     };
 
@@ -334,32 +392,61 @@ export function SettingsTable({ initialSettings }: { initialSettings: any[] }) {
 
             // Build karatPrices object — only include karats with a value entered
             const karatPricesObj: Record<string, number> = {};
-            for (const [k, v] of Object.entries(karatPrices)) {
-                if (v !== "") karatPricesObj[k] = parseFloat(v);
+            if (formData.availableMetals.includes("Gold")) {
+                for (const [k, v] of Object.entries(karatPrices)) {
+                    if (v !== "") karatPricesObj[k] = parseFloat(v);
+                }
             }
 
-            // Build nested sizePrices object: { karat: { size: price } }
+            // Build nested sizePrices object: { karat/metal: { size: price } }
             const sizePricesObj: Record<string, Record<string, number>> = {};
-            for (const k of KARATS) {
+            if (formData.availableMetals.includes("Gold")) {
+                for (const k of ["10K", "14K", "18K", "22K"]) {
+                    const sizeMap: Record<string, number> = {};
+                    for (const [s, v] of Object.entries(optionSizePrices[k] || {})) {
+                        if (v !== "") sizeMap[s] = parseFloat(v);
+                    }
+                    if (Object.keys(sizeMap).length > 0) sizePricesObj[k] = sizeMap;
+                }
+            }
+            if (formData.availableMetals.includes("Silver")) {
                 const sizeMap: Record<string, number> = {};
-                for (const [s, v] of Object.entries(karatSizePrices[k] || {})) {
+                for (const [s, v] of Object.entries(optionSizePrices["silver"] || {})) {
                     if (v !== "") sizeMap[s] = parseFloat(v);
                 }
-                if (Object.keys(sizeMap).length > 0) sizePricesObj[k] = sizeMap;
+                if (Object.keys(sizeMap).length > 0) sizePricesObj["silver"] = sizeMap;
             }
+            if (formData.availableMetals.includes("Platinum")) {
+                const sizeMap: Record<string, number> = {};
+                for (const [s, v] of Object.entries(optionSizePrices["platinum"] || {})) {
+                    if (v !== "") sizeMap[s] = parseFloat(v);
+                }
+                if (Object.keys(sizeMap).length > 0) sizePricesObj["platinum"] = sizeMap;
+            }
+
+            const goldBase = karatPricesObj["18K"] ?? karatPricesObj["14K"] ?? karatPricesObj["10K"] ?? karatPricesObj["22K"] ?? null;
+            const silverVal = formData.availableMetals.includes("Silver") ? parseFloat(formData.silverPrice) || null : null;
+            const platVal = formData.availableMetals.includes("Platinum") ? parseFloat(formData.platinumPrice) || null : null;
+            const basePrice = goldBase ?? silverVal ?? platVal ?? 0;
 
             const isEditing = !!editingSetting;
             const url = isEditing ? `/api/admin/settings/${editingSetting.id}` : `/api/admin/settings`;
             const method = isEditing ? "PATCH" : "POST";
 
             const payload = {
-                ...formData,
+                name: formData.name,
+                description: formData.description,
                 imageUrl: primaryImageUrl,
                 images: JSON.stringify(finalImageUrls),
                 videoUrl: uploadedVideoUrl,
                 modelUrl: uploadedModelUrl,
-                price: parseFloat(formData.price),
+                price: basePrice,
                 stockCount: parseInt(formData.stockCount) || 1,
+                category: formData.category,
+                availableMetals: formData.availableMetals.join(","),
+                goldPrice: goldBase,
+                silverPrice: silverVal,
+                platinumPrice: platVal,
                 karatPrices: JSON.stringify(karatPricesObj),
                 sizePrices: JSON.stringify(sizePricesObj),
                 supportedShapes: JSON.stringify(supportedShapes)
@@ -416,9 +503,78 @@ export function SettingsTable({ initialSettings }: { initialSettings: any[] }) {
                                 <div><label className="block text-[10px] font-bold uppercase tracking-widest text-gray-600 mb-2">Name</label>
                                     <input required className="w-full bg-gray-50 border border-gray-200 rounded-none p-3 text-sm text-[#111111] outline-none focus:border-[#111111] transition-colors" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} />
                                 </div>
-                                <div><label className="block text-[10px] font-bold uppercase tracking-widest text-gray-600 mb-2">Base Price (₹)</label>
-                                    <input type="number" required className="w-full bg-gray-50 border border-gray-200 rounded-none p-3 text-sm text-[#111111] outline-none focus:border-[#111111] transition-colors" value={formData.price} onChange={e => setFormData({ ...formData, price: e.target.value })} />
+                                <div className="md:col-span-2">
+                                    <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-600 mb-2">Available Metals</label>
+                                    <div className="flex gap-4">
+                                        {["Gold", "Silver", "Platinum"].map((metal) => (
+                                            <label key={metal} className="flex items-center gap-2 cursor-pointer bg-gray-50 border border-gray-200 px-4 py-2 hover:bg-gray-150 transition-colors">
+                                                <input
+                                                    type="checkbox"
+                                                    className="accent-[#C9A14A]"
+                                                    checked={formData.availableMetals?.includes(metal) ?? false}
+                                                    onChange={(e) => {
+                                                        const current = formData.availableMetals ?? [];
+                                                        const next = e.target.checked
+                                                            ? [...current, metal]
+                                                            : current.filter((m: string) => m !== metal);
+                                                        setFormData({ ...formData, availableMetals: next });
+                                                    }}
+                                                />
+                                                <span className="text-sm font-medium text-gray-750">{metal}</span>
+                                            </label>
+                                        ))}
+                                    </div>
                                 </div>
+
+                                {formData.availableMetals?.includes("Gold") && (
+                                    <div className="md:col-span-2 border border-amber-100 bg-amber-50/60 p-5">
+                                        <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-amber-700 mb-1">Gold Karat Base Pricing</p>
+                                        <p className="text-[11px] text-amber-600/85 mb-4">Set base prices for enabled Gold karats.</p>
+                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                            {(["10K", "14K", "18K", "22K"] as const).map((k) => (
+                                                <div key={k}>
+                                                    <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-600 mb-2">{k} Gold (₹)</label>
+                                                    <input
+                                                        type="number"
+                                                        min="0"
+                                                        placeholder="e.g. 50000"
+                                                        className="w-full bg-white border rounded-none p-3 text-sm text-[#111111] outline-none focus:border-amber-400 border-amber-200 transition-colors"
+                                                        value={karatPrices[k] ?? ""}
+                                                        onChange={e => setKaratPrices(prev => ({ ...prev, [k]: e.target.value }))}
+                                                    />
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {formData.availableMetals?.includes("Silver") && (
+                                    <div className="md:col-span-1">
+                                        <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-600 mb-2">Silver Base Price (₹)</label>
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            required
+                                            className="w-full bg-gray-50 border border-gray-200 rounded-none p-3 text-sm text-[#111111] outline-none focus:border-[#111111] transition-colors"
+                                            value={formData.silverPrice}
+                                            onChange={e => setFormData({ ...formData, silverPrice: e.target.value })}
+                                        />
+                                    </div>
+                                )}
+
+                                {formData.availableMetals?.includes("Platinum") && (
+                                    <div className="md:col-span-1">
+                                        <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-600 mb-2">Platinum Base Price (₹)</label>
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            required
+                                            className="w-full bg-gray-50 border border-gray-200 rounded-none p-3 text-sm text-[#111111] outline-none focus:border-[#111111] transition-colors"
+                                            value={formData.platinumPrice}
+                                            onChange={e => setFormData({ ...formData, platinumPrice: e.target.value })}
+                                        />
+                                    </div>
+                                )}
                                 <div><label className="block text-[10px] font-bold uppercase tracking-widest text-gray-600 mb-2">Category</label>
                                     <select className="w-full bg-gray-50 border border-gray-200 rounded-none p-3 text-sm text-[#111111] outline-none focus:border-[#111111] transition-colors" value={formData.category} onChange={e => setFormData({ ...formData, category: e.target.value })}>
                                         <option>Solitaire</option><option>Halo</option><option>Vintage</option><option>Three-Stone</option>
@@ -453,54 +609,83 @@ export function SettingsTable({ initialSettings }: { initialSettings: any[] }) {
 
 
 
-                                {/* Ring Size Pricing Section — per karat */}
-                                <div className="md:col-span-2">
-                                    <div className="border border-blue-100 bg-blue-50/40 rounded-none p-5">
-                                        <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-blue-700 mb-1">Ring Size Pricing (US) — Per Karat</p>
-                                        <p className="text-[11px] text-blue-600/70 mb-3">Select a karat, then enter the price for each size. Leave blank to hide that size.</p>
-                                        {/* Karat Tab Bar */}
-                                        <div className="flex gap-1 mb-4">
-                                            {KARATS.map(k => (
-                                                <button
-                                                    key={k}
-                                                    type="button"
-                                                    onClick={() => setActiveSizeKarat(k)}
-                                                    className={`flex-1 py-1.5 text-[10px] font-bold uppercase tracking-widest border transition-all ${
-                                                        activeSizeKarat === k
-                                                            ? "bg-blue-600 text-white border-blue-600"
-                                                            : "bg-white text-blue-600 border-blue-200 hover:bg-blue-50"
-                                                    }`}
-                                                >
-                                                    {k}
-                                                    {Object.values(karatSizePrices[k] || {}).some(v => v !== "") && (
-                                                        <span className="ml-1 inline-block w-1.5 h-1.5 rounded-full bg-emerald-400 align-middle" />
+                                {/* Ring Size Pricing Section */}
+                                {(() => {
+                                    const activeTabs: { key: string; label: string }[] = [];
+                                    if (formData.availableMetals?.includes("Gold")) {
+                                        activeTabs.push({ key: "10K", label: "10K Gold" });
+                                        activeTabs.push({ key: "14K", label: "14K Gold" });
+                                        activeTabs.push({ key: "18K", label: "18K Gold" });
+                                        activeTabs.push({ key: "22K", label: "22K Gold" });
+                                    }
+                                    if (formData.availableMetals?.includes("Silver")) {
+                                        activeTabs.push({ key: "silver", label: "Silver" });
+                                    }
+                                    if (formData.availableMetals?.includes("Platinum")) {
+                                        activeTabs.push({ key: "platinum", label: "Platinum" });
+                                    }
+
+                                    // Auto-adjust active tab if current is hidden
+                                    if (activeTabs.length > 0 && !activeTabs.some(t => t.key === activeSizeOption)) {
+                                        setTimeout(() => setActiveSizeOption(activeTabs[0].key), 0);
+                                    }
+
+                                    if (activeTabs.length === 0) return null;
+
+                                    return (
+                                        <div className="md:col-span-2">
+                                            <div className="border border-blue-100 bg-blue-50/40 rounded-none p-5">
+                                                <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-blue-700 mb-1">Ring Size Pricing (US) — Per Metal/Karat</p>
+                                                <p className="text-[11px] text-blue-600/70 mb-3">Select a metal finish option, then enter the price/add-on for each size. Leave blank to hide that size.</p>
+                                                {/* Metal/Karat Tab Bar */}
+                                                <div className="flex flex-wrap gap-1 mb-4">
+                                                    {activeTabs.map(tab => (
+                                                        <button
+                                                            key={tab.key}
+                                                            type="button"
+                                                            onClick={() => setActiveSizeOption(tab.key)}
+                                                            className={`flex-1 min-w-[70px] py-1.5 text-[10px] font-bold uppercase tracking-widest border transition-all ${
+                                                                activeSizeOption === tab.key
+                                                                    ? "bg-blue-600 text-white border-blue-600"
+                                                                    : "bg-white text-blue-600 border-blue-200 hover:bg-blue-50"
+                                                            }`}
+                                                        >
+                                                            {tab.label}
+                                                            {Object.values(optionSizePrices[tab.key] || {}).some(v => v !== "") && (
+                                                                <span className="ml-1 inline-block w-1.5 h-1.5 rounded-full bg-emerald-400 align-middle" />
+                                                            )}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                                {/* Size grid for active selection */}
+                                                <div className="max-h-56 overflow-y-auto custom-scrollbar pr-1">
+                                                    {optionSizePrices[activeSizeOption] ? (
+                                                        <div className="grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-3">
+                                                            {RING_SIZES.map((size) => (
+                                                                <div key={size} className="flex items-center gap-2">
+                                                                    <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider w-12 flex-shrink-0">{size}</span>
+                                                                    <input
+                                                                        type="number"
+                                                                        min="0"
+                                                                        placeholder="₹"
+                                                                        className="w-full bg-white border rounded-none p-2 text-sm text-[#111111] outline-none focus:border-blue-400 border-blue-200 transition-colors"
+                                                                        value={optionSizePrices[activeSizeOption]?.[size] ?? ""}
+                                                                        onChange={e => setOptionSizePrices(prev => ({
+                                                                            ...prev,
+                                                                            [activeSizeOption]: { ...prev[activeSizeOption], [size]: e.target.value }
+                                                                        }))}
+                                                                    />
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    ) : (
+                                                        <p className="text-xs text-blue-600/70 italic text-center py-4">Please select a tab to enter size prices.</p>
                                                     )}
-                                                </button>
-                                            ))}
-                                        </div>
-                                        {/* Size grid for active karat */}
-                                        <div className="max-h-56 overflow-y-auto custom-scrollbar pr-1">
-                                            <div className="grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-3">
-                                                {RING_SIZES.map((size) => (
-                                                    <div key={size} className="flex items-center gap-2">
-                                                        <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider w-12 flex-shrink-0">{size}</span>
-                                                        <input
-                                                            type="number"
-                                                            min="0"
-                                                            placeholder="₹"
-                                                            className="w-full bg-white border rounded-none p-2 text-sm text-[#111111] outline-none focus:border-blue-400 border-blue-200 transition-colors"
-                                                            value={karatSizePrices[activeSizeKarat]?.[size] ?? ""}
-                                                            onChange={e => setKaratSizePrices(prev => ({
-                                                                ...prev,
-                                                                [activeSizeKarat]: { ...prev[activeSizeKarat], [size]: e.target.value }
-                                                            }))}
-                                                        />
-                                                    </div>
-                                                ))}
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </div>
+                                    );
+                                })()}
 
                                 <div className="md:col-span-2"><label className="block text-[10px] font-bold uppercase tracking-widest text-gray-600 mb-2">Description</label>
                                     <textarea required rows={3} className="w-full bg-gray-50 border border-gray-200 rounded-none p-3 text-sm text-[#111111] outline-none focus:border-[#111111] transition-colors" value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} />

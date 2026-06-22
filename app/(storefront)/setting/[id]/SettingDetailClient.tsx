@@ -5,7 +5,7 @@ import { useState, useMemo, useCallback, useRef, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronLeft, ChevronRight, Box, ArrowLeft, Check, ShoppingBag, ShieldCheck, Truck, Award, HelpCircle, Eye, Sparkles } from "lucide-react";
+import { ChevronLeft, ChevronRight, ChevronDown, Box, ArrowLeft, Check, ShoppingBag, ShieldCheck, Truck, Award, HelpCircle, Eye, Sparkles } from "lucide-react";
 import { useCustomizerStore } from "@/lib/customizer-store";
 import type { MetalType } from "@/lib/customizer-store";
 import { useCart } from "@/components/CartProvider";
@@ -76,47 +76,126 @@ export default function SettingDetailClient({ setting }: { setting: any }) {
     }, []);
 
     const RING_SIZES = ["2","2 1/4","2 1/2","2 3/4","3","3 1/4","3 1/2","3 3/4","4","4 1/4","4 1/2","4 3/4","5","5 1/4","5 1/2","5 3/4","6","6 1/4","6 1/2","6 3/4","7","7 1/4","7 1/2","7 3/4","8","8 1/4","8 1/2","8 3/4","9","9 1/4","9 1/2","9 3/4","10","10 1/4","10 1/2","10 3/4","11","11 1/4","11 1/2","11 3/4","12"];
-    const ALL_KARATS = ["9K", "14K", "18K", "22K"] as const;
 
     const sizePricesNested: Record<string, Record<string, number>> = (() => {
-        try { return JSON.parse(setting.sizePrices || "{}"); } catch { return {}; }
+        try { 
+            const parsed = JSON.parse(setting.sizePrices || "{}");
+            const firstKey = Object.keys(parsed)[0];
+            if (firstKey && typeof parsed[firstKey] === "number") {
+                return { "18K": parsed };
+            }
+            return parsed; 
+        } catch { 
+            return {}; 
+        }
     })();
 
     const karatPricesMap: Record<string, number> = (() => {
         try { return JSON.parse(setting.karatPrices || "{}"); } catch { return {}; }
     })();
 
-    const availableKarats = ALL_KARATS.filter(k => {
+    const enabledMetals = setting.availableMetals 
+        ? setting.availableMetals.split(",").map((m: string) => m.trim().toLowerCase()) 
+        : ["gold"];
+
+    const enabledFinishes: string[] = [];
+    if (enabledMetals.includes("gold") || enabledMetals.length === 0) {
+        enabledFinishes.push("Yellow Gold", "White Gold", "Rose Gold");
+    }
+    if (enabledMetals.includes("silver")) {
+        enabledFinishes.push("Silver");
+    }
+    if (enabledMetals.includes("platinum")) {
+        enabledFinishes.push("Platinum");
+    }
+    if (enabledFinishes.length === 0) {
+        enabledFinishes.push("Yellow Gold", "White Gold", "Rose Gold");
+    }
+
+    const initialFinish = enabledFinishes.find(f => {
+        const pmt = (setting.metalType || "").toLowerCase();
+        if (pmt.includes("yellow")) return f === "Yellow Gold";
+        if (pmt.includes("white")) return f === "White Gold";
+        if (pmt.includes("rose")) return f === "Rose Gold";
+        if (pmt.includes("silver")) return f === "Silver";
+        if (pmt.includes("platinum")) return f === "Platinum";
+        return false;
+    }) || enabledFinishes[0];
+
+    const [selectedFinish, setSelectedFinish] = useState<string>(initialFinish);
+
+    const isGold = ["Yellow Gold", "White Gold", "Rose Gold"].includes(selectedFinish);
+
+    const allPossibleKarats = ["10K", "14K", "18K", "22K"] as const;
+    const definedKarats = allPossibleKarats.filter(k => {
         const hasNestedSizes = sizePricesNested[k] && Object.keys(sizePricesNested[k]).length > 0;
         const hasLegacyPrice = karatPricesMap[k] !== undefined;
         return hasNestedSizes || hasLegacyPrice;
     });
-    const [selectedKarat, setSelectedKarat] = useState<string>(availableKarats[0] ?? "");
+    const availableKarats = definedKarats.length > 0 ? definedKarats : allPossibleKarats;
+    const [selectedKarat, setSelectedKarat] = useState<string>(availableKarats[0] || "18K");
 
-    const sizePricesForKarat: Record<string, number> = selectedKarat
-        ? (sizePricesNested[selectedKarat] || {})
-        : {};
-    const availableSizes = RING_SIZES.filter(s => sizePricesForKarat[s] !== undefined);
-    const [selectedSize, setSelectedSize] = useState<string>(availableSizes[0] ?? "");
+    const getBasePrice = () => {
+        if (isGold) {
+            if (selectedKarat && karatPricesMap[selectedKarat] !== undefined && karatPricesMap[selectedKarat] !== null && karatPricesMap[selectedKarat] > 0) {
+                return karatPricesMap[selectedKarat];
+            }
+            if (setting.goldPrice !== null && setting.goldPrice !== undefined && setting.goldPrice > 0) {
+                return setting.goldPrice;
+            }
+            return setting.price || 0;
+        } else if (selectedFinish === "Silver") {
+            if (setting.silverPrice !== null && setting.silverPrice !== undefined && setting.silverPrice > 0) {
+                return setting.silverPrice;
+            }
+            return setting.price || 0;
+        } else if (selectedFinish === "Platinum") {
+            if (setting.platinumPrice !== null && setting.platinumPrice !== undefined && setting.platinumPrice > 0) {
+                return setting.platinumPrice;
+            }
+            return setting.price || 0;
+        }
+        return setting.price || 0;
+    };
+    const karatBase = getBasePrice();
 
-    const karatBase = selectedKarat && karatPricesMap[selectedKarat] !== undefined
-        ? karatPricesMap[selectedKarat]
-        : setting.price;
-    const sizeAddon = selectedSize && sizePricesForKarat[selectedSize] !== undefined
-        ? sizePricesForKarat[selectedSize]
+    const sizePricesForSelection: Record<string, number> = (() => {
+        if (isGold) {
+            return sizePricesNested[selectedKarat] || {};
+        } else if (selectedFinish === "Silver") {
+            return sizePricesNested["silver"] || {};
+        } else if (selectedFinish === "Platinum") {
+            return sizePricesNested["platinum"] || {};
+        }
+        return {};
+    })();
+
+    const availableSizes = RING_SIZES.filter(s => sizePricesForSelection[s] !== undefined);
+    const [selectedSize, setSelectedSize] = useState<string>("");
+
+    useEffect(() => {
+        if (availableSizes.length > 0) {
+            if (!availableSizes.includes(selectedSize)) {
+                setSelectedSize(availableSizes[0]);
+            }
+        } else {
+            setSelectedSize("");
+        }
+    }, [selectedKarat, selectedFinish]);
+
+    const sizeAddon = selectedSize && sizePricesForSelection[selectedSize] !== undefined
+        ? sizePricesForSelection[selectedSize]
         : 0;
-    const hasNestedPricing = selectedKarat && sizePricesNested[selectedKarat] && Object.keys(sizePricesNested[selectedKarat]).length > 0;
+
+    const hasNestedPricing = Object.keys(sizePricesForSelection).length > 0;
     const displayPrice = hasNestedPricing
-        ? sizeAddon
-        : karatBase + (availableSizes.length > 0 ? sizeAddon : 0);
+        ? (sizeAddon > 0 ? sizeAddon : karatBase)
+        : karatBase;
+
+    const finalMetalType = isGold ? `${selectedKarat} ${selectedFinish}` : selectedFinish;
 
     const handleKaratChange = (newKarat: string) => {
         setSelectedKarat(newKarat);
-        const newSizePrices = sizePricesNested[newKarat] || {};
-        const newAvailableSizes = RING_SIZES.filter(s => newSizePrices[s] !== undefined);
-        if (!newAvailableSizes.includes(selectedSize)) {
-            setSelectedSize(newAvailableSizes[0] ?? "");
-        }
     };
 
     const images: string[] = useMemo(() => {
@@ -144,7 +223,6 @@ export default function SettingDetailClient({ setting }: { setting: any }) {
     }, [images, videoUrl, modelUrl]);
 
     const [activeIdx, setActiveIdx] = useState(0);
-    const [selectedMetal, setSelectedMetal] = useState<MetalType>(currentMetal || "18K White Gold");
     const activeItem = mediaItems[activeIdx] ?? null;
 
     const prev = useCallback(() => setActiveIdx(i => (i - 1 + mediaItems.length) % mediaItems.length), [mediaItems.length]);
@@ -157,27 +235,35 @@ export default function SettingDetailClient({ setting }: { setting: any }) {
     };
 
     const currentMetalOption = useMemo(() => {
-        return METAL_OPTIONS.find(m => m.label === selectedMetal) ?? METAL_OPTIONS[0];
-    }, [selectedMetal]);
+        return {
+            label: finalMetalType,
+            priceAdjustment: 0
+        };
+    }, [finalMetalType]);
 
     // Customizer Flow CTA Handler
     const handleChoose = () => {
         setMetalType(currentMetalOption.label, currentMetalOption.priceAdjustment);
-        setRingKaratSize(selectedKarat, selectedSize, karatBase, sizeAddon);
+        setRingKaratSize(
+            isGold ? selectedKarat : "",
+            selectedSize,
+            karatBase,
+            hasNestedPricing && sizeAddon > 0 ? sizeAddon - karatBase : sizeAddon
+        );
         setSetting(setting);
         router.push("/customizer/step-3-review");
     };
 
     // Standalone Add to Cart Handler
     const handleAddToCart = () => {
-        const finalPrice = displayPrice + currentMetalOption.priceAdjustment;
+        const finalPrice = displayPrice;
         addToCart({
-            id: `setting-${setting.id}-${selectedMetal.replace(/\s+/g, '-')}-${selectedKarat}-${selectedSize.replace(/\s+/g, '-')}`,
-            name: `${setting.name} Setting (${selectedKarat} ${selectedMetal}, Size ${selectedSize})`,
+            id: `setting-${setting.id}-${finalMetalType.replace(/\s+/g, '-')}-${selectedSize.replace(/\s+/g, '-')}`,
+            name: `${setting.name} Setting (${finalMetalType}, Size ${selectedSize})`,
             price: finalPrice,
             image: images[0] || setting.imageUrl || "/products/setting-1.jpg",
             quantity: 1,
-            metalType: selectedMetal,
+            metalType: finalMetalType,
         });
         toast.success("Setting added to cart!");
         const btn = document.querySelector('[data-cart-drawer-trigger]') as HTMLButtonElement;
@@ -187,7 +273,12 @@ export default function SettingDetailClient({ setting }: { setting: any }) {
     // Standalone Add to Ring Builder Handler
     const handleAddToRing = () => {
         setMetalType(currentMetalOption.label, currentMetalOption.priceAdjustment);
-        setRingKaratSize(selectedKarat, selectedSize, karatBase, sizeAddon);
+        setRingKaratSize(
+            isGold ? selectedKarat : "",
+            selectedSize,
+            karatBase,
+            hasNestedPricing && sizeAddon > 0 ? sizeAddon - karatBase : sizeAddon
+        );
         setSetting(setting);
         toast.success("Setting selected! Now select a center diamond.");
         router.push("/customizer/step-1-diamond");
@@ -348,46 +439,38 @@ export default function SettingDetailClient({ setting }: { setting: any }) {
                         <div className="py-4 border-t border-b border-zinc-100">
                             <div className="flex items-baseline gap-2">
                                 <span className="text-[18px] md:text-2xl font-bold text-zinc-900 tracking-tight">
-                                    {fmt(displayPrice + currentMetalOption.priceAdjustment)}
+                                    {fmt(displayPrice)}
                                 </span>
                                 <span className="text-[9px] text-zinc-400 font-semibold uppercase tracking-wider">
                                     (Setting Only)
                                 </span>
                             </div>
-                            {currentMetalOption.priceAdjustment > 0 && (
-                                <p className="text-[10px] text-zinc-400 font-medium mt-1">
-                                    * Includes {currentMetalOption.label} upgrade (+{fmt(currentMetalOption.priceAdjustment)})
-                                </p>
-                            )}
                         </div>
 
-                        {/* Metal selector */}
+                        {/* Metal Finish selector */}
                         <div>
                             <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-2">
-                                Precious Metal: <span className="text-zinc-800 font-semibold">{selectedMetal}</span>
+                                Metal Finish: <span className="text-zinc-800 font-semibold">{selectedFinish}</span>
                             </p>
-                            <div className="flex gap-3">
-                                {METAL_OPTIONS.map((m) => (
-                                    <button
-                                        key={m.label}
-                                        title={m.label}
-                                        onClick={() => setSelectedMetal(m.label)}
-                                        className={`w-9 h-9 rounded-full transition-all duration-200 border-2 ${
-                                            selectedMetal === m.label
-                                                ? "scale-105 border-[#C9A14A] ring-2 ring-[#C9A14A]/10 ring-offset-1"
-                                                : "border-zinc-200 opacity-70 hover:opacity-100 hover:scale-102"
-                                        }`}
-                                        style={{ backgroundColor: m.color }}
-                                    />
-                                ))}
+                            <div className="relative">
+                                <select 
+                                    value={selectedFinish}
+                                    onChange={(e) => setSelectedFinish(e.target.value)}
+                                    className="w-full p-4 rounded-none border border-zinc-200 bg-white text-zinc-900 appearance-none focus:outline-none focus:border-[#C9A14A] transition-colors cursor-pointer text-[14px]"
+                                >
+                                    {enabledFinishes.map((finish) => (
+                                        <option key={finish} value={finish}>{finish}</option>
+                                    ))}
+                                </select>
+                                <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none" size={16} />
                             </div>
                         </div>
 
                         {/* Karat selector */}
-                        {availableKarats.length > 0 && (
+                        {isGold && availableKarats.length > 0 && (
                             <div>
                                 <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-2">
-                                    Karat: <span className="text-zinc-800 font-semibold">{selectedKarat} Gold</span>
+                                    Gold Karat: <span className="text-zinc-800 font-semibold">{selectedKarat}</span>
                                 </p>
                                 <div className="grid grid-cols-4 gap-2">
                                     {availableKarats.map(k => (
@@ -414,8 +497,10 @@ export default function SettingDetailClient({ setting }: { setting: any }) {
                                     <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">
                                         Ring Size (US): <span className="text-zinc-800 font-semibold">{selectedSize}</span>
                                     </p>
-                                    {selectedSize && sizePricesForKarat[selectedSize] !== undefined && (
-                                        <span className="text-[9px] font-semibold text-zinc-400 uppercase">+{fmt(sizePricesForKarat[selectedSize])} Size Add-on</span>
+                                    {selectedSize && sizePricesForSelection[selectedSize] !== undefined && (
+                                        <span className="text-[9px] font-semibold text-zinc-400 uppercase">
+                                            {hasNestedPricing ? `₹${sizePricesForSelection[selectedSize].toLocaleString("en-IN")}` : `+${fmt(sizePricesForSelection[selectedSize])} Size Add-on`}
+                                        </span>
                                     )}
                                 </div>
                                 <div className="grid grid-cols-4 gap-1.5 max-h-28 overflow-y-auto custom-scrollbar p-1 border border-zinc-100 rounded-none md:rounded-[4px]">
@@ -518,8 +603,8 @@ export default function SettingDetailClient({ setting }: { setting: any }) {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
                                         {[
                                             { label: "Setting Style", val: setting.category },
-                                            { label: "Metal Selection", val: selectedMetal },
-                                            { label: "Selected Karat", val: selectedKarat ? `${selectedKarat} Gold` : "Platinum" },
+                                            { label: "Metal Selection", val: finalMetalType },
+                                            { label: "Selected Karat", val: isGold ? `${selectedKarat} Gold` : "N/A" },
                                             { label: "Size Selected", val: `Size ${selectedSize} US` },
                                             { label: "Supported Shapes", val: setting.supportedShapes ? JSON.parse(setting.supportedShapes).join(", ") : "All Shapes" },
                                             { label: "Prong Style", val: "Four-Prong Classic" },

@@ -46,7 +46,11 @@ model Product {
   diamondId   String?  @unique
   diamond     Diamond? @relation(fields: [diamondId], references: [id])
   metalType      String   // e.g., "18K White Gold"
-  karatPrices    String?  @default("{}") // JSON: {"9K":50000,"14K":65000,"18K":80000,"22K":95000}
+  karatPrices    String?  @default("{}") // JSON: {"10K":50000,"14K":65000,"18K":80000,"22K":95000}
+  availableMetals String?  @default("") // Comma-separated: "Gold,Silver,Platinum"
+  goldPrice       Float?
+  silverPrice     Float?
+  platinumPrice   Float?
   stockCount     Int      @default(1)
   isFeatured     Boolean  @default(false)
   tags           String?  @default("")
@@ -148,7 +152,11 @@ model Setting {
   images      String?  @default("[]") // Stores JSON array of URLs
   videoUrl    String?
   modelUrl    String?
-  karatPrices String?  @default("{}") // JSON: {"9K":50000,"14K":65000,"18K":80000,"22K":95000}
+  karatPrices String?  @default("{}") // JSON: {"10K":50000,"14K":65000,"18K":80000,"22K":95000}
+  availableMetals String?  @default("") // Comma-separated: "Gold,Silver,Platinum"
+  goldPrice       Float?
+  silverPrice     Float?
+  platinumPrice   Float?
   sizePrices  String?  @default("{}") // JSON: {"2":48000,"2 1/4":48500,...,"12":62000}
   stockCount  Int      @default(1)
   category    String   // e.g., "Solitaire", "Halo", "Vintage", "Three-Stone"

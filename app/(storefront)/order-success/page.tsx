@@ -171,7 +171,10 @@ function OrderSuccessContent() {
                                         </div>
                                         <div className="min-w-0 flex-1">
                                             <p className="truncate text-sm font-semibold text-[#111]">{item.name}</p>
-                                            <p className="mt-1 text-xs text-gray-400">Qty {item.quantity}</p>
+                                            <p className="mt-1 text-xs text-gray-400">
+                                                Qty {item.quantity}
+                                                {(item as any).metalType && ` · ${(item as any).metalType}`}
+                                            </p>
                                         </div>
                                         <p className="text-sm font-bold text-[#111]">₹{item.price.toLocaleString("en-IN")}</p>
                                     </div>

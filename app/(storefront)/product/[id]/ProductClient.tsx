@@ -220,7 +220,7 @@ export default function ProductClient({ product }: { product: any }) {
                         {mediaItems.map((item, idx) => (
                             <FadeIn 
                                 key={`${item.src}-${idx}`} 
-                                className={`relative aspect-[4/3] w-full overflow-hidden bg-[#FAF8F4] border border-zinc-100 rounded-[4px] flex items-center justify-center p-2 group ${
+                                className={`relative aspect-[4/5] w-full overflow-hidden flex items-center justify-center p-2 group ${
                                     mediaItems.length === 1 || (mediaItems.length % 2 !== 0 && idx === 0) ? "md:col-span-2" : ""
                                 }`}
                             >
@@ -245,7 +245,7 @@ export default function ProductClient({ product }: { product: any }) {
                             </FadeIn>
                         ))}
                         {mediaItems.length === 0 && (
-                            <div className="relative aspect-[4/3] w-full overflow-hidden bg-[#FAF8F4] border border-zinc-100 rounded-[4px] flex items-center justify-center col-span-2">
+                            <div className="relative aspect-[4/5] w-full overflow-hidden flex items-center justify-center col-span-2">
                                 <SmartImage
                                     src=""
                                     alt={product.name}
@@ -260,7 +260,7 @@ export default function ProductClient({ product }: { product: any }) {
 
                     {/* Mobile Carousel / Thumbnail Selection */}
                     <div className="block md:hidden w-full">
-                        <div className="relative aspect-[4/3] w-full overflow-hidden bg-[#FAF8F4] flex items-center justify-center p-2 border border-zinc-100/50 rounded-none">
+                        <div className="relative aspect-[4/5] w-full overflow-hidden flex items-center justify-center p-2 rounded-none">
                             {mediaItems.length > 0 ? (
                                 mediaItems[activeMediaIndex].type === "image" ? (
                                     <SmartImage

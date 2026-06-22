@@ -159,7 +159,7 @@ export default function DiamondDetailClient({ diamond }: { diamond: any }) {
                             {mediaItems.map((item, idx) => (
                                 <div
                                     key={idx}
-                                    className={`relative aspect-[4/3] w-full overflow-hidden bg-[#FAF8F4] border border-zinc-100 rounded-[4px] flex items-center justify-center p-2 group ${
+                                    className={`relative aspect-[4/5] w-full overflow-hidden flex items-center justify-center p-2 group ${
                                         mediaItems.length === 1 || (mediaItems.length % 2 !== 0 && idx === 0) ? "md:col-span-2" : ""
                                     }`}
                                 >
@@ -187,7 +187,7 @@ export default function DiamondDetailClient({ diamond }: { diamond: any }) {
 
                         {/* Mobile Viewport + Thumbs selection */}
                         <div className="block md:hidden w-full">
-                            <div className="relative aspect-[4/3] w-full overflow-hidden bg-[#FAF8F4] flex items-center justify-center p-2 border border-zinc-100/50 rounded-none">
+                            <div className="relative aspect-[4/5] w-full overflow-hidden flex items-center justify-center p-2 rounded-none">
                                 {mediaItems.length > 0 ? (
                                     mediaItems[activeIdx]?.type === "photo" ? (
                                         <SmartImage

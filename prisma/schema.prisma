@@ -45,14 +45,19 @@ model Product {
   category    Category @relation(fields: [categoryId], references: [id])
   diamondId   String?  @unique
   diamond     Diamond? @relation(fields: [diamondId], references: [id])
-  metalType   String   // e.g., "18K White Gold"
-  karatPrices String?  @default("{}") // JSON: {"9K":50000,"14K":65000,"18K":80000,"22K":95000}
-  stockCount  Int      @default(1)
-  isFeatured  Boolean  @default(false)
-  orders      OrderItem[]
-  reviews     Review[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  metalType      String   // e.g., "18K White Gold"
+  karatPrices    String?  @default("{}") // JSON: {"9K":50000,"14K":65000,"18K":80000,"22K":95000}
+  stockCount     Int      @default(1)
+  isFeatured     Boolean  @default(false)
+  tags           String?  @default("")
+  searchKeywords String?  @default("")
+  extraKeywords  String?  @default("")
+  seoTitle       String?
+  seoDescription String?
+  orders         OrderItem[]
+  reviews        Review[]
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 }
 
 model Diamond {

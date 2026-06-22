@@ -29,9 +29,15 @@ export function ProductTable({ initialProducts, categories }: { initialProducts:
         categoryId: categories[0]?.name || "Rings",
         metalType: "18K Gold",
         stockCount: "1",
+        tags: "",
+        extraKeywords: "",
+        seoTitle: "",
+        seoDescription: ""
     });
 
     const [karatPrices, setKaratPrices] = useState({ "9K": "", "14K": "", "18K": "", "22K": "" });
+    const [editingProduct, setEditingProduct] = useState<any | null>(null);
+    const [editFormData, setEditFormData] = useState<any | null>(null);
 
     const handleDelete = async (id: string) => {
         if (!confirm("Delete product permanently?")) return;
@@ -157,7 +163,8 @@ export function ProductTable({ initialProducts, categories }: { initialProducts:
                 setProducts([data.product, ...products]);
                 setIsAdding(false);
                 setFormData({
-                    name: "", description: "", price: "", categoryId: categories[0]?.name || "Rings", metalType: "18K Gold", stockCount: "1"
+                    name: "", description: "", price: "", categoryId: categories[0]?.name || "Rings", metalType: "18K Gold", stockCount: "1",
+                    tags: "", extraKeywords: "", seoTitle: "", seoDescription: ""
                 });
                 setKaratPrices({ "9K": "", "14K": "", "18K": "", "22K": "" });
                 clearPendingMedia();
@@ -171,11 +178,104 @@ export function ProductTable({ initialProducts, categories }: { initialProducts:
         }
     };
 
+    const startEdit = (product: any) => {
+        setEditingProduct(product);
+        let kpObj = { "9K": "", "14K": "", "18K": "", "22K": "" };
+        try {
+            const parsed = JSON.parse(product.karatPrices || "{}");
+            kpObj = {
+                "9K": parsed["9K"] !== undefined ? String(parsed["9K"]) : "",
+                "14K": parsed["14K"] !== undefined ? String(parsed["14K"]) : "",
+                "18K": parsed["18K"] !== undefined ? String(parsed["18K"]) : "",
+                "22K": parsed["22K"] !== undefined ? String(parsed["22K"]) : "",
+            };
+        } catch {}
+
+        setEditFormData({
+            name: product.name,
+            description: product.description,
+            price: String(product.price),
+            categoryId: product.category?.name || categories[0]?.name || "Rings",
+            metalType: product.metalType,
+            stockCount: String(product.stockCount),
+            tags: product.tags || "",
+            extraKeywords: product.extraKeywords || "",
+            seoTitle: product.seoTitle || "",
+            seoDescription: product.seoDescription || "",
+            karatPrices: kpObj
+        });
+        setIsAdding(false);
+    };
+
+    const handleEditSave = async (e: React.FormEvent) => {
+        e.preventDefault();
+        try {
+            setIsUploading(true);
+
+            const karatPricesObj: Record<string, number> = {};
+            for (const [k, v] of Object.entries(editFormData.karatPrices)) {
+                if (v !== "") karatPricesObj[k] = parseFloat(v as string);
+            }
+
+            const payload = {
+                name: editFormData.name,
+                description: editFormData.description,
+                price: parseFloat(editFormData.price),
+                categoryId: editFormData.categoryId,
+                metalType: editFormData.metalType,
+                stockCount: parseInt(editFormData.stockCount) || 1,
+                tags: editFormData.tags,
+                extraKeywords: editFormData.extraKeywords,
+                seoTitle: editFormData.seoTitle,
+                seoDescription: editFormData.seoDescription,
+                karatPrices: JSON.stringify(karatPricesObj)
+            };
+
+            const res = await fetch(`/api/admin/products?id=${editingProduct.id}`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (res.ok) {
+                toast.success("Product updated!");
+                setProducts(products.map(p => p.id === editingProduct.id ? data.product : p));
+                setEditingProduct(null);
+                setEditFormData(null);
+            } else {
+                toast.error(data.error || "Update failed");
+            }
+        } catch {
+            toast.error("Error");
+        } finally {
+            setIsUploading(false);
+        }
+    };
+
+    const slugify = (text: string) => {
+        return (text || "")
+            .toLowerCase()
+            .replace(/[^a-z0-9\s-]/g, "")
+            .trim()
+            .replace(/\s+/g, "-")
+            .replace(/-+/g, "-");
+    };
+
     return (
         <div className="space-y-6">
-            <div className="flex justify-end">
+            <div className="flex justify-end gap-3">
+                {editingProduct && (
+                    <button onClick={() => {
+                        setEditingProduct(null);
+                        setEditFormData(null);
+                    }} className="bg-gray-100 text-gray-700 border border-gray-200 px-6 py-3 rounded-none font-bold text-xs uppercase tracking-widest transition-all hover:bg-gray-200">
+                        Cancel Edit
+                    </button>
+                )}
                 <button onClick={() => {
                     setIsAdding(!isAdding);
+                    setEditingProduct(null);
+                    setEditFormData(null);
                     clearPendingMedia();
                 }} className="bg-[#111111] text-white border border-transparent px-6 py-3 rounded-none font-bold text-xs uppercase tracking-widest transition-all shadow-md hover:shadow-lg hover:-translate-y-1 hover:bg-[#C9A14A] hover:text-white">
                     {isAdding ? "Cancel" : "+ Add Product"}
@@ -317,6 +417,60 @@ export function ProductTable({ initialProducts, categories }: { initialProducts:
                         <textarea required className="w-full bg-gray-50 border rounded-none p-3 text-sm text-[#111111] outline-none focus:border-[#111111] border-gray-200 transition-colors" rows={3} value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} />
                     </div>
 
+                    {/* SEO & Search Section */}
+                    <div className="md:col-span-3 border-t border-gray-200 pt-6 mt-4">
+                        <h4 className="text-sm font-bold uppercase tracking-widest text-[#111111] mb-4">SEO & Search Optimization</h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label className="block text-xs font-bold uppercase tracking-widest text-gray-600 mb-2">Search Tags (Comma-separated)</label>
+                                <input placeholder="e.g. vintage, solitaire, gift" className="w-full bg-gray-50 border rounded-none p-3 text-sm text-[#111111] outline-none focus:border-[#111111] border-gray-200 transition-colors" value={formData.tags} onChange={e => setFormData({ ...formData, tags: e.target.value })} />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold uppercase tracking-widest text-gray-600 mb-2">Extra Search Keywords (Comma-separated)</label>
+                                <input placeholder="e.g. unique band, proposal rings" className="w-full bg-gray-50 border rounded-none p-3 text-sm text-[#111111] outline-none focus:border-[#111111] border-gray-200 transition-colors" value={formData.extraKeywords} onChange={e => setFormData({ ...formData, extraKeywords: e.target.value })} />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold uppercase tracking-widest text-gray-600 mb-2">SEO Custom Title (Optional)</label>
+                                <input placeholder="Fallback: Product Name | Zynora Luxe" className="w-full bg-gray-50 border rounded-none p-3 text-sm text-[#111111] outline-none focus:border-[#111111] border-gray-200 transition-colors" value={formData.seoTitle} onChange={e => setFormData({ ...formData, seoTitle: e.target.value })} />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold uppercase tracking-widest text-gray-600 mb-2">SEO Custom Description (Optional)</label>
+                                <input placeholder="Fallback: Product description" className="w-full bg-gray-50 border rounded-none p-3 text-sm text-[#111111] outline-none focus:border-[#111111] border-gray-200 transition-colors" value={formData.seoDescription} onChange={e => setFormData({ ...formData, seoDescription: e.target.value })} />
+                            </div>
+                        </div>
+
+                        {/* Live SEO & Slug Preview */}
+                        <div className="mt-6 p-5 bg-gray-50 border border-gray-200">
+                            <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-gray-500 mb-4">Search Engine Result Preview</p>
+                            <div className="space-y-4">
+                                <div>
+                                    <span className="text-xs font-semibold text-gray-500 block mb-1">Slug / URL Preview:</span>
+                                    <code className="text-xs text-amber-600 break-all select-all">
+                                        https://zynoraluxe.com/product/{slugify(formData.name) || "product-name"}-xxxx
+                                    </code>
+                                </div>
+                                <div className="border border-gray-200 bg-white p-4 rounded shadow-sm max-w-xl">
+                                    <div className="flex items-center gap-2 mb-1">
+                                        <div className="w-4 h-4 rounded-full bg-gray-200 flex items-center justify-center text-[8px] font-bold text-gray-600">Z</div>
+                                        <div className="text-xs text-gray-600 truncate">
+                                            <span>Zynora Luxe</span>
+                                            <span className="mx-1 text-gray-400">›</span>
+                                            <span className="text-gray-500">product</span>
+                                            <span className="mx-1 text-gray-400">›</span>
+                                            <span>{slugify(formData.name) || "product-name"}</span>
+                                        </div>
+                                    </div>
+                                    <h3 className="text-blue-800 text-lg hover:underline cursor-pointer font-sans truncate">
+                                        {formData.seoTitle || (formData.name ? `${formData.name} | Zynora Luxe` : "Product Name | Zynora Luxe")}
+                                    </h3>
+                                    <p className="text-sm text-gray-600 font-sans line-clamp-2 mt-1">
+                                        {formData.seoDescription || formData.description || "Enter a description or custom SEO description to see how it will display on search engines."}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div className="md:col-span-3 flex justify-end">
                         <button type="submit" disabled={isUploading} className="bg-[#111111] text-white border border-transparent px-8 py-3 rounded-none font-bold uppercase tracking-widest text-xs disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg transition-all hover:bg-[#C9A14A] hover:text-white">
                             {isUploading ? "Uploading..." : "Save Product"}
@@ -325,7 +479,138 @@ export function ProductTable({ initialProducts, categories }: { initialProducts:
                 </form>
             )}
 
-            <div className="w-full overflow-x-auto bg-white  border border-gray-100 rounded-none shadow-sm custom-scrollbar pb-4 mt-8">
+            {editingProduct && editFormData && (
+                <form onSubmit={handleEditSave} className="bg-white p-8 border border-[#C9A14A] rounded-none shadow-sm grid grid-cols-1 md:grid-cols-3 gap-6 animate-in fade-in slide-in-from-top-4 duration-500">
+                    <h3 className="md:col-span-3 text-xl font-heading !text-[#111111] border-b border-gray-200 pb-4 tracking-wide flex justify-between items-center">
+                        <span>Edit Product: {editingProduct.name}</span>
+                        <button type="button" onClick={() => { setEditingProduct(null); setEditFormData(null); }} className="text-gray-400 hover:text-red-500"><X size={20} /></button>
+                    </h3>
+
+                    <div className="md:col-span-2"><label className="block text-xs font-bold uppercase tracking-widest text-gray-600 mb-2">Product Name</label>
+                        <input required className="w-full bg-gray-50 border rounded-none p-3 text-sm text-[#111111] outline-none focus:border-[#111111] border-gray-200 transition-colors" value={editFormData.name} onChange={e => setEditFormData({ ...editFormData, name: e.target.value })} />
+                    </div>
+                    <div><label className="block text-xs font-bold uppercase tracking-widest text-gray-600 mb-2">Price (₹)</label>
+                        <input type="number" required className="w-full bg-gray-50 border rounded-none p-3 text-sm text-[#111111] outline-none focus:border-[#111111] border-gray-200 transition-colors" value={editFormData.price} onChange={e => setEditFormData({ ...editFormData, price: e.target.value })} />
+                    </div>
+
+                    <div><label className="block text-xs font-bold uppercase tracking-widest text-gray-600 mb-2">Category</label>
+                        <select 
+                            required 
+                            className="w-full bg-white border border-gray-200 rounded-none p-3 text-sm text-[#111111] outline-none focus:border-[#111111] transition-colors cursor-pointer" 
+                            style={{ minHeight: "44px", WebkitAppearance: "menulist", appearance: "menulist" }}
+                            value={editFormData.categoryId} 
+                            onChange={e => setEditFormData({ ...editFormData, categoryId: e.target.value })}
+                        >
+                            {categories.map(c => (
+                                <option key={c.id} value={c.name} className="bg-white text-[#111111]">
+                                    {c.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    <div><label className="block text-xs font-bold uppercase tracking-widest text-gray-600 mb-2">Metal/Material</label>
+                        <input required className="w-full bg-gray-50 border rounded-none p-3 text-sm text-[#111111] outline-none focus:border-[#111111] border-gray-200 transition-colors" value={editFormData.metalType} onChange={e => setEditFormData({ ...editFormData, metalType: e.target.value })} />
+                    </div>
+                    <div><label className="block text-xs font-bold uppercase tracking-widest text-gray-600 mb-2">Quantity (Stock)</label>
+                        <input type="number" required min="0" className="w-full bg-gray-50 border rounded-none p-3 text-sm text-[#111111] outline-none focus:border-[#111111] border-gray-200 transition-colors" value={editFormData.stockCount} onChange={e => setEditFormData({ ...editFormData, stockCount: e.target.value })} />
+                    </div>
+
+                    {/* Karat Pricing Section */}
+                    <div className="md:col-span-3">
+                        <div className="border border-amber-100 bg-amber-50/60 rounded-none p-5">
+                            <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-amber-700 mb-1">Gold Karat Pricing</p>
+                            <p className="text-[11px] text-amber-600/80 mb-4">Set per-karat prices. Leave blank to hide that karat from customers.</p>
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                {(["9K", "14K", "18K", "22K"] as const).map((k) => (
+                                    <div key={k}>
+                                        <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-600 mb-2">{k} Gold (₹)</label>
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            placeholder="e.g. 55000"
+                                            className="w-full bg-white border rounded-none p-3 text-sm text-[#111111] outline-none focus:border-amber-400 border-amber-200 transition-colors"
+                                            value={editFormData.karatPrices[k]}
+                                            onChange={e => setEditFormData((prev: any) => ({
+                                                ...prev,
+                                                karatPrices: { ...prev.karatPrices, [k]: e.target.value }
+                                            }))}
+                                        />
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="md:col-span-3"><label className="block text-xs font-bold uppercase tracking-widest text-gray-600 mb-2">Description</label>
+                        <textarea required className="w-full bg-gray-50 border rounded-none p-3 text-sm text-[#111111] outline-none focus:border-[#111111] border-gray-200 transition-colors" rows={3} value={editFormData.description} onChange={e => setEditFormData({ ...editFormData, description: e.target.value })} />
+                    </div>
+
+                    {/* SEO & Search Section */}
+                    <div className="md:col-span-3 border-t border-gray-200 pt-6 mt-4">
+                        <h4 className="text-sm font-bold uppercase tracking-widest text-[#111111] mb-4">SEO & Search Optimization</h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label className="block text-xs font-bold uppercase tracking-widest text-gray-600 mb-2">Search Tags (Comma-separated)</label>
+                                <input placeholder="e.g. vintage, solitaire, gift" className="w-full bg-gray-50 border rounded-none p-3 text-sm text-[#111111] outline-none focus:border-[#111111] border-gray-200 transition-colors" value={editFormData.tags} onChange={e => setEditFormData({ ...editFormData, tags: e.target.value })} />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold uppercase tracking-widest text-gray-600 mb-2">Extra Search Keywords (Comma-separated)</label>
+                                <input placeholder="e.g. unique band, proposal rings" className="w-full bg-gray-50 border rounded-none p-3 text-sm text-[#111111] outline-none focus:border-[#111111] border-gray-200 transition-colors" value={editFormData.extraKeywords} onChange={e => setEditFormData({ ...editFormData, extraKeywords: e.target.value })} />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold uppercase tracking-widest text-gray-600 mb-2">SEO Custom Title (Optional)</label>
+                                <input placeholder="Fallback: Product Name | Zynora Luxe" className="w-full bg-gray-50 border rounded-none p-3 text-sm text-[#111111] outline-none focus:border-[#111111] border-gray-200 transition-colors" value={editFormData.seoTitle} onChange={e => setEditFormData({ ...editFormData, seoTitle: e.target.value })} />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold uppercase tracking-widest text-gray-600 mb-2">SEO Custom Description (Optional)</label>
+                                <input placeholder="Fallback: Product description" className="w-full bg-gray-50 border rounded-none p-3 text-sm text-[#111111] outline-none focus:border-[#111111] border-gray-200 transition-colors" value={editFormData.seoDescription} onChange={e => setEditFormData({ ...editFormData, seoDescription: e.target.value })} />
+                            </div>
+                        </div>
+
+                        {/* Live SEO & Slug Preview */}
+                        <div className="mt-6 p-5 bg-gray-50 border border-gray-200">
+                            <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-gray-500 mb-4">Search Engine Result Preview</p>
+                            <div className="space-y-4">
+                                <div>
+                                    <span className="text-xs font-semibold text-gray-500 block mb-1">Slug / URL Preview:</span>
+                                    <code className="text-xs text-amber-600 break-all select-all">
+                                        https://zynoraluxe.com/product/{slugify(editFormData.name) || "product-name"}-{editingProduct.id.slice(-4)}
+                                    </code>
+                                </div>
+                                <div className="border border-gray-200 bg-white p-4 rounded shadow-sm max-w-xl">
+                                    <div className="flex items-center gap-2 mb-1">
+                                        <div className="w-4 h-4 rounded-full bg-gray-200 flex items-center justify-center text-[8px] font-bold text-gray-600">Z</div>
+                                        <div className="text-xs text-gray-600 truncate">
+                                            <span>Zynora Luxe</span>
+                                            <span className="mx-1 text-gray-400">›</span>
+                                            <span className="text-gray-500">product</span>
+                                            <span className="mx-1 text-gray-400">›</span>
+                                            <span>{slugify(editFormData.name) || "product-name"}</span>
+                                        </div>
+                                    </div>
+                                    <h3 className="text-blue-800 text-lg hover:underline cursor-pointer font-sans truncate">
+                                        {editFormData.seoTitle || (editFormData.name ? `${editFormData.name} | Zynora Luxe` : "Product Name | Zynora Luxe")}
+                                    </h3>
+                                    <p className="text-sm text-gray-600 font-sans line-clamp-2 mt-1">
+                                        {editFormData.seoDescription || editFormData.description || "Enter a description or custom SEO description to see how it will display on search engines."}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="md:col-span-3 flex justify-end gap-3 border-t border-gray-200 pt-6">
+                        <button type="button" onClick={() => { setEditingProduct(null); setEditFormData(null); }} className="bg-white text-gray-700 border border-gray-200 px-8 py-3 rounded-none font-bold uppercase tracking-widest text-xs shadow-sm hover:bg-gray-50 transition-all">
+                            Cancel
+                        </button>
+                        <button type="submit" disabled={isUploading} className="bg-[#111111] text-white border border-transparent px-8 py-3 rounded-none font-bold uppercase tracking-widest text-xs disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg transition-all hover:bg-[#C9A14A] hover:text-white">
+                            {isUploading ? "Saving..." : "Update Product"}
+                        </button>
+                    </div>
+                </form>
+            )}
+
+            <div className="w-full overflow-x-auto bg-white border border-gray-100 rounded-none shadow-sm custom-scrollbar pb-4 mt-8">
                 <table className="w-full text-left border-collapse whitespace-nowrap">
                     <thead>
                         <tr className="bg-gray-50 border-b border-gray-200 text-[10px] uppercase tracking-widest text-gray-400">
@@ -372,7 +657,10 @@ export function ProductTable({ initialProducts, categories }: { initialProducts:
                                     <td className="p-5 font-bold font-body text-[#111111] tracking-wide">₹{product.price.toLocaleString("en-IN")}</td>
                                     <td className="p-5 text-sm">{product.stockCount > 0 ? <span className="text-[#111111] font-bold uppercase tracking-widest text-[10px] bg-amber-50 border border-amber-100 px-3 py-1.5 rounded-full">{product.stockCount} In Stock</span> : <span className="text-gray-400 font-bold uppercase tracking-widest text-[10px] bg-gray-50 border border-gray-200 px-3 py-1.5 rounded-full">Out of Stock</span>}</td>
                                     <td className="p-5 text-right">
-                                        <button onClick={() => handleDelete(product.id)} className="text-[10px] uppercase font-bold tracking-widest text-gray-500 hover:text-red-600 hover:bg-red-50 hover:border-red-200 transition-colors bg-gray-50 px-4 py-2 rounded-md border border-gray-200">Delete</button>
+                                        <div className="flex gap-2 justify-end">
+                                            <button onClick={() => startEdit(product)} className="text-[10px] uppercase font-bold tracking-widest text-gray-500 hover:text-[#C9A14A] hover:bg-amber-50 hover:border-amber-200 transition-colors bg-gray-50 px-4 py-2 rounded-md border border-gray-200">Edit</button>
+                                            <button onClick={() => handleDelete(product.id)} className="text-[10px] uppercase font-bold tracking-widest text-gray-500 hover:text-red-600 hover:bg-red-50 hover:border-red-200 transition-colors bg-gray-50 px-4 py-2 rounded-md border border-gray-200">Delete</button>
+                                        </div>
                                     </td>
                                 </tr>
                             )

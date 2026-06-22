@@ -23,8 +23,20 @@ import { getServerSession } from "@/lib/auth";
 const prisma = new PrismaClient();
 
 export const metadata: Metadata = {
-    title: "ZYNORA LUXE | Lab Grown Diamond Jewelry",
-    description: "Discover certified diamonds, premium settings, and handcrafted jewelry from ZYNORA LUXE.",
+    title: "Zynora Luxe | Lab Grown Diamond Jewelry",
+    description: "Zynora Luxe is a luxury jewelry brand offering lab grown diamond engagement rings, pendants, bracelets, earrings, necklaces, and custom fine jewelry.",
+    keywords: [
+        "zynora",
+        "zynora luxe",
+        "zynoraluxe",
+        "lab grown diamond jewelry",
+        "custom diamond jewelry",
+        "luxury jewelry",
+        "engagement rings"
+    ],
+    alternates: {
+        canonical: "https://zynoraluxe.com",
+    }
 };
 
 export const dynamic = "force-dynamic";
@@ -40,8 +52,42 @@ export default async function HomePage() {
         return acc;
     }, {});
 
+    const orgSchema = {
+        "@context": "https://schema.org",
+        "@type": "JewelryStore",
+        "@id": "https://zynoraluxe.com/#organization",
+        "name": "Zynora Luxe",
+        "url": "https://zynoraluxe.com",
+        "logo": "https://zynoraluxe.com/favicon.ico",
+        "description": "Zynora Luxe is a premier luxury jewelry brand crafting exquisite lab grown diamond engagement rings, settings, and bespoke fine jewelry."
+    };
+
+    const websiteSchema = {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "@id": "https://zynoraluxe.com/#website",
+        "name": "Zynora Luxe",
+        "url": "https://zynoraluxe.com",
+        "potentialAction": {
+            "@type": "SearchAction",
+            "target": {
+                "@type": "EntryPoint",
+                "urlTemplate": "https://zynoraluxe.com/search?q={search_term_string}"
+            },
+            "query-input": "required name=search_term_string"
+        }
+    };
+
     return (
         <div className="bg-white text-[#1A1A1A] relative">
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema) }}
+            />
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+            />
             {/* Header + Hero Slider loads immediately on first paint */}
             <div className="relative">
                 <HeroSlider customSlides={assetsMap} customText={assetsMap} />

@@ -15,6 +15,7 @@ export async function GET(request: Request) {
     const diamondShape = searchParams.get('shape'); // e.g. "Round,Oval"
     const metalType = searchParams.get('metal'); // e.g. "18K White Gold"
     const sort = searchParams.get('sort'); // "price-asc" | "price-desc" | "newest" | "popular"
+    const query = searchParams.get('query') || searchParams.get('search') || undefined;
 
     // Pagination
     const page = searchParams.get('page') ? parseInt(searchParams.get('page')!) : undefined;
@@ -23,6 +24,27 @@ export async function GET(request: Request) {
 
     try {
         const whereClause: any = {};
+
+        // Text search query
+        if (query) {
+            const q = query.trim();
+            whereClause.OR = [
+                { name: { contains: q, mode: 'insensitive' } },
+                { description: { contains: q, mode: 'insensitive' } },
+                { metalType: { contains: q, mode: 'insensitive' } },
+                { tags: { contains: q, mode: 'insensitive' } },
+                { searchKeywords: { contains: q, mode: 'insensitive' } },
+                { category: { name: { contains: q, mode: 'insensitive' } } },
+                { diamond: {
+                    OR: [
+                        { shape: { contains: q, mode: 'insensitive' } },
+                        { cut: { contains: q, mode: 'insensitive' } },
+                        { clarity: { contains: q, mode: 'insensitive' } },
+                        { color: { contains: q, mode: 'insensitive' } }
+                    ]
+                }}
+            ];
+        }
 
         // Category filter
         if (categorySlug) {

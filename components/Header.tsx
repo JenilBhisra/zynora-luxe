@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { ShoppingCart, Menu, X as XIcon, ChevronRight, User } from "lucide-react";
+import { ShoppingCart, Menu, X as XIcon, ChevronRight, User, Search } from "lucide-react";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 import { useCart } from "./CartProvider";
@@ -118,7 +118,7 @@ export function Header() {
                                 </span>
                             </Link>
 
-                            {/* Right Icons: Account + Cart aligned absolute right */}
+                            {/* Right Icons: Account + Search + Cart aligned absolute right */}
                             <div 
                                 style={{
                                     position: "absolute",
@@ -132,6 +132,21 @@ export function Header() {
                                     height: "60px"
                                 }}
                             >
+                                {/* Search icon */}
+                                <Link 
+                                    href="/search" 
+                                    aria-label="Search" 
+                                    style={{
+                                        width: "22px",
+                                        height: "22px",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center"
+                                    }}
+                                    className="text-[#1A1A1A] hover:text-[#C9A14A] transition-colors duration-300"
+                                >
+                                    <Search size={20} strokeWidth={1.5} style={{ width: "22px", height: "22px" }} />
+                                </Link>
                                 {/* Account circle */}
                                 <div 
                                     style={{
@@ -200,7 +215,7 @@ export function Header() {
                     {/* ── MOBILE layout: hamburger LEFT · logo CENTER · actions RIGHT ── */}
                     <div className="lg:hidden flex h-16 w-full items-center px-4 justify-between bg-white">
                         {/* Left: Hamburger */}
-                        <div className="w-1/4 flex justify-start">
+                        <div className="w-[15%] flex justify-start">
                             <button
                                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                                 className="text-[#1A1A1A] hover:text-[#C9A14A] transition-colors p-2"
@@ -227,8 +242,24 @@ export function Header() {
                             </Link>
                         </div>
 
-                        {/* Right: Cart + Profile */}
-                        <div className="w-1/4 flex justify-end items-center gap-[18px]">
+                        {/* Right: Search + Profile + Cart */}
+                        <div className="w-[35%] flex justify-end items-center gap-[12px] sm:gap-[18px]">
+                            {/* Search icon */}
+                            <Link 
+                                href="/search" 
+                                aria-label="Search" 
+                                style={{
+                                    width: "22px",
+                                    height: "22px",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center"
+                                }}
+                                className="text-[#1A1A1A] hover:text-[#C9A14A] transition-colors duration-300"
+                            >
+                                <Search size={20} strokeWidth={1.5} style={{ width: "22px", height: "22px" }} />
+                            </Link>
+                            {/* Profile Menu */}
                             <div 
                                 style={{
                                     width: "38px",
@@ -241,6 +272,7 @@ export function Header() {
                             >
                                 <ProfileMenu />
                             </div>
+                            {/* Cart icon */}
                             <Link 
                                 href="/cart" 
                                 aria-label="Cart" 

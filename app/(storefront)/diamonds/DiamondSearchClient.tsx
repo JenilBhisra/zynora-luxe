@@ -48,7 +48,7 @@ function DiamondSearchClientContent({ customizerMode = false }: { customizerMode
     const [isUrlSynced, setIsUrlSynced] = useState<boolean>(false);
     
     // Filter States
-    const [priceRange, setPriceRange] = useState<[number, number]>([10000, 2000000]);
+    const [priceRange, setPriceRange] = useState<[number, number]>([1000, 2000000]);
     const [caratRange, setCaratRange] = useState<[number, number]>([0.2, 10]);
 
     const [selectedShapes, setSelectedShapes] = useState<string[]>([]);
@@ -211,7 +211,7 @@ function DiamondSearchClientContent({ customizerMode = false }: { customizerMode
     };
 
     const resetFilters = () => {
-        setPriceRange([10000, 2000000]);
+        setPriceRange([1000, 2000000]);
         setCaratRange([0.2, 10]);
         setSelectedShapes([]);
         setSelectedCuts([]);
@@ -232,7 +232,7 @@ function DiamondSearchClientContent({ customizerMode = false }: { customizerMode
     if (caratRange[0] !== 0.2 || caratRange[1] !== 10) {
         activeChips.push({ type: 'carat', value: caratRange, label: `${caratRange[0]} - ${caratRange[1]} CT` });
     }
-    if (priceRange[0] !== 10000 || priceRange[1] !== 2000000) {
+    if (priceRange[0] !== 1000 || priceRange[1] !== 2000000) {
         activeChips.push({ type: 'price', value: priceRange, label: `₹${priceRange[0].toLocaleString('en-IN')} - ₹${priceRange[1].toLocaleString('en-IN')}` });
     }
     if (selectedColors.length > 0) {
@@ -251,7 +251,7 @@ function DiamondSearchClientContent({ customizerMode = false }: { customizerMode
         } else if (chip.type === 'carat') {
             setCaratRange([0.2, 10]);
         } else if (chip.type === 'price') {
-            setPriceRange([10000, 2000000]);
+            setPriceRange([1000, 2000000]);
         } else if (chip.type === 'color') {
             setSelectedColors(prev => prev.filter(c => c !== chip.value));
         } else if (chip.type === 'clarity') {
@@ -349,9 +349,9 @@ function DiamondSearchClientContent({ customizerMode = false }: { customizerMode
                 <p className="text-[13px] md:text-[14px] font-semibold text-zinc-900 tracking-wide mb-3 uppercase">Price Range</p>
                 <div className="px-1">
                     <DualRangeSlider
-                        min={10000}
+                        min={1000}
                         max={2000000}
-                        step={10000}
+                        step={1000}
                         value={priceRange}
                         onValueChange={(val) => {
                             setPriceRange(val);
@@ -367,7 +367,7 @@ function DiamondSearchClientContent({ customizerMode = false }: { customizerMode
                             type="number"
                             value={priceRange[0]}
                             onChange={(e) => {
-                                const val = Math.max(10000, Math.min(priceRange[1], parseInt(e.target.value) || 0));
+                                const val = Math.max(1000, Math.min(priceRange[1], parseInt(e.target.value) || 0));
                                 setPriceRange([val, priceRange[1]]);
                                 setPage(1);
                             }}

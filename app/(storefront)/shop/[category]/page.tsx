@@ -61,7 +61,7 @@ export default async function CategoryPage(props: { params: Promise<{ category: 
                             <span className="text-[10px] md:text-[11px] tracking-[0.34em] font-medium text-[#C9A14A] uppercase mb-4 block">
                                 Collection
                             </span>
-                            <h1 className="text-zinc-900 text-4xl md:text-5xl font-heading mb-0 font-medium">
+                            <h1 className="text-zinc-900 text-[24px] md:text-[32px] font-serif mb-0 font-normal tracking-wide">
                                 {categoryDetails.name}
                             </h1>
                         </div>

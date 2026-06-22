@@ -24,7 +24,7 @@ export default function DiamondsPage() {
             <AnimatedSection className="py-12 md:py-16 bg-[#FAF8F4] border-b border-zinc-100">
                 <div className="container-custom flex flex-col items-center text-center max-w-4xl mx-auto px-4">
                     <span className="text-[9px] md:text-[10px] tracking-[0.34em] font-bold text-[#C9A14A] uppercase mb-3 block">Diamonds</span>
-                    <h1 className="mb-4 text-3xl md:text-4xl font-serif text-zinc-900 font-medium tracking-wide">
+                    <h1 className="mb-4 text-[24px] md:text-[32px] font-serif text-zinc-900 font-normal tracking-wide">
                         Find Your Perfect Diamond
                     </h1>
                     <p className="text-zinc-500 font-normal max-w-[560px] mx-auto text-sm md:text-base leading-relaxed">

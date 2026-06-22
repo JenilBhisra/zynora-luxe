@@ -23,8 +23,9 @@ function getFirstImageFromMedia(images: string | null | undefined) {
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
     const { id } = await params;
+    const decodedSlug = decodeURIComponent(id);
     const product = await prisma.product.findUnique({
-        where: { slug: id }
+        where: { slug: decodedSlug }
     });
 
     if (!product) return { title: "Product Not Found | ZYNORA LUXE" };
@@ -59,8 +60,9 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 export default async function ProductDetailPage({ params }: { params: Promise<{ id: string }> }) {
     // Treat params.id as slug according to link structure
     const { id } = await params;
+    const decodedSlug = decodeURIComponent(id);
     const product = await prisma.product.findUnique({
-        where: { slug: id },
+        where: { slug: decodedSlug },
         include: { diamond: true, category: true }
     });
 

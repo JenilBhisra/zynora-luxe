@@ -235,12 +235,13 @@ async function HomeContent({ isAdmin, assetsMap }: { isAdmin: boolean; assetsMap
                                                 <span className="absolute top-4 right-4 text-[10px] uppercase tracking-[0.24em] font-bold text-[#C9A14A] opacity-0 group-hover:opacity-100 transition-opacity duration-500">View</span>
                                                 {isAdmin && <VisualEditButton type="homepage" assetKey={cardAssetKey} />}
                                             </div>
-                                            <div className="p-5 md:p-6 bg-white">
-                                                <h3 className="text-[16px] md:text-[18px] font-medium text-[#1A1A1A] line-clamp-1 mb-2 group-hover:text-[#C9A14A] transition-colors duration-500">{product.name}</h3>
-                                                <div className="flex items-center justify-between gap-4">
-                                                    <p className="text-[14px] text-[#666666]">Rs {Number(product.price).toLocaleString("en-IN")}</p>
-                                                    <span className="text-[10px] uppercase tracking-[0.24em] text-[#C9A14A]">View</span>
+                                            <div className="p-5 md:p-6 bg-white text-center">
+                                                {/* 1. Price */}
+                                                <div className="mb-1">
+                                                    <p className="text-[18px] font-semibold tracking-tight text-zinc-900">Rs {Number(product.price).toLocaleString("en-IN")}</p>
                                                 </div>
+                                                {/* 2. Title */}
+                                                <h3 className="text-[14px] md:text-[17px] font-sans font-medium text-zinc-900 line-clamp-1 group-hover:text-[#C9A14A] transition-colors duration-500">{product.name}</h3>
                                             </div>
                                         </div>
                                     </Link>

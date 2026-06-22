@@ -138,17 +138,20 @@ export function ProductListClient({
                                         </span>
                                     </div>
                                     <div className="text-center pb-3 px-2">
-                                        <h3 className="text-xs md:text-sm font-medium text-zinc-900 mb-1 line-clamp-1 group-hover:text-[#C9A14A] transition-colors duration-500 font-serif">
-                                            {product.name}
-                                        </h3>
-                                        <p className="text-[11px] md:text-xs text-zinc-600 font-semibold">
+                                        {/* 1. Price */}
+                                        <p className="text-[18px] font-semibold tracking-tight text-zinc-900 mb-1">
                                             {showFrom && (
-                                                <span className="text-[9px] text-zinc-400 uppercase tracking-widest mr-1">
+                                                <span className="text-[13px] text-zinc-500 font-normal mr-1 normal-case tracking-normal">
                                                     From
                                                 </span>
                                             )}
                                             ₹{displayPrice.toLocaleString("en-IN")}
                                         </p>
+
+                                        {/* 2. Title */}
+                                        <h3 className="text-[14px] md:text-[17px] font-sans font-medium text-zinc-900 mb-1.5 line-clamp-1 group-hover:text-[#C9A14A] transition-colors duration-500">
+                                            {product.name}
+                                        </h3>
                                     </div>
                                 </div>
                             </Link>

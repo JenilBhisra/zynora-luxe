@@ -58,7 +58,7 @@ export default function CustomizerLayout({
             {!isDetailPage && (
                 <div className="w-full max-w-none px-4 md:px-[40px] lg:px-[70px] mt-6 md:mt-8">
                     <div className="text-center mb-6 md:mb-10 max-w-4xl mx-auto px-4 mt-6">
-                        <h1 className="text-2xl md:text-[36px] font-medium text-zinc-900 mb-4 tracking-wide font-serif leading-tight">
+                        <h1 className="text-[24px] md:text-[32px] font-normal text-zinc-900 mb-4 tracking-wide font-serif leading-tight">
                             Design Your Own Engagement Ring
                         </h1>
                         <p className="text-zinc-500 text-sm md:text-[15px] font-light max-w-3xl mx-auto leading-relaxed">

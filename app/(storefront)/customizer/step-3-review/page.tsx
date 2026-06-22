@@ -135,7 +135,7 @@ export default function Step4ReviewPage() {
 
     return (
         <div className="animate-in fade-in duration-700 max-w-3xl mx-auto mb-20 text-zinc-900">
-            <h2 className="text-[28px] font-medium text-zinc-900 mb-10 text-center block">Review Your Ring</h2>
+            <h2 className="text-[24px] md:text-[32px] font-serif text-zinc-900 mb-10 text-center block font-normal tracking-wide">Review Your Ring</h2>
 
             <div className="luxury-shell p-8 md:p-10 border border-zinc-100 rounded-[22px]">
 
@@ -144,7 +144,7 @@ export default function Step4ReviewPage() {
                     <span className="text-[10px] font-medium uppercase tracking-[0.28em] text-[#C9A14A] mb-3 block">
                         Your Masterpiece
                     </span>
-                    <h3 className="text-[24px] font-medium text-zinc-900 mb-4">
+                    <h3 className="text-[20px] md:text-[22px] font-medium leading-tight tracking-[-0.02em] text-zinc-900 mb-4">
                         {setting.name}
                     </h3>
                     <p className="text-zinc-600 mb-6 text-[14px] leading-relaxed font-normal">

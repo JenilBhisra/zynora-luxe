@@ -104,8 +104,10 @@ function ProductCard({ item, index }: { item: any; index: number }) {
                 />
             </div>
             <div className="text-center">
-                <h3 className="text-[14px] font-medium text-[#111111] mb-1 leading-tight tracking-wide">{item.name}</h3>
-                <p className="text-[13px] text-[#6B6B6B] font-light">₹{Number(item.price).toLocaleString("en-IN")}</p>
+                {/* 1. Price */}
+                <p className="text-[18px] font-semibold tracking-tight text-zinc-900 mb-1">₹{Number(item.price).toLocaleString("en-IN")}</p>
+                {/* 2. Title */}
+                <h3 className="text-[14px] md:text-[17px] font-sans font-medium text-zinc-900 mb-1 leading-tight">{item.name}</h3>
             </div>
         </Link>
     );

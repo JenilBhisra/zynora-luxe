@@ -153,24 +153,28 @@ export default function Step2SettingPage() {
                                         View Details
                                     </span>
                                 </div>
-                            </div>
-
-                            {/* Content */}
+                            </div>                            {/* Content */}
                             <div className="flex flex-col flex-grow text-center px-1">
-                                <span className="text-[8px] font-bold tracking-[0.2em] uppercase text-zinc-400 mb-1 block">
-                                    {setting.category}
+                                {/* 1. Price */}
+                                <span className="text-[18px] font-semibold tracking-tight text-zinc-900 mb-1.5 block">
+                                    {formatPrice(setting.price)}
                                 </span>
-                                <h3 className="text-xs md:text-sm font-serif font-medium text-zinc-900 mb-1 line-clamp-1 group-hover:text-[#C9A14A] transition-colors">
+
+                                {/* 2. Title */}
+                                <h3 className="text-[14px] md:text-[18px] font-sans font-medium text-zinc-900 mb-1.5 line-clamp-1 group-hover:text-[#C9A14A] transition-colors">
                                     {setting.name}
                                 </h3>
-                                <p className="hidden md:line-clamp-2 text-[11px] text-zinc-500 mb-3 font-normal leading-relaxed">
+
+                                {/* 3. Metadata */}
+                                <span className="text-[13px] text-zinc-500 font-normal mb-1 block normal-case tracking-normal">
+                                    {setting.category}
+                                </span>
+                                <p className="hidden md:line-clamp-2 text-[13px] text-zinc-500 mb-3 font-normal leading-relaxed">
                                     {setting.description}
                                 </p>
 
+                                {/* Select Button */}
                                 <div className="mt-auto pt-2 flex flex-col w-full relative z-10">
-                                    <span className="text-[12px] md:text-sm font-bold text-zinc-900 mb-2 block">
-                                        {formatPrice(setting.price)}
-                                    </span>
                                     <button
                                         onClick={(e) => {
                                             e.preventDefault();

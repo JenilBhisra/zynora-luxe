@@ -53,7 +53,7 @@ export function InteractiveCategoryGallery({ customImages = {}, isAdmin = false 
             <div className="mx-auto max-w-[1440px] px-6 md:px-12">
                 {/* Heading & Subheading */}
                 <div className="mb-12 md:mb-16 text-center md:text-left">
-                    <h2 className="text-[32px] md:text-[44px] font-serif text-[#1A1A1A] mb-4 font-semibold tracking-wide">
+                    <h2 className="text-[24px] md:text-[32px] font-serif text-[#1A1A1A] mb-4 font-normal tracking-wide">
                         Shop Jewelry by Category
                      </h2>
                     <p className="text-[#666666] text-[15px] md:text-[17px] font-light max-w-2xl">

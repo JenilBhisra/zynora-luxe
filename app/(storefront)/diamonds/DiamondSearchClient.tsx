@@ -635,25 +635,30 @@ function DiamondSearchClientContent({ customizerMode = false }: { customizerMode
                                                     />
                                                 </Link>
 
-                                                {/* Product Title & Info below image */}
-                                                <div className="w-full text-left px-1 z-10 mb-2">
+                                                {/* Price & Certification */}
+                                                <div className="flex justify-between items-baseline w-full mt-2 px-1 mb-2 z-10">
+                                                    <span className="text-[18px] font-semibold tracking-tight text-zinc-900">{formatPrice(diamond.price)}</span>
+                                                    <span className="text-[13px] text-zinc-500 font-normal">{diamond.certification}</span>
+                                                </div>
+
+                                                {/* Product Title */}
+                                                <div className="w-full text-left px-1 z-10 mb-1.5">
                                                     <Link href={`/diamonds/${diamond.id}${customizerMode ? '?mode=customizer' : ''}`}>
-                                                        <h3 className="font-sans font-medium text-zinc-800 text-[13px] md:text-[15px] mb-1.5 leading-tight hover:text-[#C9A14A] transition-colors">
+                                                        <h3 className="font-sans font-medium text-zinc-800 text-[13px] md:text-[15px] mb-0 leading-snug hover:text-[#C9A14A] transition-colors">
                                                             {diamond.caratWeight.toFixed(2)} ct. {diamond.shape} Diamond
                                                         </h3>
                                                     </Link>
-                                                    <p className="text-[12px] text-zinc-400 font-normal leading-tight">
+                                                </div>
+
+                                                {/* Metadata */}
+                                                <div className="w-full text-left px-1 z-10 mb-3">
+                                                    <p className="text-[13px] text-zinc-500 font-normal leading-tight">
                                                         {diamond.cut} · {diamond.color} · {diamond.clarity}
                                                     </p>
                                                 </div>
                                             </div>
 
                                             <div>
-                                                <div className="flex justify-between items-baseline w-full mt-2 px-1 mb-3">
-                                                    <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{diamond.certification}</span>
-                                                    <span className="text-[14px] md:text-[16px] font-bold text-zinc-900">{formatPrice(diamond.price)}</span>
-                                                </div>
-
                                                 <button
                                                     className="w-full z-10 text-xs font-semibold py-2.5 rounded-none bg-white border border-zinc-300 text-zinc-800 hover:bg-zinc-900 hover:text-white hover:border-zinc-900 transition-colors duration-300 uppercase tracking-wider"
                                                     onClick={() => {

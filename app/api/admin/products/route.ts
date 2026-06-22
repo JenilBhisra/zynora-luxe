@@ -27,7 +27,11 @@ export async function POST(req: Request) {
         const newProduct = await prisma.product.create({
             data: {
                 name: body.name,
-                slug: body.name.toLowerCase().replace(/\s+/g, '-') + '-' + Date.now().toString().slice(-4),
+                slug: body.name.toLowerCase()
+                    .replace(/[^a-z0-9\s-]/g, '')
+                    .trim()
+                    .replace(/\s+/g, '-')
+                    .replace(/-+/g, '-') + '-' + Date.now().toString().slice(-4),
                 description: body.description,
                 price: parseFloat(body.price),
                 categoryId: category.id,

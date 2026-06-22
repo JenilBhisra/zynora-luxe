@@ -43,7 +43,7 @@ export default async function ShopCategoryPage() {
                 <div className="container-custom">
                     <div className="max-w-[720px] text-center mx-auto">
                         <span className="text-[9px] md:text-[10px] tracking-[0.34em] font-medium text-[#C9A14A] uppercase mb-3 block">Collections</span>
-                        <h1 className="mb-3 text-2xl md:text-3xl text-zinc-900 font-serif font-medium">Discover the Signatures</h1>
+                        <h1 className="mb-3 text-[24px] md:text-[32px] text-zinc-900 font-serif font-normal">Discover the Signatures</h1>
                         <p className="text-zinc-500 font-normal text-[13px] md:text-[14px] leading-relaxed">
                             Explore our meticulously curated categories, featuring unparalleled craftsmanship and ethically sourced diamonds.
                         </p>

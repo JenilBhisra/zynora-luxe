@@ -1,8 +1,11 @@
 import { Metadata } from "next";
 import { AnimatedSection } from "@/components/AnimatedSection";
-import dynamic from "next/dynamic";
+import nextDynamic from "next/dynamic";
+import { PrismaClient } from "@prisma/client";
 
-const DiamondSearchClient = dynamic(() => import("./DiamondSearchClient").then(mod => mod.DiamondSearchClient), {
+export const dynamic = "force-dynamic";
+
+const DiamondSearchClient = nextDynamic(() => import("./DiamondSearchClient").then(mod => mod.DiamondSearchClient), {
     loading: () => <div className="py-24 flex items-center justify-center text-white/40 font-serif tracking-[0.2em] text-xs uppercase animate-pulse">Loading Diamond Search...</div>
 });
 
@@ -18,7 +21,23 @@ export const metadata: Metadata = {
     },
 };
 
-export default function DiamondsPage() {
+const prisma = new PrismaClient();
+
+export default async function DiamondsPage() {
+    // Fetch all shape icon assets from database
+    const shapeAssets = await prisma.siteAsset.findMany({
+        where: {
+            key: {
+                startsWith: "diamond-shape-icon"
+            }
+        }
+    });
+
+    const shapeImages = shapeAssets.reduce((acc: Record<string, string>, asset) => {
+        acc[asset.key] = asset.url;
+        return acc;
+    }, {});
+
     return (
         <main className="min-h-screen pb-32 bg-white text-zinc-900">
             <AnimatedSection className="py-12 md:py-16 bg-[#FAF8F4] border-b border-zinc-100">
@@ -33,7 +52,7 @@ export default function DiamondsPage() {
                 </div>
             </AnimatedSection>
             <div className="max-w-7xl mx-auto px-4 md:px-8 mt-8">
-                <DiamondSearchClient />
+                <DiamondSearchClient shapeImages={shapeImages} />
             </div>
         </main>
     );

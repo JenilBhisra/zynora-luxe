@@ -24,7 +24,7 @@ const formatPrice = (value: number) => {
     }).format(value);
 };
 
-export function DiamondSearchClient(props: { customizerMode?: boolean }) {
+export function DiamondSearchClient(props: { customizerMode?: boolean, shapeImages?: Record<string, string> }) {
     return (
         <Suspense fallback={<div className="py-24 flex items-center justify-center text-zinc-400 font-serif tracking-[0.2em] text-xs uppercase animate-pulse">Loading Diamond Search...</div>}>
             <DiamondSearchClientContent {...props} />
@@ -32,7 +32,7 @@ export function DiamondSearchClient(props: { customizerMode?: boolean }) {
     );
 }
 
-function DiamondSearchClientContent({ customizerMode = false }: { customizerMode?: boolean }) {
+function DiamondSearchClientContent({ customizerMode = false, shapeImages = {} }: { customizerMode?: boolean, shapeImages?: Record<string, string> }) {
     const router = useRouter();
     const searchParams = useSearchParams();
     const pathname = usePathname();
@@ -317,8 +317,8 @@ function DiamondSearchClientContent({ customizerMode = false }: { customizerMode
                                         ? "border-2 border-zinc-900 shadow-sm"
                                         : "border border-zinc-200 group-hover:border-zinc-400"
                                 }`}>
-                                    {shape.thumbnailImageUrl || shape.imageUrl ? (
-                                        <img src={shape.thumbnailImageUrl || shape.imageUrl} alt={shape.name} className="w-8 h-8 object-contain rounded-full" />
+                                    {shape.thumbnailImageUrl || shape.imageUrl || shapeImages[`diamond-shape-icon-${shape.slug}`] ? (
+                                        <img src={shape.thumbnailImageUrl || shape.imageUrl || shapeImages[`diamond-shape-icon-${shape.slug}`]} alt={shape.name} className="w-8 h-8 object-contain rounded-full" />
                                     ) : (
                                         <div className="text-zinc-600">
                                             {shape.name === "Round" && <RoundIcon />}

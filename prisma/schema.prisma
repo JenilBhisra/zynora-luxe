@@ -36,6 +36,7 @@ model Category {
 
 model Product {
   id          String   @id @default(cuid())
+  sku         String?  @unique
   name        String
   slug        String   @unique
   description String
@@ -66,6 +67,7 @@ model Product {
 
 model Diamond {
   id            String   @id @default(cuid())
+  sku           String?  @unique
   shape         String   // Round, Oval, Princess, Emerald
   caratWeight   Float
   cut           String   // Excellent, Very Good, Good
@@ -129,6 +131,9 @@ model OrderItem {
   ringConfiguration   RingConfiguration? @relation(fields: [ringConfigurationId], references: [id])
   quantity            Int         @default(1)
   price               Float
+  sku                 String?     // Snapshot for standard product
+  settingSku          String?     // Snapshot for custom setting
+  diamondSku          String?     // Snapshot for custom diamond
 }
 
 model Review {
@@ -145,6 +150,7 @@ model Review {
 
 model Setting {
   id          String   @id @default(cuid())
+  sku         String?  @unique
   name        String
   description String
   price       Float

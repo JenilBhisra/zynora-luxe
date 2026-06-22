@@ -27,6 +27,7 @@ export function DiamondTable({ initialDiamonds }: { initialDiamonds: any[] }) {
     const [modelName, setModelName] = useState<string>("");
     const [isUploading, setIsUploading] = useState(false);
     const [formData, setFormData] = useState({
+        sku: "",
         shape: "Round",
         caratWeight: "1.0",
         cut: "Excellent",
@@ -48,7 +49,8 @@ export function DiamondTable({ initialDiamonds }: { initialDiamonds: any[] }) {
             d.id.toLowerCase().includes(q) ||
             d.color.toLowerCase().includes(q) ||
             d.clarity.toLowerCase().includes(q) ||
-            d.certification.toLowerCase().includes(q)
+            d.certification.toLowerCase().includes(q) ||
+            (d.sku && d.sku.toLowerCase().includes(q))
         );
     }, [diamonds, searchQuery]);
 
@@ -70,6 +72,7 @@ export function DiamondTable({ initialDiamonds }: { initialDiamonds: any[] }) {
         setModelFile(null);
         setModelName("");
         setFormData({
+            sku: "",
             shape: "Round", caratWeight: "1.0", cut: "Excellent", clarity: "VS1", color: "G", certification: "GIA", price: "150000", stockCount: "1", imageUrl: "", modelUrl: ""
         });
         setIsAddEditModalOpen(true);
@@ -82,6 +85,7 @@ export function DiamondTable({ initialDiamonds }: { initialDiamonds: any[] }) {
         setModelFile(null);
         setModelName(diamond.modelUrl ? diamond.modelUrl.split('/').pop() : "");
         setFormData({
+            sku: diamond.sku || "",
             shape: diamond.shape,
             caratWeight: diamond.caratWeight.toString(),
             cut: diamond.cut,
@@ -319,6 +323,7 @@ export function DiamondTable({ initialDiamonds }: { initialDiamonds: any[] }) {
                     <thead>
                         <tr className="bg-gray-50 border-b border-gray-200 text-[10px] uppercase tracking-widest text-gray-400">
                             <th className="p-5 font-bold">Image</th>
+                            <th className="p-5 font-bold">SKU</th>
                             <th className="p-5 font-bold">Specs</th>
                             <th className="p-5 font-bold">Grading</th>
                             <th className="p-5 font-bold">Price</th>
@@ -328,7 +333,7 @@ export function DiamondTable({ initialDiamonds }: { initialDiamonds: any[] }) {
                     </thead>
                     <tbody className="divide-y divide-gray-100">
                         {currentDiamonds.length === 0 ? (
-                            <tr><td colSpan={6} className="p-10 text-center text-gray-400 text-xs uppercase tracking-widest font-bold">No diamonds match your search criteria.</td></tr>
+                            <tr><td colSpan={7} className="p-10 text-center text-gray-400 text-xs uppercase tracking-widest font-bold">No diamonds match your search criteria.</td></tr>
                         ) : currentDiamonds.map((diamond) => (
                             <tr key={diamond.id} className="hover:bg-gray-100/50 transition-colors">
                                 <td className="p-5">
@@ -339,6 +344,9 @@ export function DiamondTable({ initialDiamonds }: { initialDiamonds: any[] }) {
                                             <span className="text-gray-300 text-[10px] uppercase font-bold tracking-widest">No Img</span>
                                         )}
                                     </div>
+                                </td>
+                                <td className="p-5 font-mono text-xs text-gray-700 font-bold uppercase">
+                                    {diamond.sku || "SKU: Not assigned"}
                                 </td>
                                 <td className="p-5">
                                     <p className="font-bold text-[#111111] tracking-wide">{parseFloat(diamond.caratWeight).toFixed(2)}ct {diamond.shape}</p>
@@ -437,6 +445,18 @@ export function DiamondTable({ initialDiamonds }: { initialDiamonds: any[] }) {
 
                         <form onSubmit={handleSubmit} className="p-8">
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
+                                <div>
+                                    <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-600 mb-2">SKU</label>
+                                    <input 
+                                        placeholder="e.g. ZL-DIA-001" 
+                                        className="w-full bg-gray-50 border border-gray-200 rounded-none p-3 text-sm text-[#111111] outline-none focus:border-[#111111]" 
+                                        value={formData.sku || ""} 
+                                        onChange={e => {
+                                            const val = e.target.value.toUpperCase().replace(/[^A-Z0-9-]/g, "");
+                                            setFormData({ ...formData, sku: val });
+                                        }} 
+                                    />
+                                </div>
                                 <div>
                                     <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-600 mb-2">Shape</label>
                                     <select className="w-full bg-gray-50 border border-gray-200 rounded-none p-3 text-sm text-[#111111] outline-none focus:border-[#111111]" value={formData.shape} onChange={e => setFormData({ ...formData, shape: e.target.value })}>

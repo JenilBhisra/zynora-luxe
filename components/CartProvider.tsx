@@ -12,6 +12,7 @@ type CartItem = {
     isCustomRing?: boolean;
     ringConfigurationId?: string;
     metalType?: string;
+    sku?: string | null;
 };
 
 type CartContextType = {

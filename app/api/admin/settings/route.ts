@@ -5,6 +5,16 @@ import { getServerSession } from "@/lib/auth";
 
 const prisma = new PrismaClient();
 
+function cleanAndValidateSku(skuInput: any) {
+    if (skuInput === undefined || skuInput === null) return { sku: undefined };
+    const cleaned = String(skuInput).trim().toUpperCase();
+    if (cleaned === "") return { sku: null };
+    if (!/^[A-Z0-9-]+$/.test(cleaned)) {
+        return { error: "SKU must contain only letters, numbers, and hyphens" };
+    }
+    return { sku: cleaned };
+}
+
 function normalizeSettingModelUrl(input?: string): string {
     if (!input) return "";
     const value = input.trim().replace(/\\/g, "/");
@@ -37,8 +47,28 @@ export async function POST(req: Request) {
 
         const body = await req.json();
 
+        // SKU validation
+        let sku: string | null | undefined = undefined;
+        if (body.sku !== undefined) {
+            const skuRes = cleanAndValidateSku(body.sku);
+            if (skuRes.error) {
+                return NextResponse.json({ error: skuRes.error }, { status: 400 });
+            }
+            sku = skuRes.sku;
+
+            if (sku) {
+                const existingSetting = await prisma.setting.findUnique({
+                    where: { sku }
+                });
+                if (existingSetting) {
+                    return NextResponse.json({ error: `SKU "${sku}" is already in use by another setting.` }, { status: 400 });
+                }
+            }
+        }
+
         const setting = await prisma.setting.create({
             data: {
+                sku: sku,
                 name: body.name,
                 description: body.description,
                 category: body.category,

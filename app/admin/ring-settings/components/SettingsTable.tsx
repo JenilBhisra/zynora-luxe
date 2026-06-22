@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { toast } from "sonner";
 import { compressImage } from "@/lib/image-compression";
 import Image from "next/image";
-import { Edit2, Trash2, X } from "lucide-react";
+import { Edit2, Trash2, X, Search } from "lucide-react";
 
 export function SettingsTable({ initialSettings }: { initialSettings: any[] }) {
     const [settings, setSettings] = useState(initialSettings);
@@ -26,7 +26,10 @@ export function SettingsTable({ initialSettings }: { initialSettings: any[] }) {
     const DIAMOND_SHAPES = ["Round", "Oval", "Emerald", "Cushion", "Elongated Cushion", "Pear", "Radiant", "Princess", "Marquise", "Asscher", "Heart"];
     const [supportedShapes, setSupportedShapes] = useState<string[]>([]);
 
+    const [searchQuery, setSearchQuery] = useState("");
+
     const [formData, setFormData] = useState({
+        sku: "",
         name: "",
         description: "",
         price: "",
@@ -41,6 +44,16 @@ export function SettingsTable({ initialSettings }: { initialSettings: any[] }) {
         silverPrice: "",
         platinumPrice: ""
     });
+
+    const filteredSettings = useMemo(() => {
+        if (!searchQuery) return settings;
+        const q = searchQuery.toLowerCase();
+        return settings.filter(s =>
+            s.name.toLowerCase().includes(q) ||
+            s.category.toLowerCase().includes(q) ||
+            (s.sku && s.sku.toLowerCase().includes(q))
+        );
+    }, [settings, searchQuery]);
 
     const [karatPrices, setKaratPrices] = useState({ "10K": "", "14K": "", "18K": "", "22K": "" });
 
@@ -63,6 +76,7 @@ export function SettingsTable({ initialSettings }: { initialSettings: any[] }) {
         setModelFile(null);
         setModelName("");
         setFormData({
+            sku: "",
             name: "",
             description: "",
             price: "",
@@ -104,6 +118,7 @@ export function SettingsTable({ initialSettings }: { initialSettings: any[] }) {
             : ["Gold"];
 
         setFormData({
+            sku: setting.sku || "",
             name: setting.name,
             description: setting.description,
             price: setting.price.toString(),
@@ -434,6 +449,7 @@ export function SettingsTable({ initialSettings }: { initialSettings: any[] }) {
             const method = isEditing ? "PATCH" : "POST";
 
             const payload = {
+                sku: formData.sku || null,
                 name: formData.name,
                 description: formData.description,
                 imageUrl: primaryImageUrl,
@@ -481,7 +497,19 @@ export function SettingsTable({ initialSettings }: { initialSettings: any[] }) {
 
     return (
         <div className="space-y-6">
-            <div className="flex justify-end">
+            <div className="flex flex-col sm:flex-row justify-between gap-4">
+                <div className="relative max-w-sm w-full">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <Search size={18} className="text-gray-400" />
+                    </div>
+                    <input
+                        type="text"
+                        placeholder="Search SKU, name, category..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="pl-11 pr-4 py-3 w-full bg-white text-[#111111] border border-gray-200 rounded-none text-[0.95rem] focus:ring-2 focus:ring-gray-200 focus:border-[#111111] outline-none transition-all placeholder-soft-cream/30 shadow-sm"
+                    />
+                </div>
                 <button onClick={openCreateModal} className="bg-[#111111] text-white border border-transparent px-6 py-3 rounded-none font-bold uppercase tracking-widest text-xs transition-all shadow-md hover:shadow-lg hover:-translate-y-1 hover:bg-[#C9A14A] hover:text-white">
                     + Add Setting
                 </button>
@@ -502,6 +530,17 @@ export function SettingsTable({ initialSettings }: { initialSettings: any[] }) {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                                 <div><label className="block text-[10px] font-bold uppercase tracking-widest text-gray-600 mb-2">Name</label>
                                     <input required className="w-full bg-gray-50 border border-gray-200 rounded-none p-3 text-sm text-[#111111] outline-none focus:border-[#111111] transition-colors" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} />
+                                </div>
+                                <div><label className="block text-[10px] font-bold uppercase tracking-widest text-gray-600 mb-2">SKU</label>
+                                    <input 
+                                        placeholder="e.g. ZL-SET-001" 
+                                        className="w-full bg-gray-50 border border-gray-200 rounded-none p-3 text-sm text-[#111111] outline-none focus:border-[#111111] transition-colors" 
+                                        value={formData.sku || ""} 
+                                        onChange={e => {
+                                            const val = e.target.value.toUpperCase().replace(/[^A-Z0-9-]/g, "");
+                                            setFormData({ ...formData, sku: val });
+                                        }} 
+                                    />
                                 </div>
                                 <div className="md:col-span-2">
                                     <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-600 mb-2">Available Metals</label>
@@ -806,7 +845,9 @@ export function SettingsTable({ initialSettings }: { initialSettings: any[] }) {
             )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {settings.map((setting) => (
+                {filteredSettings.length === 0 ? (
+                    <div className="md:col-span-2 lg:col-span-3 text-center py-12 text-gray-400 font-bold uppercase tracking-widest text-xs bg-white border border-gray-100 shadow-sm">No settings found.</div>
+                ) : filteredSettings.map((setting) => (
                     <div key={setting.id} className="bg-white  border border-gray-100 shadow-sm rounded-none p-5 flex gap-5 group hover:border-gray-300 transition-all duration-300">
                         <div className="w-24 h-24 bg-gray-50 rounded-none relative overflow-hidden flex-shrink-0 shadow-none border border-gray-200 group-hover:border-gray-300 transition-colors">
                             {setting.imageUrl ? (
@@ -818,7 +859,12 @@ export function SettingsTable({ initialSettings }: { initialSettings: any[] }) {
                         <div className="flex-1 min-w-0 flex flex-col justify-between">
                             <div>
                                 <h4 className="font-heading font-medium tracking-wide !text-[#111111] truncate text-lg">{setting.name}</h4>
-                                <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500 mt-1">{setting.category}</p>
+                                <div className="flex justify-between items-center mt-1">
+                                    <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500">{setting.category}</p>
+                                    <p className="text-[10px] font-mono font-bold uppercase text-gray-700 tracking-wider bg-gray-50 border border-gray-200 px-2 py-0.5 rounded-md" title={setting.sku || "SKU: Not assigned"}>
+                                        {setting.sku || "SKU: Not assigned"}
+                                    </p>
+                                </div>
                             </div>
                             <div className="flex justify-between items-end mt-4">
                                 <span className="text-[1rem] font-bold font-body text-[#111111] tracking-wide">₹{(setting.price || 0).toLocaleString("en-IN")}</span>

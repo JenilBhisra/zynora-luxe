@@ -257,7 +257,8 @@ export default function ProductClient({ product }: { product: any }) {
             price: displayPrice,
             quantity: 1,
             image: activeImage,
-            metalType: finalMetalType
+            metalType: finalMetalType,
+            sku: product.sku || null
         });
     };
 
@@ -268,7 +269,8 @@ export default function ProductClient({ product }: { product: any }) {
             price: displayPrice,
             quantity: 1,
             image: activeImage,
-            metalType: finalMetalType
+            metalType: finalMetalType,
+            sku: product.sku || null
         };
 
         if (!user) {

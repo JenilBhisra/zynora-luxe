@@ -6,6 +6,16 @@ import { getServerSession } from "@/lib/auth";
 
 const prisma = new PrismaClient();
 
+function cleanAndValidateSku(skuInput: any) {
+    if (skuInput === undefined || skuInput === null) return { sku: undefined };
+    const cleaned = String(skuInput).trim().toUpperCase();
+    if (cleaned === "") return { sku: null };
+    if (!/^[A-Z0-9-]+$/.test(cleaned)) {
+        return { error: "SKU must contain only letters, numbers, and hyphens" };
+    }
+    return { sku: cleaned };
+}
+
 function normalizeSettingModelUrl(input?: string): string {
     if (!input) return "";
     const value = input.trim().replace(/\\/g, "/");
@@ -31,6 +41,29 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
         const existing = await prisma.setting.findUnique({ where: { id } });
 
         const updateData: any = {};
+
+        // SKU validation
+        if (body.sku !== undefined) {
+            const skuRes = cleanAndValidateSku(body.sku);
+            if (skuRes.error) {
+                return NextResponse.json({ error: skuRes.error }, { status: 400 });
+            }
+            const sku = skuRes.sku;
+
+            if (sku) {
+                const existingSetting = await prisma.setting.findFirst({
+                    where: {
+                        sku,
+                        id: { not: id }
+                    }
+                });
+                if (existingSetting) {
+                    return NextResponse.json({ error: `SKU "${sku}" is already in use by another setting.` }, { status: 400 });
+                }
+            }
+            updateData.sku = sku;
+        }
+
         if (body.name) updateData.name = body.name;
         if (body.description) updateData.description = body.description;
         if (body.category) updateData.category = body.category;

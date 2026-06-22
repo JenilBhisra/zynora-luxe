@@ -1,15 +1,36 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { format } from "date-fns";
 import { toast } from "sonner";
-import { X, Eye, FileText, Package, Truck, CheckCircle, Clock } from "lucide-react";
+import { X, Eye, FileText, Package, Truck, CheckCircle, Clock, Search } from "lucide-react";
 
 export function OrderTable({ initialOrders }: { initialOrders: any[] }) {
     const [orders, setOrders] = useState(initialOrders);
     const [updatingId, setUpdatingId] = useState<string | null>(null);
     const [selectedOrder, setSelectedOrder] = useState<any | null>(null);
+    const [searchQuery, setSearchQuery] = useState("");
+
+    const filteredOrders = useMemo(() => {
+        if (!searchQuery) return orders;
+        const q = searchQuery.toLowerCase();
+        return orders.filter(order => {
+            const matchesBase = 
+                (order.displayOrderId && order.displayOrderId.toLowerCase().includes(q)) ||
+                (order.id && order.id.toLowerCase().includes(q)) ||
+                (order.user?.name && order.user.name.toLowerCase().includes(q)) ||
+                (order.user?.email && order.user.email.toLowerCase().includes(q));
+            
+            const matchesItems = order.items && order.items.some((item: any) => 
+                (item.sku && item.sku.toLowerCase().includes(q)) ||
+                (item.settingSku && item.settingSku.toLowerCase().includes(q)) ||
+                (item.diamondSku && item.diamondSku.toLowerCase().includes(q))
+            );
+            
+            return matchesBase || matchesItems;
+        });
+    }, [orders, searchQuery]);
 
     const updateStatus = async (orderId: string, newStatus: string) => {
         setUpdatingId(orderId);
@@ -62,6 +83,21 @@ export function OrderTable({ initialOrders }: { initialOrders: any[] }) {
 
     return (
         <div className="space-y-6">
+            <div className="flex flex-col sm:flex-row justify-between gap-4">
+                <div className="relative max-w-sm w-full">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <Search size={18} className="text-gray-400" />
+                    </div>
+                    <input
+                        type="text"
+                        placeholder="Search SKU, Order ID, customer..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="pl-11 pr-4 py-3 w-full bg-white text-[#111111] border border-gray-200 rounded-none text-[0.95rem] focus:ring-2 focus:ring-gray-200 focus:border-[#111111] outline-none transition-all placeholder-soft-cream/30 shadow-sm"
+                    />
+                </div>
+            </div>
+
             <div className="w-full overflow-x-auto bg-white  border border-gray-100 shadow-sm rounded-none pb-4">
                 <table className="w-full text-left border-collapse whitespace-nowrap">
                     <thead>
@@ -76,9 +112,9 @@ export function OrderTable({ initialOrders }: { initialOrders: any[] }) {
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
-                        {orders.length === 0 ? (
+                        {filteredOrders.length === 0 ? (
                             <tr><td colSpan={7} className="p-10 text-center text-gray-400 text-xs uppercase tracking-widest font-bold">No orders found.</td></tr>
-                        ) : orders.map((order) => (
+                        ) : filteredOrders.map((order) => (
                             <tr key={order.id} className="hover:bg-gray-100 transition-colors">
                                 <td className="p-5 font-mono text-xs text-gray-500 tracking-wider">{order.displayOrderId || order.id.slice(-8).toUpperCase()}</td>
                                 <td className="p-5">
@@ -245,6 +281,20 @@ export function OrderTable({ initialOrders }: { initialOrders: any[] }) {
                                                     <p className="text-[0.95rem] font-bold text-[#111111] tracking-wide truncate">
                                                         {item.product?.name || item.ringConfiguration?.setting?.name || "Custom Ring"}
                                                     </p>
+                                                    {item.ringConfigurationId ? (
+                                                        <div className="mt-2 space-y-1">
+                                                            <p className="text-[11px] text-gray-600 font-mono">
+                                                                <span className="font-bold">Setting SKU:</span> {item.settingSku || "Not assigned"}
+                                                            </p>
+                                                            <p className="text-[11px] text-gray-600 font-mono">
+                                                                <span className="font-bold">Diamond SKU:</span> {item.diamondSku || "Not assigned"}
+                                                            </p>
+                                                        </div>
+                                                    ) : (
+                                                        <p className="text-[11px] text-gray-600 font-mono mt-1.5">
+                                                            <span className="font-bold">SKU:</span> {item.sku || "Not assigned"}
+                                                        </p>
+                                                    )}
                                                     <p className="text-[10px] uppercase font-bold tracking-widest text-gray-400 mt-1.5">Qty: {item.quantity}</p>
                                                     <p className="text-sm font-bold font-body text-[#111111] mt-1.5">₹{item.price.toLocaleString("en-IN")}</p>
                                                 </div>

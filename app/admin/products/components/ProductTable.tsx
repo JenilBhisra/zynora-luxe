@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import { useRef, useState } from "react";
+import { useRef, useState, useMemo } from "react";
 import { toast } from "sonner";
 import { compressImage } from "@/lib/image-compression";
 import Image from "next/image";
-import { Play, X } from "lucide-react";
+import { Play, X, Search } from "lucide-react";
 
 type PendingMedia = {
     file: File;
@@ -17,12 +17,14 @@ const VIDEO_EXT_REGEX = /\.(mp4|webm|mov)(\?|#|$)/i;
 export function ProductTable({ initialProducts, categories }: { initialProducts: any[], categories: any[] }) {
     const [products, setProducts] = useState(initialProducts);
     const [isAdding, setIsAdding] = useState(false);
+    const [searchQuery, setSearchQuery] = useState("");
 
     const [pendingMedia, setPendingMedia] = useState<PendingMedia[]>([]);
     const [isUploading, setIsUploading] = useState(false);
     const imageInputRef = useRef<HTMLInputElement | null>(null);
 
     const [formData, setFormData] = useState({
+        sku: "",
         name: "",
         description: "",
         categoryId: categories[0]?.name || "Rings",
@@ -41,6 +43,17 @@ export function ProductTable({ initialProducts, categories }: { initialProducts:
 
     const [editingProduct, setEditingProduct] = useState<any | null>(null);
     const [editFormData, setEditFormData] = useState<any | null>(null);
+
+    const filteredProducts = useMemo(() => {
+        if (!searchQuery) return products;
+        const q = searchQuery.toLowerCase();
+        return products.filter(p =>
+            p.name.toLowerCase().includes(q) ||
+            p.metalType.toLowerCase().includes(q) ||
+            (p.category?.name && p.category.name.toLowerCase().includes(q)) ||
+            (p.sku && p.sku.toLowerCase().includes(q))
+        );
+    }, [products, searchQuery]);
 
     const handleDelete = async (id: string) => {
         if (!confirm("Delete product permanently?")) return;
@@ -158,6 +171,7 @@ export function ProductTable({ initialProducts, categories }: { initialProducts:
             const basePrice = goldBase ?? silverVal ?? platVal ?? 0;
 
             const payload = {
+                sku: formData.sku || null,
                 name: formData.name,
                 description: formData.description,
                 price: basePrice,
@@ -187,6 +201,7 @@ export function ProductTable({ initialProducts, categories }: { initialProducts:
                 setProducts([data.product, ...products]);
                 setIsAdding(false);
                 setFormData({
+                    sku: "",
                     name: "", description: "", categoryId: categories[0]?.name || "Rings", metalType: "Gold", stockCount: "1",
                     tags: "", extraKeywords: "", seoTitle: "", seoDescription: "",
                     availableMetals: ["Gold"], goldPrice: "", silverPrice: "", platinumPrice: "",
@@ -221,6 +236,7 @@ export function ProductTable({ initialProducts, categories }: { initialProducts:
         } catch {}
 
         setEditFormData({
+            sku: product.sku || "",
             name: product.name,
             description: product.description,
             categoryId: product.category?.name || categories[0]?.name || "Rings",
@@ -259,6 +275,7 @@ export function ProductTable({ initialProducts, categories }: { initialProducts:
             const basePrice = goldBase ?? silverVal ?? platVal ?? 0;
 
             const payload = {
+                sku: editFormData.sku || null,
                 name: editFormData.name,
                 description: editFormData.description,
                 price: basePrice,
@@ -308,23 +325,37 @@ export function ProductTable({ initialProducts, categories }: { initialProducts:
 
     return (
         <div className="space-y-6">
-            <div className="flex justify-end gap-3">
-                {editingProduct && (
+            <div className="flex flex-col sm:flex-row justify-between gap-4">
+                <div className="relative max-w-sm w-full">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                        <Search size={18} className="text-gray-400" />
+                    </div>
+                    <input
+                        type="text"
+                        placeholder="Search SKU, name, metal, category..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="pl-11 pr-4 py-3 w-full bg-white text-[#111111] border border-gray-200 rounded-none text-[0.95rem] focus:ring-2 focus:ring-gray-200 focus:border-[#111111] outline-none transition-all placeholder-soft-cream/30 shadow-sm"
+                    />
+                </div>
+                <div className="flex gap-3">
+                    {editingProduct && (
+                        <button onClick={() => {
+                            setEditingProduct(null);
+                            setEditFormData(null);
+                        }} className="bg-gray-100 text-gray-700 border border-gray-200 px-6 py-3 rounded-none font-bold text-xs uppercase tracking-widest transition-all hover:bg-gray-200">
+                            Cancel Edit
+                        </button>
+                    )}
                     <button onClick={() => {
+                        setIsAdding(!isAdding);
                         setEditingProduct(null);
                         setEditFormData(null);
-                    }} className="bg-gray-100 text-gray-700 border border-gray-200 px-6 py-3 rounded-none font-bold text-xs uppercase tracking-widest transition-all hover:bg-gray-200">
-                        Cancel Edit
+                        clearPendingMedia();
+                    }} className="bg-[#111111] text-white border border-transparent px-6 py-3 rounded-none font-bold text-xs uppercase tracking-widest transition-all shadow-md hover:shadow-lg hover:-translate-y-1 hover:bg-[#C9A14A] hover:text-white">
+                        {isAdding ? "Cancel" : "+ Add Product"}
                     </button>
-                )}
-                <button onClick={() => {
-                    setIsAdding(!isAdding);
-                    setEditingProduct(null);
-                    setEditFormData(null);
-                    clearPendingMedia();
-                }} className="bg-[#111111] text-white border border-transparent px-6 py-3 rounded-none font-bold text-xs uppercase tracking-widest transition-all shadow-md hover:shadow-lg hover:-translate-y-1 hover:bg-[#C9A14A] hover:text-white">
-                    {isAdding ? "Cancel" : "+ Add Product"}
-                </button>
+                </div>
             </div>
 
             {isAdding && (
@@ -333,6 +364,17 @@ export function ProductTable({ initialProducts, categories }: { initialProducts:
 
                     <div className="md:col-span-2"><label className="block text-xs font-bold uppercase tracking-widest text-gray-600 mb-2">Product Name</label>
                         <input required className="w-full bg-gray-50 border rounded-none p-3 text-sm text-[#111111] outline-none focus:border-[#111111] border-gray-200 transition-colors" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} />
+                    </div>
+                    <div><label className="block text-xs font-bold uppercase tracking-widest text-gray-600 mb-2">SKU</label>
+                        <input 
+                            placeholder="e.g. ZL-RNG-OVL-001" 
+                            className="w-full bg-gray-50 border rounded-none p-3 text-sm text-[#111111] outline-none focus:border-[#111111] border-gray-200 transition-colors" 
+                            value={formData.sku || ""} 
+                            onChange={e => {
+                                const val = e.target.value.toUpperCase().replace(/[^A-Z0-9-]/g, "");
+                                setFormData({ ...formData, sku: val });
+                            }} 
+                        />
                     </div>
                     <div><label className="block text-xs font-bold uppercase tracking-widest text-gray-600 mb-2">Category</label>
                         <select 
@@ -584,6 +626,17 @@ export function ProductTable({ initialProducts, categories }: { initialProducts:
                     <div className="md:col-span-2"><label className="block text-xs font-bold uppercase tracking-widest text-gray-600 mb-2">Product Name</label>
                         <input required className="w-full bg-gray-50 border rounded-none p-3 text-sm text-[#111111] outline-none focus:border-[#111111] border-gray-200 transition-colors" value={editFormData.name} onChange={e => setEditFormData({ ...editFormData, name: e.target.value })} />
                     </div>
+                    <div><label className="block text-xs font-bold uppercase tracking-widest text-gray-600 mb-2">SKU</label>
+                        <input 
+                            placeholder="e.g. ZL-RNG-OVL-001" 
+                            className="w-full bg-gray-50 border rounded-none p-3 text-sm text-[#111111] outline-none focus:border-[#111111] border-gray-200 transition-colors" 
+                            value={editFormData.sku || ""} 
+                            onChange={e => {
+                                const val = e.target.value.toUpperCase().replace(/[^A-Z0-9-]/g, "");
+                                setEditFormData({ ...editFormData, sku: val });
+                            }} 
+                        />
+                    </div>
                     <div><label className="block text-xs font-bold uppercase tracking-widest text-gray-600 mb-2">Category</label>
                         <select 
                             required 
@@ -757,6 +810,7 @@ export function ProductTable({ initialProducts, categories }: { initialProducts:
                     <thead>
                         <tr className="bg-gray-50 border-b border-gray-200 text-[10px] uppercase tracking-widest text-gray-400">
                             <th className="p-5 font-bold">Product</th>
+                            <th className="p-5 font-bold">SKU</th>
                             <th className="p-5 font-bold">Category</th>
                             <th className="p-5 font-bold">Price</th>
                             <th className="p-5 font-bold">Stock</th>
@@ -764,9 +818,9 @@ export function ProductTable({ initialProducts, categories }: { initialProducts:
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100 text-[0.95rem]">
-                        {products.length === 0 ? (
-                            <tr><td colSpan={5} className="p-10 text-center text-gray-400 text-xs uppercase tracking-widest font-bold">No products found.</td></tr>
-                        ) : products.map((product) => {
+                        {filteredProducts.length === 0 ? (
+                            <tr><td colSpan={6} className="p-10 text-center text-gray-400 text-xs uppercase tracking-widest font-bold">No products found.</td></tr>
+                        ) : filteredProducts.map((product) => {
                             let parsedImages = [];
                             try {
                                 parsedImages = JSON.parse(product.images);
@@ -792,6 +846,9 @@ export function ProductTable({ initialProducts, categories }: { initialProducts:
                                                 <p className="text-[11px] text-gray-500 uppercase tracking-widest mt-1">{product.metalType}</p>
                                             </div>
                                         </div>
+                                    </td>
+                                    <td className="p-5 font-mono text-xs text-gray-700 font-bold uppercase">
+                                        {product.sku || "SKU: Not assigned"}
                                     </td>
                                     <td className="p-5">
                                         <span className="text-xs font-bold uppercase tracking-widest bg-gray-50 border border-gray-200 px-3 py-1.5 rounded-md text-gray-700">{product.category.name}</span>

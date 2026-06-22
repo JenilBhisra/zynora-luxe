@@ -219,6 +219,7 @@ export async function POST(req: Request) {
       // Query checked RingConfiguration from database (ignoring client-passed price)
       const config = await prisma.ringConfiguration.findUnique({
         where: { id: ringConfigurationId },
+        include: { setting: true, diamond: true }
       });
 
       if (!config) {
@@ -233,6 +234,8 @@ export async function POST(req: Request) {
         ringConfigurationId: validConfigId,
         quantity: 1,
         price: finalPrice,
+        settingSku: config.setting?.sku || null,
+        diamondSku: config.diamond?.sku || null
       });
     } else {
       // CART items order
@@ -244,6 +247,9 @@ export async function POST(req: Request) {
         let productId = null;
         let ringConfigurationId = null;
         let itemPrice = 0;
+        let snapshotSku: string | null = null;
+        let snapshotSettingSku: string | null = null;
+        let snapshotDiamondSku: string | null = null;
 
         if (item.isCustomRing) {
           if (!item.ringConfigurationId) {
@@ -253,6 +259,7 @@ export async function POST(req: Request) {
           // Query custom ring price from verified DB record
           const config = await prisma.ringConfiguration.findUnique({
             where: { id: item.ringConfigurationId },
+            include: { setting: true, diamond: true }
           });
 
           if (!config) {
@@ -261,6 +268,8 @@ export async function POST(req: Request) {
 
           ringConfigurationId = item.ringConfigurationId;
           itemPrice = config.totalPrice;
+          snapshotSettingSku = config.setting?.sku || null;
+          snapshotDiamondSku = config.diamond?.sku || null;
         } else {
           if (!item.id) {
             return NextResponse.json({ error: "Missing product reference in cart item." }, { status: 400 });
@@ -277,6 +286,7 @@ export async function POST(req: Request) {
 
           productId = item.id;
           itemPrice = product.price;
+          snapshotSku = product.sku || null;
         }
 
         const quantity = item.quantity || 1;
@@ -287,6 +297,9 @@ export async function POST(req: Request) {
           ringConfigurationId,
           quantity,
           price: itemPrice,
+          sku: snapshotSku,
+          settingSku: snapshotSettingSku,
+          diamondSku: snapshotDiamondSku
         });
       }
     }

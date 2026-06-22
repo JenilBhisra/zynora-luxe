@@ -5,6 +5,16 @@ import { getServerSession } from "@/lib/auth";
 
 const prisma = new PrismaClient();
 
+function cleanAndValidateSku(skuInput: any) {
+    if (skuInput === undefined || skuInput === null) return { sku: undefined };
+    const cleaned = String(skuInput).trim().toUpperCase();
+    if (cleaned === "") return { sku: null };
+    if (!/^[A-Z0-9-]+$/.test(cleaned)) {
+        return { error: "SKU must contain only letters, numbers, and hyphens" };
+    }
+    return { sku: cleaned };
+}
+
 function generateKeywords(name: string, categoryName: string, metalType: string) {
     const keywords = new Set<string>();
     
@@ -85,6 +95,25 @@ export async function POST(req: Request) {
 
         const body = await req.json();
 
+        // SKU validation
+        let sku: string | null | undefined = undefined;
+        if (body.sku !== undefined) {
+            const skuRes = cleanAndValidateSku(body.sku);
+            if (skuRes.error) {
+                return NextResponse.json({ error: skuRes.error }, { status: 400 });
+            }
+            sku = skuRes.sku;
+
+            if (sku) {
+                const existingProduct = await prisma.product.findUnique({
+                    where: { sku }
+                });
+                if (existingProduct) {
+                    return NextResponse.json({ error: `SKU "${sku}" is already in use by another product.` }, { status: 400 });
+                }
+            }
+        }
+
         // Need to find category by name/slug handling since Prisma requires ID
         let category = await prisma.category.findUnique({ where: { name: body.categoryId } });
         if (!category) {
@@ -106,6 +135,7 @@ export async function POST(req: Request) {
 
         const newProduct = await prisma.product.create({
             data: {
+                sku: sku,
                 name: body.name,
                 slug: body.name.toLowerCase()
                     .replace(/[^a-z0-9\s-]/g, '')
@@ -150,6 +180,28 @@ export async function PATCH(req: Request) {
 
         const body = await req.json();
         const updateData: any = {};
+
+        // SKU validation
+        if (body.sku !== undefined) {
+            const skuRes = cleanAndValidateSku(body.sku);
+            if (skuRes.error) {
+                return NextResponse.json({ error: skuRes.error }, { status: 400 });
+            }
+            const sku = skuRes.sku;
+
+            if (sku) {
+                const existingProduct = await prisma.product.findFirst({
+                    where: {
+                        sku,
+                        id: { not: id }
+                    }
+                });
+                if (existingProduct) {
+                    return NextResponse.json({ error: `SKU "${sku}" is already in use by another product.` }, { status: 400 });
+                }
+            }
+            updateData.sku = sku;
+        }
         
         if (body.name !== undefined) {
             updateData.name = body.name;

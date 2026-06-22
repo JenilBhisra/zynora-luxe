@@ -3,10 +3,12 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
+export const dynamic = 'force-dynamic';
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://zynoraluxe.com';
 
-  // Fetch all products
+  // 1. Fetch all active/published products
   const products = await prisma.product.findMany({
     select: {
       id: true,
@@ -15,7 +17,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   });
 
-  // Fetch all settings
+  // 2. Fetch all categories
+  const categories = await prisma.category.findMany({
+    select: {
+      slug: true,
+      updatedAt: true,
+    },
+  });
+
+  // 3. Fetch all settings
   const settings = await prisma.setting.findMany({
     select: {
       id: true,
@@ -23,7 +33,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   });
 
-  // Static routes
+  // 4. Static routes (strictly public, no /admin, /api, /my-orders, /track-order)
   const staticRoutes = [
     '',
     '/shop',
@@ -31,8 +41,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     '/customize',
     '/about',
     '/customer-care',
-    '/my-orders',
-    '/track-order',
     '/b2b',
   ].map((route) => ({
     url: `${baseUrl}${route}`,
@@ -41,7 +49,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: route === '' ? 1.0 : 0.8,
   }));
 
-  // Dynamic product routes
+  // 5. Dynamic category routes
+  const categoryRoutes = categories.map((c) => ({
+    url: `${baseUrl}/shop/${c.slug}`,
+    lastModified: c.updatedAt || new Date(),
+    changeFrequency: 'weekly' as const,
+    priority: 0.8,
+  }));
+
+  // 6. Dynamic product routes (preferred: slug, fallback: id)
   const productRoutes = products.map((p) => ({
     url: `${baseUrl}/product/${p.slug || p.id}`,
     lastModified: p.updatedAt || new Date(),
@@ -49,7 +65,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
-  // Dynamic setting routes
+  // 7. Dynamic setting routes
   const settingRoutes = settings.map((s) => ({
     url: `${baseUrl}/setting/${s.id}`,
     lastModified: s.updatedAt || new Date(),
@@ -57,5 +73,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }));
 
-  return [...staticRoutes, ...productRoutes, ...settingRoutes];
+  return [...staticRoutes, ...categoryRoutes, ...productRoutes, ...settingRoutes];
 }

@@ -24,11 +24,12 @@ const prisma = new PrismaClient();
 
 export const metadata: Metadata = {
     title: "Zynora Luxe | Lab Grown Diamond Jewelry",
-    description: "Zynora Luxe is a luxury jewelry brand offering lab grown diamond engagement rings, pendants, bracelets, earrings, necklaces, and custom fine jewelry.",
+    description: "Zynora Luxe (also known as ZynoraLuxe) is a premier luxury jewelry brand offering lab grown diamond engagement rings, pendants, bracelets, earrings, necklaces, and custom fine jewelry.",
     keywords: [
-        "zynora",
-        "zynora luxe",
-        "zynoraluxe",
+        "Zynora Luxe",
+        "ZynoraLuxe",
+        "Zynora",
+        "zynoraluxe.com",
         "lab grown diamond jewelry",
         "custom diamond jewelry",
         "luxury jewelry",
@@ -57,9 +58,10 @@ export default async function HomePage() {
         "@type": "JewelryStore",
         "@id": "https://zynoraluxe.com/#organization",
         "name": "Zynora Luxe",
+        "alternateName": ["ZynoraLuxe", "Zynora"],
         "url": "https://zynoraluxe.com",
         "logo": "https://zynoraluxe.com/favicon.ico",
-        "description": "Zynora Luxe is a premier luxury jewelry brand crafting exquisite lab grown diamond engagement rings, settings, and bespoke fine jewelry."
+        "description": "Zynora Luxe (ZynoraLuxe) is a premier luxury jewelry brand crafting exquisite lab grown diamond engagement rings, settings, and bespoke fine jewelry."
     };
 
     const websiteSchema = {
@@ -203,7 +205,7 @@ async function HomeContent({ isAdmin, assetsMap }: { isAdmin: boolean; assetsMap
                             {assetsMap["text:journey-headline"] || "Create a ring as rare as the moment it marks"}
                         </h2>
                         <p className="text-[#666666] text-[15px] md:text-[16px] leading-[1.7] mb-10 max-w-[540px] reveal-step-3">
-                            {assetsMap["text:journey-body"] || "Design with certified stones, refined settings, and precious metals. Every step is deliberate, calm, and built for an effortless experience."}
+                            {assetsMap["text:journey-body"] || "At ZynoraLuxe, we design with certified stones, refined settings, and precious metals. Every step is deliberate, calm, and built for an effortless experience."}
                         </p>
                         <div className="grid grid-cols-3 gap-3 mb-10">
                             {houseMetrics.map((metric, idx) => (

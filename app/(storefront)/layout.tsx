@@ -22,7 +22,7 @@ export const metadata: Metadata = {
         "fine jewelry",
     ],
     alternates: {
-        canonical: "/",
+        canonical: "https://zynoraluxe.com",
     },
     openGraph: {
         title: "Zynora Luxe | Lab Grown Diamond Jewelry",

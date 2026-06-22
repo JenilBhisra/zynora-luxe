@@ -1,9 +1,26 @@
-"use client";
-
 import { DiamondSearchClient } from "@/app/(storefront)/diamonds/DiamondSearchClient";
 import { AnimatedSection } from "@/components/AnimatedSection";
+import { PrismaClient } from "@prisma/client";
 
-export default function Step1DiamondPage() {
+export const dynamic = "force-dynamic";
+
+const prisma = new PrismaClient();
+
+export default async function Step1DiamondPage() {
+    // Fetch all shape icon assets from database
+    const shapeAssets = await prisma.siteAsset.findMany({
+        where: {
+            key: {
+                startsWith: "diamond-shape-icon"
+            }
+        }
+    });
+
+    const shapeImages = shapeAssets.reduce((acc: Record<string, string>, asset) => {
+        acc[asset.key] = asset.url;
+        return acc;
+    }, {});
+
     return (
         <div className="animate-in fade-in duration-700 text-zinc-900">
             <AnimatedSection className="text-center mb-6 block md:hidden">
@@ -12,7 +29,7 @@ export default function Step1DiamondPage() {
             </AnimatedSection>
 
             <AnimatedSection as="div" className="w-full" delay={0.08}>
-                <DiamondSearchClient customizerMode={true} />
+                <DiamondSearchClient customizerMode={true} shapeImages={shapeImages} />
             </AnimatedSection>
         </div>
     );

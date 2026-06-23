@@ -48,10 +48,25 @@ function DiamondSearchClientContent({ customizerMode = false, shapeImages = {} }
     const [isUrlSynced, setIsUrlSynced] = useState<boolean>(false);
     
     // Filter States
-    const [priceRange, setPriceRange] = useState<[number, number]>([1000, 2000000]);
+    const [priceRange, setPriceRange] = useState<[number, number]>([0, 2000000]);
     const [caratRange, setCaratRange] = useState<[number, number]>([0.2, 10]);
 
-    const [selectedShapes, setSelectedShapes] = useState<string[]>([]);
+    const [selectedShapes, setSelectedShapes] = useState<string[]>(() => {
+        if (typeof window !== "undefined") {
+            const params = new URLSearchParams(window.location.search);
+            const shapeParam = params.get("shape");
+            if (shapeParam) {
+                const fallbackShapes = ["Round", "Oval", "Emerald", "Cushion", "Elongated Cushion", "Pear", "Radiant", "Princess", "Marquise", "Asscher", "Heart"];
+                const shapeSlugs = shapeParam.split(",");
+                const matchedShapes = shapeSlugs.map(slug => {
+                    return fallbackShapes.find(name => name.toLowerCase().replace(/\s+/g, '-') === slug);
+                }).filter((s): s is string => typeof s === "string");
+                return matchedShapes;
+            }
+        }
+        return [];
+    });
+
     const [selectedCuts, setSelectedCuts] = useState<string[]>([]);
     const [selectedClarities, setSelectedClarities] = useState<string[]>([]);
     const [selectedColors, setSelectedColors] = useState<string[]>([]);
@@ -99,19 +114,20 @@ function DiamondSearchClientContent({ customizerMode = false, shapeImages = {} }
     useEffect(() => {
         const syncFromUrl = () => {
             const params = new URLSearchParams(window.location.search);
-            const shape = params.get("shape");
-            if (shape) {
-                const matched = fallbackShapes.find(name => name.toLowerCase().replace(/\s+/g, '-') === shape);
-                if (matched) {
-                    setSelectedShapes(prev => {
-                        if (prev.length === 1 && prev[0] === matched) return prev;
-                        return [matched];
-                    });
-                    setIsUrlSynced(true);
-                    return;
-                }
+            const shapeParam = params.get("shape");
+            if (shapeParam) {
+                const shapeSlugs = shapeParam.split(",");
+                const matchedShapes = shapeSlugs.map(slug => {
+                    return fallbackShapes.find(name => name.toLowerCase().replace(/\s+/g, '-') === slug);
+                }).filter((s): s is string => typeof s === "string");
+                
+                setSelectedShapes(prev => {
+                    if (prev.length === matchedShapes.length && prev.every((v, i) => v === matchedShapes[i])) return prev;
+                    return matchedShapes;
+                });
+            } else {
+                setSelectedShapes(prev => prev.length > 0 ? [] : prev);
             }
-            setSelectedShapes(prev => prev.length > 0 ? [] : prev);
             setIsUrlSynced(true);
         };
 
@@ -126,20 +142,21 @@ function DiamondSearchClientContent({ customizerMode = false, shapeImages = {} }
         if (!isUrlSynced) return;
 
         const params = new URLSearchParams(window.location.search);
-        if (selectedShapes.length === 1) {
-            const shapeName = selectedShapes[0];
-            const found = shapesToRender.find(s => s.name === shapeName);
-            const slug = found ? found.slug : shapeName.toLowerCase().replace(/\s+/g, '-');
-            
-            if (params.get("shape") !== slug) {
-                params.set("shape", slug);
-                router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+        if (selectedShapes.length > 0) {
+            const slugs = selectedShapes.map(shapeName => {
+                const found = shapesToRender.find(s => s.name === shapeName);
+                return found ? found.slug : shapeName.toLowerCase().replace(/\s+/g, '-');
+            });
+            const joined = slugs.join(",");
+            if (params.get("shape") !== joined) {
+                params.set("shape", joined);
+                window.history.replaceState(null, "", `${pathname}?${params.toString()}`);
             }
         } else {
             if (params.has("shape")) {
                 params.delete("shape");
                 const newSearch = params.toString();
-                router.replace(`${pathname}${newSearch ? `?${newSearch}` : ""}`, { scroll: false });
+                window.history.replaceState(null, "", `${pathname}${newSearch ? `?${newSearch}` : ""}`);
             }
         }
     }, [selectedShapes, pathname, router, shapesToRender, isUrlSynced]);
@@ -211,7 +228,7 @@ function DiamondSearchClientContent({ customizerMode = false, shapeImages = {} }
     };
 
     const resetFilters = () => {
-        setPriceRange([1000, 2000000]);
+        setPriceRange([0, 2000000]);
         setCaratRange([0.2, 10]);
         setSelectedShapes([]);
         setSelectedCuts([]);
@@ -232,7 +249,7 @@ function DiamondSearchClientContent({ customizerMode = false, shapeImages = {} }
     if (caratRange[0] !== 0.2 || caratRange[1] !== 10) {
         activeChips.push({ type: 'carat', value: caratRange, label: `${caratRange[0]} - ${caratRange[1]} CT` });
     }
-    if (priceRange[0] !== 1000 || priceRange[1] !== 2000000) {
+    if (priceRange[0] !== 0 || priceRange[1] !== 2000000) {
         activeChips.push({ type: 'price', value: priceRange, label: `₹${priceRange[0].toLocaleString('en-IN')} - ₹${priceRange[1].toLocaleString('en-IN')}` });
     }
     if (selectedColors.length > 0) {
@@ -251,7 +268,7 @@ function DiamondSearchClientContent({ customizerMode = false, shapeImages = {} }
         } else if (chip.type === 'carat') {
             setCaratRange([0.2, 10]);
         } else if (chip.type === 'price') {
-            setPriceRange([1000, 2000000]);
+            setPriceRange([0, 2000000]);
         } else if (chip.type === 'color') {
             setSelectedColors(prev => prev.filter(c => c !== chip.value));
         } else if (chip.type === 'clarity') {
@@ -349,7 +366,7 @@ function DiamondSearchClientContent({ customizerMode = false, shapeImages = {} }
                 <p className="text-[13px] md:text-[14px] font-semibold text-zinc-900 tracking-wide mb-3 uppercase">Price Range</p>
                 <div className="px-1">
                     <DualRangeSlider
-                        min={1000}
+                        min={0}
                         max={2000000}
                         step={1000}
                         value={priceRange}
@@ -367,7 +384,7 @@ function DiamondSearchClientContent({ customizerMode = false, shapeImages = {} }
                             type="number"
                             value={priceRange[0]}
                             onChange={(e) => {
-                                const val = Math.max(1000, Math.min(priceRange[1], parseInt(e.target.value) || 0));
+                                const val = Math.max(0, Math.min(priceRange[1], parseInt(e.target.value) || 0));
                                 setPriceRange([val, priceRange[1]]);
                                 setPage(1);
                             }}
@@ -381,7 +398,7 @@ function DiamondSearchClientContent({ customizerMode = false, shapeImages = {} }
                             type="number"
                             value={priceRange[1]}
                             onChange={(e) => {
-                                const val = Math.min(2000000, Math.max(priceRange[0], parseInt(e.target.value) || 0));
+                                const val = Math.max(0, Math.min(2000000, parseInt(e.target.value) || 0));
                                 setPriceRange([priceRange[0], val]);
                                 setPage(1);
                             }}

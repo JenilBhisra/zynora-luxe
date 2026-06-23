@@ -1,0 +1,47 @@
+[
+  {
+    "id": "cmql8g4x90000vfd085r9ex83",
+    "name": "Engagement Ring",
+    "slug": "engagement-ring",
+    "description": "Timeless symbols of your eternal love.",
+    "imageUrl": "/products/ring-1.jpg",
+    "createdAt": "2026-06-19T17:58:50.350Z",
+    "updatedAt": "2026-06-19T17:58:50.350Z"
+  },
+  {
+    "id": "cmql8g52j0001vfd042j9670q",
+    "name": "Pendant",
+    "slug": "pendant",
+    "description": "Exquisite diamond pendants and charms.",
+    "imageUrl": "/products/necklace-1.jpg",
+    "createdAt": "2026-06-19T17:58:50.539Z",
+    "updatedAt": "2026-06-19T17:58:50.539Z"
+  },
+  {
+    "id": "cmql8g5560002vfd02lxi7dws",
+    "name": "Bracelet and Watch",
+    "slug": "bracelet-and-watch",
+    "description": "Stunning tennis bracelets and luxury timepieces.",
+    "imageUrl": "/products/ring-3.jpg",
+    "createdAt": "2026-06-19T17:58:50.634Z",
+    "updatedAt": "2026-06-19T17:58:50.634Z"
+  },
+  {
+    "id": "cmql8g57n0003vfd0b8uqsn3u",
+    "name": "Earrings",
+    "slug": "earrings",
+    "description": "Brilliant studs and drop earrings.",
+    "imageUrl": "/products/earrings-1.jpg",
+    "createdAt": "2026-06-19T17:58:50.723Z",
+    "updatedAt": "2026-06-19T17:58:50.723Z"
+  },
+  {
+    "id": "cmql8g5aa0004vfd0mo4liua3",
+    "name": "Necklace",
+    "slug": "necklace",
+    "description": "Elegant diamond necklaces and chokers.",
+    "imageUrl": "/products/necklace-2.jpg",
+    "createdAt": "2026-06-19T17:58:50.819Z",
+    "updatedAt": "2026-06-19T17:58:50.819Z"
+  }
+]

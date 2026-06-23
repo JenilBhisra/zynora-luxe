@@ -1,0 +1,24 @@
+[
+  {
+    "id": "cmqpb083e0000l404tzcax09r",
+    "sku": "ZL-1",
+    "name": "RING",
+    "description": "KKK",
+    "price": 50000,
+    "imageUrl": "https://res.cloudinary.com/drvvsooko/image/upload/f_auto,q_auto/v1782138083/zynora/collections/Gemini_Generated_Image_1b3cyj1b3cyj1b3c-1782138083244-12541863.jpg",
+    "images": "[\"https://res.cloudinary.com/drvvsooko/image/upload/f_auto,q_auto/v1782138083/zynora/collections/Gemini_Generated_Image_1b3cyj1b3cyj1b3c-1782138083244-12541863.jpg\"]",
+    "videoUrl": "",
+    "modelUrl": "",
+    "karatPrices": "{\"14K\":50000}",
+    "availableMetals": "Gold",
+    "goldPrice": 50000,
+    "silverPrice": null,
+    "platinumPrice": null,
+    "sizePrices": "{\"14K\":{\"3 1/2\":50000}}",
+    "stockCount": 1,
+    "category": "Solitaire",
+    "supportedShapes": "[\"Oval\"]",
+    "createdAt": "2026-06-22T14:21:31.515Z",
+    "updatedAt": "2026-06-22T14:21:31.515Z"
+  }
+]

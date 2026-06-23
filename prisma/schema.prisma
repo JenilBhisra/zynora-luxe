@@ -9,18 +9,18 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String?   @unique
-  password      String?
-  emailVerified DateTime?
-  image         String?
-  role          String    @default("USER") // USER, ADMIN
+  id                 String              @id @default(cuid())
+  name               String?
+  email              String?             @unique
+  password           String?
+  emailVerified      DateTime?
+  image              String?
+  role               String              @default("USER")
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
   orders             Order[]
   reviews            Review[]
   ringConfigurations RingConfiguration[]
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
 }
 
 model Category {
@@ -29,60 +29,60 @@ model Category {
   slug        String    @unique
   description String?
   imageUrl    String?
-  products    Product[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+  products    Product[]
 }
 
 model Product {
-  id          String   @id @default(cuid())
-  sku         String?  @unique
-  name        String
-  slug        String   @unique
-  description String
-  price       Float
-  images      String // Stores JSON array of URLs for SQLite compatibility
-  categoryId  String
-  category    Category @relation(fields: [categoryId], references: [id])
-  diamondId   String?  @unique
-  diamond     Diamond? @relation(fields: [diamondId], references: [id])
-  metalType      String   // e.g., "18K White Gold"
-  karatPrices    String?  @default("{}") // JSON: {"10K":50000,"14K":65000,"18K":80000,"22K":95000}
-  availableMetals String?  @default("") // Comma-separated: "Gold,Silver,Platinum"
+  id              String      @id @default(cuid())
+  sku             String?     @unique
+  name            String
+  slug            String      @unique
+  description     String
+  price           Float
+  images          String
+  categoryId      String
+  diamondId       String?     @unique
+  metalType       String
+  karatPrices     String?     @default("{}")
+  availableMetals String?     @default("")
   goldPrice       Float?
   silverPrice     Float?
   platinumPrice   Float?
-  stockCount     Int      @default(1)
-  isFeatured     Boolean  @default(false)
-  tags           String?  @default("")
-  searchKeywords String?  @default("")
-  extraKeywords  String?  @default("")
-  seoTitle       String?
-  seoDescription String?
-  orders         OrderItem[]
-  reviews        Review[]
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  stockCount      Int         @default(1)
+  isFeatured      Boolean     @default(false)
+  tags            String?     @default("")
+  searchKeywords  String?     @default("")
+  extraKeywords   String?     @default("")
+  seoTitle        String?
+  seoDescription  String?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  orders          OrderItem[]
+  category        Category    @relation(fields: [categoryId], references: [id])
+  diamond         Diamond?    @relation(fields: [diamondId], references: [id])
+  reviews         Review[]
 }
 
 model Diamond {
-  id            String   @id @default(cuid())
-  sku           String?  @unique
-  shape         String   // Round, Oval, Princess, Emerald
-  caratWeight   Float
-  cut           String   // Excellent, Very Good, Good
-  clarity       String   // FL, IF, VVS1, VVS2, VS1, VS2
-  color         String   // D, E, F, G, H, I, J
-  certification String   // GIA, IGI
-  price         Float
-  stockCount    Int      @default(1)
-  stockStatus   String   @default("AVAILABLE") // AVAILABLE, SOLD
-  imageUrl      String?
-  modelUrl      String?
-  product             Product?            // One-to-one relation if a product is a specific diamond ring
-  ringConfigurations  RingConfiguration[]
-  createdAt           DateTime            @default(now())
-  updatedAt           DateTime            @updatedAt
+  id                 String              @id @default(cuid())
+  sku                String?             @unique
+  shape              String
+  caratWeight        Float
+  cut                String
+  clarity            String
+  color              String
+  certification      String
+  price              Float
+  stockCount         Int                 @default(1)
+  stockStatus        String              @default("AVAILABLE")
+  imageUrl           String?
+  modelUrl           String?
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  product            Product?
+  ringConfigurations RingConfiguration[]
 
   @@index([price])
   @@index([caratWeight])
@@ -92,99 +92,99 @@ model Diamond {
 }
 
 model Order {
-  id              String      @id @default(cuid())
-  displayOrderId  String?     @unique // e.g. ZYNORA-ORD-A1B2
-  orderType       String?     @default("CART") // CART or CUSTOM_RING
-  userId          String
-  user            User        @relation(fields: [userId], references: [id])
-  items           OrderItem[]
-  subtotal        Float?      @default(0)
-  gstAmount       Float?      @default(0)
-  gstType         String?     // "CGST_SGST" or "IGST"
-  shippingCost    Float?      @default(0)
-  totalAmount     Float
-  gstNumber       String?
-  billingState    String?
-  shippingState   String?
-  customerName    String?
-  customerEmail   String?
-  customerPhone   String?
-  customerAddress String?
-  status          String      @default("PENDING") // PENDING, PAID, SHIPPED, DELIVERED, CONFIRMED
-  razorpayId      String?     @unique
-  razorpayOrderId   String?   @unique
-  razorpayPaymentId String?   @unique
-  paymentStatus     String?   @default("PENDING")
+  id                String      @id @default(cuid())
+  displayOrderId    String?     @unique
+  orderType         String?     @default("CART")
+  userId            String
+  subtotal          Float?      @default(0)
+  gstAmount         Float?      @default(0)
+  gstType           String?
+  shippingCost      Float?      @default(0)
+  totalAmount       Float
+  gstNumber         String?
+  billingState      String?
+  shippingState     String?
+  customerName      String?
+  customerEmail     String?
+  customerPhone     String?
+  customerAddress   String?
+  status            String      @default("PENDING")
+  razorpayId        String?     @unique
+  razorpayOrderId   String?     @unique
+  razorpayPaymentId String?     @unique
+  paymentStatus     String?     @default("PENDING")
   paymentMethod     String?
   paidAt            DateTime?
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+  user              User        @relation(fields: [userId], references: [id])
+  items             OrderItem[]
 }
 
 model OrderItem {
-  id        String   @id @default(cuid())
-  orderId   String
-  order     Order    @relation(fields: [orderId], references: [id])
-  productId           String?     // Make optional because an OrderItem could be JUST a custom ring
-  product             Product?    @relation(fields: [productId], references: [id])
+  id                  String             @id @default(cuid())
+  orderId             String
+  productId           String?
   ringConfigurationId String?
-  ringConfiguration   RingConfiguration? @relation(fields: [ringConfigurationId], references: [id])
-  quantity            Int         @default(1)
+  quantity            Int                @default(1)
   price               Float
-  sku                 String?     // Snapshot for standard product
-  settingSku          String?     // Snapshot for custom setting
-  diamondSku          String?     // Snapshot for custom diamond
+  sku                 String?
+  settingSku          String?
+  diamondSku          String?
+  order               Order              @relation(fields: [orderId], references: [id])
+  product             Product?           @relation(fields: [productId], references: [id])
+  ringConfiguration   RingConfiguration? @relation(fields: [ringConfigurationId], references: [id])
 }
 
 model Review {
   id        String   @id @default(cuid())
-  rating    Int      // 1 to 5
+  rating    Int
   comment   String?
   userId    String
-  user      User     @relation(fields: [userId], references: [id])
   productId String
-  product   Product  @relation(fields: [productId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  product   Product  @relation(fields: [productId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
 }
 
 model Setting {
-  id          String   @id @default(cuid())
-  sku         String?  @unique
-  name        String
-  description String
-  price       Float
-  imageUrl    String?
-  images      String?  @default("[]") // Stores JSON array of URLs
-  videoUrl    String?
-  modelUrl    String?
-  karatPrices String?  @default("{}") // JSON: {"10K":50000,"14K":65000,"18K":80000,"22K":95000}
-  availableMetals String?  @default("") // Comma-separated: "Gold,Silver,Platinum"
+  id              String              @id @default(cuid())
+  sku             String?             @unique
+  name            String
+  description     String
+  price           Float
+  imageUrl        String?
+  images          String?             @default("[]")
+  videoUrl        String?
+  modelUrl        String?
+  karatPrices     String?             @default("{}")
+  availableMetals String?             @default("")
   goldPrice       Float?
   silverPrice     Float?
   platinumPrice   Float?
-  sizePrices  String?  @default("{}") // JSON: {"2":48000,"2 1/4":48500,...,"12":62000}
-  stockCount  Int      @default(1)
-  category    String   // e.g., "Solitaire", "Halo", "Vintage", "Three-Stone"
-  supportedShapes String? @default("[]") // JSON array of supported diamond shapes
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  configurations RingConfiguration[]
+  sizePrices      String?             @default("{}")
+  stockCount      Int                 @default(1)
+  category        String
+  supportedShapes String?             @default("[]")
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+  configurations  RingConfiguration[]
 }
 
 model RingConfiguration {
-  id          String   @id @default(cuid())
-  userId      String?
-  user        User?    @relation(fields: [userId], references: [id])
-  settingId   String
-  setting     Setting  @relation(fields: [settingId], references: [id])
-  diamondId   String
-  diamond     Diamond  @relation(fields: [diamondId], references: [id])
-  metalType   String
-  totalPrice  Float
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  orderItems  OrderItem[]
+  id         String      @id @default(cuid())
+  userId     String?
+  settingId  String
+  diamondId  String
+  metalType  String
+  totalPrice Float
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  orderItems OrderItem[]
+  diamond    Diamond     @relation(fields: [diamondId], references: [id])
+  setting    Setting     @relation(fields: [settingId], references: [id])
+  user       User?       @relation(fields: [userId], references: [id])
 }
 
 model SiteAsset {
@@ -207,36 +207,31 @@ model OtpVerification {
 }
 
 model CustomizationRequest {
-  id             String   @id @default(cuid())
-
-  productId      String?
-  productName    String
-  productSku     String?
-  productPrice   String?
-  productUrl     String?
-
-  customerName   String
-  customerEmail  String
-  customerPhone  String
-
-  jewelrySize    String?
-  metalType      String?
-  stoneType      String?
-  stoneSize      String?
-  engraving      String?
-  requirements   String
-
-  status         String   @default("NEW")
-
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id            String   @id @default(cuid())
+  productId     String?
+  productName   String
+  productSku    String?
+  productPrice  String?
+  productUrl    String?
+  customerName  String
+  customerEmail String
+  customerPhone String
+  jewelrySize   String?
+  metalType     String?
+  stoneType     String?
+  stoneSize     String?
+  engraving     String?
+  requirements  String
+  status        String   @default("NEW")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
 model Shape {
   id                String   @id @default(cuid())
   name              String   @unique
   slug              String   @unique
-  imageUrl          String?  // Keep legacy imageUrl for compatibility/fallback
+  imageUrl          String?
   thumbnailImageUrl String?
   previewImageUrl   String?
   isActive          Boolean  @default(true)
@@ -244,5 +239,3 @@ model Shape {
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 }
-
-

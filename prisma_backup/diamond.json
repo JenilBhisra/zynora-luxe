@@ -1,0 +1,19 @@
+[
+  {
+    "id": "cmqpb3hbw0002l404oxd4t76m",
+    "sku": "Z-1",
+    "shape": "Oval",
+    "caratWeight": 1,
+    "cut": "Excellent",
+    "clarity": "VVS1",
+    "color": "D",
+    "certification": "GIA",
+    "price": 8500,
+    "stockCount": 10,
+    "stockStatus": "AVAILABLE",
+    "imageUrl": "https://res.cloudinary.com/drvvsooko/image/upload/f_auto,q_auto/v1782138238/zynora/diamonds/WhatsAppImage2026-06-12at10.54.52AM-1782138238191-115828597.jpg",
+    "modelUrl": "https://res.cloudinary.com/drvvsooko/raw/upload/v1782138235/zynora/diamonds/021-1782138235176-314462247.obj",
+    "createdAt": "2026-06-22T14:24:03.452Z",
+    "updatedAt": "2026-06-22T14:24:03.452Z"
+  }
+]

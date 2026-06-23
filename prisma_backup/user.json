@@ -1,0 +1,57 @@
+[
+  {
+    "id": "cmql8pskd0000vfpclrnjtqn0",
+    "name": "Krishna Diamond",
+    "email": "krishnadiamond404@gmail.com",
+    "password": null,
+    "emailVerified": null,
+    "image": null,
+    "role": "ADMIN",
+    "createdAt": "2026-06-19T18:06:20.893Z",
+    "updatedAt": "2026-06-19T18:06:20.893Z"
+  },
+  {
+    "id": "cmqm4opdt0000l10488k7gnzd",
+    "name": "sheta's studio",
+    "email": "shetastudio@gmail.com",
+    "password": null,
+    "emailVerified": null,
+    "image": null,
+    "role": "USER",
+    "createdAt": "2026-06-20T09:01:17.826Z",
+    "updatedAt": "2026-06-20T09:01:17.826Z"
+  },
+  {
+    "id": "cmqmmn1ct0003jp04p4tigber",
+    "name": "parthikbhisra36",
+    "email": "parthikbhisra36@gmail.com",
+    "password": null,
+    "emailVerified": null,
+    "image": null,
+    "role": "USER",
+    "createdAt": "2026-06-20T17:23:53.118Z",
+    "updatedAt": "2026-06-20T17:23:53.118Z"
+  },
+  {
+    "id": "cmqpb0x020001l4049zlgajeb",
+    "name": "rudra Bhisra",
+    "email": "bhisrarudra4@gmail.com",
+    "password": null,
+    "emailVerified": null,
+    "image": null,
+    "role": "USER",
+    "createdAt": "2026-06-22T14:22:03.794Z",
+    "updatedAt": "2026-06-22T14:22:03.794Z"
+  },
+  {
+    "id": "cmqq9gfkv0000l504c43biuv8",
+    "name": "Aaditi",
+    "email": "aaditimodiya@gmail.com",
+    "password": null,
+    "emailVerified": null,
+    "image": null,
+    "role": "USER",
+    "createdAt": "2026-06-23T06:25:54.656Z",
+    "updatedAt": "2026-06-23T06:25:54.656Z"
+  }
+]

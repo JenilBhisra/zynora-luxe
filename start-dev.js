@@ -5,12 +5,12 @@ const { spawn } = require("child_process");
 const PROXIES = [
     {
         localPort: 5433,
-        remoteHost: "ep-sparkling-surf-ao6bogzf-pooler.c-2.ap-southeast-1.aws.neon.tech",
+        remoteHost: "ep-shy-field-aoiidbou-pooler.c-2.ap-southeast-1.aws.neon.tech",
         name: "Pooler Connection"
     },
     {
         localPort: 5434,
-        remoteHost: "ep-sparkling-surf-ao6bogzf.c-2.ap-southeast-1.aws.neon.tech",
+        remoteHost: "ep-shy-field-aoiidbou.c-2.ap-southeast-1.aws.neon.tech",
         name: "Direct Connection"
     }
 ];

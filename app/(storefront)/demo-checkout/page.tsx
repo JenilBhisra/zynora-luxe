@@ -275,6 +275,7 @@ export default function DemoCheckoutPage() {
                                                     alt={ring.settingName}
                                                     fill
                                                     fallbackType="ring"
+                                                    sizeType="thumbnail"
                                                     className="object-cover p-2"
                                                 />
                                             ) : (

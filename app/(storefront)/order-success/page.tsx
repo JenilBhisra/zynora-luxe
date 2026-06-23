@@ -166,6 +166,7 @@ function OrderSuccessContent() {
                                                 alt={item.name}
                                                 fill
                                                 fallbackType={item.isCustomRing ? "setting" : "jewelry"}
+                                                sizeType="thumbnail"
                                                 className="object-cover p-1.5"
                                             />
                                         </div>

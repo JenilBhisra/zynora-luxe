@@ -99,14 +99,15 @@ export function ProductListClient({
                             <Link href={`/product/${product.slug}`} className="block h-full">
                                 <div className="h-full flex flex-col rounded-none md:rounded-[4px] overflow-hidden bg-white border-0 md:border border-zinc-150/85 shadow-none hover:shadow-sm transition-all duration-300">
                                     <div className="relative aspect-[4/5] overflow-hidden bg-zinc-50 mb-3 border-b border-zinc-100/50 rounded-none md:rounded-[4px]">
-                                        <SmartImage
-                                            src={image}
-                                            alt={product.name}
-                                            fill
-                                            fallbackType="jewelry"
-                                            className="object-cover image-zoom-reveal transition-transform duration-700 ease-out group-hover:scale-[1.08]"
-                                            priority={i < 4}
-                                        />
+                                         <SmartImage
+                                             src={image}
+                                             alt={product.name}
+                                             fill
+                                             fallbackType="jewelry"
+                                             sizeType="thumbnail"
+                                             className="object-cover image-zoom-reveal transition-transform duration-700 ease-out group-hover:scale-[1.08]"
+                                             priority={i === 0}
+                                         />
                                         
                                         {/* Small Badge Top-Left */}
                                         {i % 4 === 1 && (

@@ -2,13 +2,14 @@
 
 import Image, { ImageProps } from "next/image";
 import { useEffect, useMemo, useState } from "react";
-import { getFallbackImage, getFallbackPool, inferImageFallbackType, normalizeImageSrc, type ImageFallbackType } from "@/lib/image-utils";
+import { getFallbackImage, getFallbackPool, inferImageFallbackType, normalizeImageSrc, optimizeCloudinaryUrl, type ImageFallbackType } from "@/lib/image-utils";
 
 type SmartImageProps = Omit<ImageProps, "src"> & {
     src: string;
     fallbackType?: ImageFallbackType;
     showLoader?: boolean;
     imageKey?: string;
+    sizeType?: "thumbnail" | "detail" | "hero" | "logo" | "full";
 };
 
 export function SmartImage({
@@ -18,6 +19,7 @@ export function SmartImage({
     className,
     showLoader = true,
     imageKey,
+    sizeType = "full",
     ...props
 }: SmartImageProps) {
     const resolvedFallbackType = useMemo(() => fallbackType || inferImageFallbackType(src, alt), [fallbackType, src, alt]);
@@ -26,8 +28,9 @@ export function SmartImage({
 
     const resolvedSrc = useMemo(() => {
         const normalized = normalizeImageSrc(src);
-        return normalized || fallback;
-    }, [src, fallback]);
+        const source = normalized || fallback;
+        return optimizeCloudinaryUrl(source, sizeType);
+    }, [src, fallback, sizeType]);
 
     const [imgSrc, setImgSrc] = useState(resolvedSrc);
     const [isLoading, setIsLoading] = useState(true);
@@ -54,6 +57,7 @@ export function SmartImage({
                 sizes={computedSizes}
                 loading={props.priority ? "eager" : "lazy"}
                 decoding="async"
+                unoptimized={true}
                 onLoad={() => setIsLoading(false)}
                 onError={() => {
                     if (imgSrc !== fallback) {

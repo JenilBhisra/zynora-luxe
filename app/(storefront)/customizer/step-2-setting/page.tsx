@@ -115,6 +115,7 @@ export default function Step2SettingPage() {
                                         fill
                                         fallbackType="setting"
                                         imageKey={setting.id}
+                                        sizeType="thumbnail"
                                         className="object-contain opacity-95 transition-transform duration-500 ease-out group-hover:scale-[1.03]"
                                     />
                                 ) : (

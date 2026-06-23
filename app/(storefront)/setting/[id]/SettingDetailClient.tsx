@@ -3,7 +3,7 @@
 
 import { useState, useMemo, useCallback, useRef, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import Image from "next/image";
+import { SmartImage } from "@/components/SmartImage";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight, ChevronDown, Box, ArrowLeft, Check, ShoppingBag, ShieldCheck, Truck, Award, HelpCircle, Eye, Sparkles } from "lucide-react";
 import { useCustomizerStore } from "@/lib/customizer-store";
@@ -329,15 +329,16 @@ export default function SettingDetailClient({ setting }: { setting: any }) {
                                     }`}
                                 >
                                     {item.type === "photo" && (
-                                        <div className="relative w-full h-full">
-                                            <Image
-                                                src={(item as any).src}
-                                                alt={setting.name}
-                                                fill
-                                                className="object-contain p-4 transition-transform duration-700 ease-out group-hover:scale-[1.03]"
-                                                unoptimized
-                                            />
-                                        </div>
+                                        <SmartImage
+                                            src={(item as any).src}
+                                            alt={setting.name}
+                                            fill
+                                            fallbackType="setting"
+                                            imageKey={`grid-${setting.id}-${idx}`}
+                                            sizeType="detail"
+                                            priority={idx === 0}
+                                            className="object-contain p-4 transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+                                        />
                                     )}
                                     {item.type === "video" && videoUrl && (
                                         <div className="relative w-full h-full flex items-center justify-center">
@@ -361,15 +362,16 @@ export default function SettingDetailClient({ setting }: { setting: any }) {
                             <div className="relative aspect-[4/5] w-full overflow-hidden flex items-center justify-center p-2 rounded-none">
                                 {mediaItems.length > 0 ? (
                                     mediaItems[activeIdx]?.type === "photo" ? (
-                                        <div className="relative w-full h-full">
-                                            <Image
-                                                src={(mediaItems[activeIdx] as any).src}
-                                                alt={setting.name}
-                                                fill
-                                                className="object-contain p-4"
-                                                unoptimized
-                                            />
-                                        </div>
+                                        <SmartImage
+                                            src={(mediaItems[activeIdx] as any).src}
+                                            alt={setting.name}
+                                            fill
+                                            fallbackType="setting"
+                                            imageKey={`mobile-main-${setting.id}`}
+                                            sizeType="detail"
+                                            priority={true}
+                                            className="object-contain p-4"
+                                        />
                                     ) : mediaItems[activeIdx]?.type === "video" && videoUrl ? (
                                         <div className="relative w-full h-full flex items-center justify-center">
                                             <video src={videoUrl} controls className="w-full h-full object-contain p-2" />
@@ -401,15 +403,15 @@ export default function SettingDetailClient({ setting }: { setting: any }) {
                                             } rounded-none`}
                                         >
                                             {item.type === "photo" ? (
-                                                <div className="relative w-full h-full">
-                                                    <Image
-                                                        src={(item as any).src}
-                                                        alt={`Thumbnail ${idx}`}
-                                                        fill
-                                                        className="object-contain p-1"
-                                                        unoptimized
-                                                    />
-                                                </div>
+                                                <SmartImage
+                                                    src={(item as any).src}
+                                                    alt={`Thumbnail ${idx}`}
+                                                    fill
+                                                    fallbackType="setting"
+                                                    imageKey={`mobile-thumb-${setting.id}-${idx}`}
+                                                    sizeType="thumbnail"
+                                                    className="object-contain p-1"
+                                                />
                                             ) : (
                                                 <div className="w-full h-full flex items-center justify-center bg-zinc-100 text-[9px] text-zinc-500 font-bold uppercase">
                                                     {item.type}

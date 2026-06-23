@@ -66,6 +66,7 @@ export default async function ShopCategoryPage() {
                                         src={imageUrl} 
                                         alt={cat.name} 
                                         fill 
+                                        sizeType="thumbnail"
                                         className="object-cover transition-transform duration-1000 ease-out group-hover:scale-[1.08] filter group-hover:brightness-110" 
                                     />
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent transition-opacity duration-700 opacity-90 group-hover:opacity-100" />

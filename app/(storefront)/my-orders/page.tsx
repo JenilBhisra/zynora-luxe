@@ -90,7 +90,7 @@ export default function MyOrdersPage() {
                             <div className="rounded-[18px] border border-zinc-200 bg-zinc-50/50 p-6 flex flex-col md:flex-row md:items-center md:justify-between shadow-sm">
                                 <div className="flex items-center gap-4">
                                     <div className="w-20">
-                                        <SmartImage src={order.items[0]?.image || "/assets/placeholder.png"} alt={order.items[0]?.name || "Item"} width={80} height={80} className="rounded-[12px] object-cover" />
+                                        <SmartImage src={order.items[0]?.image || "/assets/placeholder.png"} alt={order.items[0]?.name || "Item"} width={80} height={80} sizeType="thumbnail" className="rounded-[12px] object-cover" />
                                     </div>
                                     <div>
                                         <p className="text-sm text-zinc-500">Order ID</p>

@@ -24,6 +24,7 @@ export function HeroSlider({ customSlides = {}, customText = {} }: HeroSliderPro
                     alt="Zynora Luxe Fine Jewelry"
                     fill 
                     fallbackType="jewelry" 
+                    sizeType="hero"
                     className="object-cover object-center w-full h-full" 
                     priority
                     sizes="100vw"
@@ -40,6 +41,7 @@ export function HeroSlider({ customSlides = {}, customText = {} }: HeroSliderPro
                     alt="Zynora Luxe Fine Jewelry"
                     fill 
                     fallbackType="jewelry" 
+                    sizeType="hero"
                     className="object-cover object-center w-full h-full" 
                     priority
                     sizes="100vw"

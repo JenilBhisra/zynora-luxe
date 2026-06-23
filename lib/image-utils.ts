@@ -136,3 +136,80 @@ export function selectCardImage(
 export function getFallbackPool(type: ImageFallbackType): string[] {
     return FALLBACK_POOL[type] || FALLBACK_POOL.generic;
 }
+
+/**
+ * Checks if a URL is a Cloudinary URL.
+ */
+export function isCloudinaryUrl(url?: string | null): boolean {
+    if (!url) return false;
+    return url.includes("res.cloudinary.com");
+}
+
+/**
+ * Gets clean Cloudinary base URL and path by stripping existing transformations.
+ */
+export function getCleanCloudinaryPath(url: string): { baseUrl: string; cleanPath: string } {
+    const uploadIndex = url.indexOf("/upload/");
+    if (uploadIndex === -1) return { baseUrl: "", cleanPath: url };
+    
+    const baseUrl = url.slice(0, uploadIndex + "/upload/".length);
+    const rest = url.slice(uploadIndex + "/upload/".length);
+    
+    const segments = rest.split("/");
+    const cleanSegments: string[] = [];
+    let foundAssetPath = false;
+    
+    for (const segment of segments) {
+        if (foundAssetPath) {
+            cleanSegments.push(segment);
+            continue;
+        }
+        
+        // A segment starts the asset path if it is a version (v123456)
+        const isVersion = /^v\d+$/.test(segment);
+        
+        // Or if it is a folder name that does not look like a transformation.
+        // Cloudinary transformations are combinations of short keys (1-2 chars) followed by underscore.
+        // We check if it matches a transformation pattern.
+        const isTransformation = /^(?:[a-z]{1,2}_[a-zA-Z0-9.-]+,?)+$/.test(segment);
+        
+        if (isVersion || !isTransformation) {
+            foundAssetPath = true;
+            cleanSegments.push(segment);
+        }
+    }
+    
+    if (!foundAssetPath) {
+        return { baseUrl, cleanPath: rest };
+    }
+    
+    return { baseUrl, cleanPath: cleanSegments.join("/") };
+}
+
+/**
+ * Optimizes a Cloudinary URL by injecting format, quality, and dimension transformations.
+ */
+export function optimizeCloudinaryUrl(
+    url: string,
+    sizeType: "thumbnail" | "detail" | "hero" | "logo" | "full" = "full"
+): string {
+    if (!url || !isCloudinaryUrl(url)) return url;
+    if (url.includes("/raw/upload/")) return url; // Do not optimize raw model files
+    
+    const { baseUrl, cleanPath } = getCleanCloudinaryPath(url);
+    if (!baseUrl) return url;
+    
+    // Define transformations based on size type
+    let transformations = "f_auto,q_auto";
+    if (sizeType === "thumbnail") {
+        transformations += ",w_500,c_limit";
+    } else if (sizeType === "detail") {
+        transformations += ",w_1200,c_limit";
+    } else if (sizeType === "hero") {
+        transformations += ",w_1920,c_limit";
+    } else if (sizeType === "logo") {
+        transformations += ",w_200,c_limit";
+    }
+    
+    return `${baseUrl}${transformations}/${cleanPath}`;
+}

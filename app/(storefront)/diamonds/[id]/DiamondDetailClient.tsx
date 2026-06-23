@@ -170,6 +170,8 @@ export default function DiamondDetailClient({ diamond }: { diamond: any }) {
                                             fill
                                             fallbackType="diamond"
                                             imageKey={`grid-${diamond.id}-${idx}`}
+                                            sizeType="detail"
+                                            priority={idx === 0}
                                             className="object-contain p-4 transition-transform duration-700 ease-out group-hover:scale-[1.03]"
                                         />
                                     )}
@@ -190,14 +192,16 @@ export default function DiamondDetailClient({ diamond }: { diamond: any }) {
                             <div className="relative aspect-[4/5] w-full overflow-hidden flex items-center justify-center p-2 rounded-none">
                                 {mediaItems.length > 0 ? (
                                     mediaItems[activeIdx]?.type === "photo" ? (
-                                        <SmartImage
-                                            src={(mediaItems[activeIdx] as any).src}
-                                            alt={`${diamond.shape} Diamond`}
-                                            fill
-                                            fallbackType="diamond"
-                                            imageKey={`mobile-main-${diamond.id}`}
-                                            className="object-contain p-4"
-                                        />
+                                         <SmartImage
+                                             src={(mediaItems[activeIdx] as any).src}
+                                             alt={`${diamond.shape} Diamond`}
+                                             fill
+                                             fallbackType="diamond"
+                                             imageKey={`mobile-main-${diamond.id}`}
+                                             sizeType="detail"
+                                             priority={true}
+                                             className="object-contain p-4"
+                                         />
                                     ) : mediaItems[activeIdx]?.type === "3d" ? (
                                         <div className="relative w-full h-full">
                                             <ModelCanvas url={diamond.modelUrl} shape={diamond.shape} />
@@ -231,6 +235,7 @@ export default function DiamondDetailClient({ diamond }: { diamond: any }) {
                                                     fill
                                                     fallbackType="diamond"
                                                     imageKey={`mobile-thumb-${diamond.id}-${idx}`}
+                                                    sizeType="thumbnail"
                                                     className="object-contain p-1"
                                                 />
                                             ) : (

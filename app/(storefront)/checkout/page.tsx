@@ -560,6 +560,7 @@ export default function CheckoutPage() {
                                                     alt={item.name}
                                                     fill
                                                     fallbackType={item.isCustomRing ? "setting" : "jewelry"}
+                                                    sizeType="thumbnail"
                                                     className="object-cover p-2"
                                                 />
                                                 <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-[#C9A14A] text-[10px] font-bold text-white">

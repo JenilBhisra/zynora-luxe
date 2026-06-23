@@ -315,6 +315,8 @@ export default function ProductClient({ product }: { product: any }) {
                                         fill
                                         fallbackType={imageFallbackType}
                                         imageKey={`${product.id}:grid:${idx}`}
+                                        sizeType="detail"
+                                        priority={idx === 0}
                                         className="object-contain p-4 transition-transform duration-700 ease-out group-hover:scale-[1.03]"
                                     />
                                 ) : (
@@ -353,6 +355,8 @@ export default function ProductClient({ product }: { product: any }) {
                                         fill
                                         fallbackType={imageFallbackType}
                                         imageKey={`${product.id}:mobile-main`}
+                                        sizeType="detail"
+                                        priority={true}
                                         className="object-contain p-4"
                                     />
                                 ) : (
@@ -396,6 +400,7 @@ export default function ProductClient({ product }: { product: any }) {
                                                 fill
                                                 fallbackType={imageFallbackType}
                                                 imageKey={`${product.id}:mobile-thumb:${idx}`}
+                                                sizeType="thumbnail"
                                                 className="object-contain p-1"
                                             />
                                         ) : (

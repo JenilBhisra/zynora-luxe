@@ -335,7 +335,15 @@ function DiamondSearchClientContent({ customizerMode = false, shapeImages = {} }
                                         : "border border-zinc-200 group-hover:border-zinc-400"
                                 }`}>
                                     {shape.thumbnailImageUrl || shape.imageUrl || shapeImages[`diamond-shape-icon-${shape.slug}`] ? (
-                                        <img src={shape.thumbnailImageUrl || shape.imageUrl || shapeImages[`diamond-shape-icon-${shape.slug}`]} alt={shape.name} className="w-8 h-8 object-contain rounded-full" />
+                                        <SmartImage 
+                                            src={shape.thumbnailImageUrl || shape.imageUrl || shapeImages[`diamond-shape-icon-${shape.slug}`]} 
+                                            alt={shape.name} 
+                                            width={32} 
+                                            height={32} 
+                                            sizeType="logo" 
+                                            fallbackType="diamond"
+                                            className="w-8 h-8 object-contain rounded-full" 
+                                        />
                                     ) : (
                                         <div className="text-zinc-600">
                                             {shape.name === "Round" && <RoundIcon />}
@@ -648,6 +656,7 @@ function DiamondSearchClientContent({ customizerMode = false, shapeImages = {} }
                                                         fill
                                                         fallbackType="diamond"
                                                         imageKey={`${diamond.id}:${index}`}
+                                                        sizeType="thumbnail"
                                                         className="object-contain mix-blend-multiply opacity-95 group-hover:scale-[1.03] transition-transform duration-500 ease-out"
                                                     />
                                                 </Link>

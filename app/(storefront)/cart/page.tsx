@@ -82,6 +82,7 @@ export default function CartPage() {
                                                 alt={item.name} 
                                                 fill 
                                                 fallbackType={item.isCustomRing ? "setting" : "jewelry"} 
+                                                sizeType="thumbnail"
                                                 className="object-cover p-2" 
                                             />
                                         </div>

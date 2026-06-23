@@ -278,6 +278,7 @@ async function HomeContent({ isAdmin, assetsMap }: { isAdmin: boolean; assetsMap
                                                     alt={product.name}
                                                     fill
                                                     fallbackType="jewelry"
+                                                    sizeType="thumbnail"
                                                     className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.08]"
                                                 />
                                                 <span className="absolute top-4 right-4 text-[10px] uppercase tracking-[0.24em] font-bold text-[#C9A14A] opacity-0 group-hover:opacity-100 transition-opacity duration-500">View</span>

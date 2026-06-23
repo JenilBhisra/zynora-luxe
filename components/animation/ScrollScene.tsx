@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useLayoutEffect, useMemo, useRef, useState, useEffect } from "react";
 import { SmartImage } from "@/components/SmartImage";
 import { VisualEditButton } from "@/components/VisualEditButton";
 import gsap from "gsap";
@@ -89,15 +89,42 @@ export function ScrollScene({ images, nextSectionSelector, customImages = {}, is
     const productLayerRef = useRef<HTMLDivElement | null>(null);
     const textLayerRef = useRef<HTMLDivElement | null>(null);
 
+    const [fetchedAssets, setFetchedAssets] = useState<Record<string, string>>({});
+
+    useEffect(() => {
+        const loadAssets = async () => {
+            try {
+                const res = await fetch("/api/admin/homepage");
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.success && data.assets) {
+                        setFetchedAssets(data.assets);
+                    }
+                }
+            } catch (err) {
+                console.error("Failed to fetch scroll scene assets dynamically:", err);
+            }
+        };
+        loadAssets();
+    }, []);
+
+    const mergedImages = useMemo(() => {
+        return { ...customImages, ...fetchedAssets };
+    }, [customImages, fetchedAssets]);
+
+    const mergedText = useMemo(() => {
+        return { ...customText, ...fetchedAssets };
+    }, [customText, fetchedAssets]);
+
     // Merge DB text overrides into each frame
     const mergedFrames = useMemo(() => {
         return FRAMES.map((frame, idx) => ({
             ...frame,
-            kicker: customText[`text:scroll-${idx + 1}-kicker`] || frame.kicker,
-            title:  customText[`text:scroll-${idx + 1}-title`]  || frame.title,
-            body:   customText[`text:scroll-${idx + 1}-body`]   || frame.body,
+            kicker: mergedText[`text:scroll-${idx + 1}-kicker`] || frame.kicker,
+            title:  mergedText[`text:scroll-${idx + 1}-title`]  || frame.title,
+            body:   mergedText[`text:scroll-${idx + 1}-body`]   || frame.body,
         }));
-    }, [customText]);
+    }, [mergedText]);
 
     const timelineImages = useMemo(() => {
         const fallback: TimelineImage = { src: "/products/ring-2.jpg", alt: "Krishna Diamonds ring" };
@@ -106,10 +133,10 @@ export function ScrollScene({ images, nextSectionSelector, customImages = {}, is
         return Array.from({ length: FRAMES.length }, (_, idx) => {
             const base = source[idx % source.length] || fallback;
             const customKey = `scroll-scene-${idx + 1}`;
-            const customUrl = customImages[customKey];
+            const customUrl = mergedImages[customKey];
             return customUrl ? { src: customUrl, alt: base.alt } : base;
         });
-    }, [images, customImages]);
+    }, [images, mergedImages]);
 
     useLayoutEffect(() => {
         if (!rootRef.current) return;

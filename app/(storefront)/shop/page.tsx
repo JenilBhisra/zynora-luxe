@@ -5,6 +5,8 @@ import { AnimatedSection } from "@/components/AnimatedSection";
 import { FadeIn } from "@/components/FadeIn";
 import { selectCardImage } from "@/lib/image-utils";
 
+import { unstable_cache } from "next/cache";
+
 const prisma = new PrismaClient();
 
 const categoriesList = [
@@ -15,27 +17,30 @@ const categoriesList = [
     { name: "Necklace", slug: "necklace", fallback: "necklace.jpg" }
 ];
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
+
+const getCachedCategoriesWithProducts = unstable_cache(
+    async () => {
+        const categoryPromises = categoriesList.map(async (cat) => {
+            const product = await prisma.product.findFirst({
+                where: { category: { slug: cat.slug } },
+                orderBy: { createdAt: "desc" },
+                select: { images: true, id: true, slug: true, name: true }
+            });
+            
+            return {
+                ...cat,
+                product
+            };
+        });
+        return Promise.all(categoryPromises);
+    },
+    ["shop-categories-list"],
+    { revalidate: 300, tags: ["shop-categories-list"] }
+);
 
 export default async function ShopCategoryPage() {
-    // We want to fetch one latest product for each category to act as its poster image
-    // If no product exists for that category, we will use the fallback image.
-    
-    // Create an array of promises to fetch the latest product for each category
-    const categoryPromises = categoriesList.map(async (cat) => {
-        const product = await prisma.product.findFirst({
-            where: { category: { slug: cat.slug } },
-            orderBy: { createdAt: "desc" },
-            select: { images: true, id: true, slug: true, name: true }
-        });
-        
-        return {
-            ...cat,
-            product
-        };
-    });
-
-    const categoriesWithProducts = await Promise.all(categoryPromises);
+    const categoriesWithProducts = await getCachedCategoriesWithProducts();
 
     return (
         <div className="min-h-screen pb-24 bg-white text-zinc-900">

@@ -6,6 +6,8 @@ import { Button } from "@/components/Button";
 import { ChevronLeft } from "lucide-react";
 import { ProductListClient } from "./components/ProductListClient";
 
+import { unstable_cache } from "next/cache";
+
 const prisma = new PrismaClient();
 
 const categoriesList = [
@@ -16,7 +18,35 @@ const categoriesList = [
     { name: "Necklace", slug: "necklace" }
 ];
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
+
+export async function generateStaticParams() {
+    return categoriesList.map((c) => ({
+        category: c.slug,
+    }));
+}
+
+const getCachedCategoryProducts = (categorySlug: string, limit: number) => unstable_cache(
+    async () => {
+        return prisma.product.findMany({
+            where: { category: { slug: categorySlug } },
+            orderBy: { createdAt: "desc" },
+            take: limit,
+        });
+    },
+    [`category-products-${categorySlug}-${limit}`],
+    { revalidate: 300, tags: [`category-products-${categorySlug}`] }
+)();
+
+const getCachedCategoryCount = (categorySlug: string) => unstable_cache(
+    async () => {
+        return prisma.product.count({
+            where: { category: { slug: categorySlug } }
+        });
+    },
+    [`category-count-${categorySlug}`],
+    { revalidate: 300, tags: [`category-count-${categorySlug}`] }
+)();
 
 export default async function CategoryPage(props: { params: Promise<{ category: string }> }) {
     const params = await props.params;
@@ -30,14 +60,8 @@ export default async function CategoryPage(props: { params: Promise<{ category: 
     const INITIAL_LIMIT = 8;
 
     const [products, totalCount] = await Promise.all([
-        prisma.product.findMany({
-            where: { category: { slug: categorySlug } },
-            orderBy: { createdAt: "desc" },
-            take: INITIAL_LIMIT,
-        }),
-        prisma.product.count({
-            where: { category: { slug: categorySlug } }
-        })
+        getCachedCategoryProducts(categorySlug, INITIAL_LIMIT),
+        getCachedCategoryCount(categorySlug)
     ]);
 
     // Serialize decimal/float field price if needed, or pass directly

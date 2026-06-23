@@ -39,7 +39,38 @@ export async function GET() {
             });
         }
 
-        return NextResponse.json(shapes);
+        // Fetch corresponding site asset URLs for shapes dynamically
+        const shapeKeys = shapes.flatMap(s => [
+            `diamond-shape-icon-${s.slug}`,
+            `diamond-shape-hover-${s.slug}`
+        ]);
+
+        const assets = await prisma.siteAsset.findMany({
+            where: {
+                key: { in: shapeKeys }
+            },
+            select: {
+                key: true,
+                url: true
+            }
+        });
+
+        const assetsMap = assets.reduce((acc: Record<string, string>, asset) => {
+            acc[asset.key] = asset.url;
+            return acc;
+        }, {});
+
+        const shapesWithAssets = shapes.map(shape => {
+            const iconKey = `diamond-shape-icon-${shape.slug}`;
+            const hoverKey = `diamond-shape-hover-${shape.slug}`;
+            return {
+                ...shape,
+                thumbnailImageUrl: shape.thumbnailImageUrl || assetsMap[iconKey] || null,
+                previewImageUrl: shape.previewImageUrl || assetsMap[hoverKey] || null
+            };
+        });
+
+        return NextResponse.json(shapesWithAssets);
     } catch (error) {
         console.error("Failed to fetch shapes:", error);
         return NextResponse.json(

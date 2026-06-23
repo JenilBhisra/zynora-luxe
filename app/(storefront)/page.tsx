@@ -92,8 +92,36 @@ const getCachedFeaturedSettings = unstable_cache(
 );
 
 export default async function HomePage() {
-    // Query site assets immediately (resolved from DB)
+    // Query site assets immediately (resolved from DB - only homepage specific keys)
+    const homepageAssetKeys = [
+        "hero-slide-1",
+        "hero-slide-1-mobile",
+        "category-engagement-ring",
+        "category-pendant",
+        "category-bracelet-and-watch",
+        "category-earrings",
+        "category-necklace",
+        "diamond-shape-main-image",
+        "journey-image",
+        "journey-image-2",
+        "journey-image-3",
+        "text:journey-kicker",
+        "text:journey-headline",
+        "text:journey-body",
+        "featured-collection-bg",
+        "text:featured-heading",
+        "text:trust-heading",
+        "text:trust-body",
+        "text:cta-heading",
+        "text:cta-body"
+    ];
+
     const siteAssets = await prisma.siteAsset.findMany({
+        where: {
+            key: {
+                in: homepageAssetKeys
+            }
+        },
         select: {
             key: true,
             url: true
@@ -119,45 +147,14 @@ export default async function HomePage() {
         "category-necklace": assetsMap["category-necklace"],
     };
 
-    // Prune assets passed to DiamondShapeSection (main image + icons + hovers)
-    const shapeImages: Record<string, string> = {};
-    const shapeKeys = [
-        "diamond-shape-main-image",
-        "diamond-shape-icon-oval", "diamond-shape-icon-round", "diamond-shape-icon-emerald",
-        "diamond-shape-icon-marquise", "diamond-shape-icon-radiant", "diamond-shape-icon-pear",
-        "diamond-shape-icon-elongated-cushion", "diamond-shape-icon-cushion", "diamond-shape-icon-princess",
-        "diamond-shape-icon-asscher", "diamond-shape-icon-heart",
-        "diamond-shape-hover-oval", "diamond-shape-hover-round", "diamond-shape-hover-emerald",
-        "diamond-shape-hover-marquise", "diamond-shape-hover-radiant", "diamond-shape-hover-pear",
-        "diamond-shape-hover-elongated-cushion", "diamond-shape-hover-cushion", "diamond-shape-hover-princess",
-        "diamond-shape-hover-asscher", "diamond-shape-hover-heart"
-    ];
-    for (const key of shapeKeys) {
-        if (assetsMap[key]) {
-            shapeImages[key] = assetsMap[key];
-        }
-    }
+    // Prune assets passed to DiamondShapeSection (main image only, icons and hovers are client-side dynamic)
+    const shapeImages: Record<string, string> = {
+        "diamond-shape-main-image": assetsMap["diamond-shape-main-image"] || ""
+    };
 
-    // Prune assets passed to ScrollScene (scroll-scene images and scroll-scene text)
+    // Prune assets passed to ScrollScene (scroll-scene images and scroll-scene text - loaded client-side now)
     const scrollImages: Record<string, string> = {};
-    const scrollKeys = [
-        "scroll-scene-1", "scroll-scene-2", "scroll-scene-3", "scroll-scene-4", "scroll-scene-5"
-    ];
-    for (const key of scrollKeys) {
-        if (assetsMap[key]) {
-            scrollImages[key] = assetsMap[key];
-        }
-    }
-
     const scrollText: Record<string, string> = {};
-    for (let i = 1; i <= 5; i++) {
-        const kickerKey = `text:scroll-${i}-kicker`;
-        const titleKey = `text:scroll-${i}-title`;
-        const bodyKey = `text:scroll-${i}-body`;
-        if (assetsMap[kickerKey]) scrollText[kickerKey] = assetsMap[kickerKey];
-        if (assetsMap[titleKey]) scrollText[titleKey] = assetsMap[titleKey];
-        if (assetsMap[bodyKey]) scrollText[bodyKey] = assetsMap[bodyKey];
-    }
 
     // Prune assets used directly inside HomeContent to prevent serializing the full assetsMap
     const homeContentAssets = {

@@ -1,3 +1,5 @@
+import { cache } from "react";
+import { unstable_cache } from "next/cache";
 import { PrismaClient } from "@prisma/client";
 import dynamic from "next/dynamic";
 import { Metadata } from "next";
@@ -8,6 +10,28 @@ const ProductClient = dynamic(() => import("./ProductClient"), {
 
 const prisma = new PrismaClient();
 const VIDEO_EXT_REGEX = /\.(mp4|webm|mov)(\?|#|$)/i;
+
+export const revalidate = 300;
+
+const getCachedProduct = (decodedSlug: string) => unstable_cache(
+    async () => {
+        return prisma.product.findFirst({
+            where: {
+                OR: [
+                    { slug: decodedSlug },
+                    { id: decodedSlug }
+                ]
+            },
+            include: { diamond: true, category: true }
+        });
+    },
+    [`product-${decodedSlug}`],
+    { revalidate: 300, tags: [`product-${decodedSlug}`] }
+)();
+
+const getProduct = cache(async (decodedSlug: string) => {
+    return getCachedProduct(decodedSlug);
+});
 
 function getFirstImageFromMedia(images: string | null | undefined) {
     if (!images) return "";
@@ -24,14 +48,7 @@ function getFirstImageFromMedia(images: string | null | undefined) {
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
     const { id } = await params;
     const decodedSlug = decodeURIComponent(id);
-    const product = await prisma.product.findFirst({
-        where: {
-            OR: [
-                { slug: decodedSlug },
-                { id: decodedSlug }
-            ]
-        }
-    });
+    const product = await getProduct(decodedSlug);
 
     if (!product) return { title: "Product Not Found | Zynora Luxe" };
 
@@ -69,15 +86,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
     // Treat params.id as slug or ID
     const { id } = await params;
     const decodedSlug = decodeURIComponent(id);
-    const product = await prisma.product.findFirst({
-        where: {
-            OR: [
-                { slug: decodedSlug },
-                { id: decodedSlug }
-            ]
-        },
-        include: { diamond: true, category: true }
-    });
+    const product = await getProduct(decodedSlug);
 
     if (!product) {
         return <div className="py-32 text-center text-2xl text-text-dark font-heading">Product Not Found</div>;

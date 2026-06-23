@@ -9,10 +9,12 @@ import {
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { compressImage } from "@/lib/image-compression";
+import { useAuth } from "@/components/AuthProvider";
 
 interface AdminStudioProps {
-    isAdmin: boolean;
+    isAdmin?: boolean;
 }
+
 
 interface Diamond {
     id: string;
@@ -125,7 +127,9 @@ function TextFieldRow({ field, initialValue, hasOverride, isSaving, onSave }: Te
     );
 }
 
-export function AdminStudio({ isAdmin }: AdminStudioProps) {
+export function AdminStudio({ isAdmin: propIsAdmin }: AdminStudioProps) {
+    const { user } = useAuth();
+    const isAdmin = propIsAdmin ?? (user?.email?.toLowerCase() === "krishnadiamond404@gmail.com");
     const [isEditMode, setIsEditMode] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
     const [activeTab, setActiveTab] = useState<"homepage" | "diamonds" | "settings" | "text" | "shapes">("homepage");
@@ -295,7 +299,6 @@ export function AdminStudio({ isAdmin }: AdminStudioProps) {
         }
     };
 
-    if (!isAdmin) return null;
 
     const handleUploadClick = (subType?: "thumbnail" | "preview" | React.MouseEvent) => {
         if (subType && typeof subType === "string") {
@@ -533,6 +536,8 @@ export function AdminStudio({ isAdmin }: AdminStudioProps) {
 
     const currentHomepageOverride = homepageAssets[selectedHomepageKey] || "";
     const activeHomepageItem = homepageKeys.find(item => item.key === selectedHomepageKey);
+
+    if (!isAdmin) return null;
 
     return (
         <>

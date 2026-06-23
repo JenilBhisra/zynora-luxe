@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Edit3 } from "lucide-react";
+import { useAuth } from "@/components/AuthProvider";
 
 interface VisualEditButtonProps {
     type: "homepage" | "diamond" | "setting";
@@ -11,6 +12,7 @@ interface VisualEditButtonProps {
 }
 
 export function VisualEditButton({ type, assetKey, item, className = "" }: VisualEditButtonProps) {
+    const { user, loading } = useAuth();
     const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
@@ -28,7 +30,8 @@ export function VisualEditButton({ type, assetKey, item, className = "" }: Visua
         };
     }, []);
 
-    if (!isVisible) return null;
+    const isAdmin = user?.email?.toLowerCase() === "krishnadiamond404@gmail.com";
+    if (loading || !isAdmin || !isVisible) return null;
 
     const handleClick = (e: React.MouseEvent) => {
         e.preventDefault();

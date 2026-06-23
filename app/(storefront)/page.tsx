@@ -5,20 +5,20 @@ import { FadeIn } from "@/components/FadeIn";
 import { SmartImage } from "@/components/SmartImage";
 import { AnimatedSection } from "@/components/AnimatedSection";
 import { selectCardImage } from "@/lib/image-utils";
-import { InteractiveCategoryGallery } from "@/components/InteractiveCategoryGallery";
-import { DiamondShapeSection } from "@/components/DiamondShapeSection";
 import { HeroSlider } from "@/components/HeroSlider";
 import nextDynamic from "next/dynamic";
 import { Suspense } from "react";
+import { unstable_cache } from "next/cache";
 
+// Dynamically import heavy below-the-fold components
+const InteractiveCategoryGallery = nextDynamic(() => import("@/components/InteractiveCategoryGallery").then(mod => mod.InteractiveCategoryGallery));
+const DiamondShapeSection = nextDynamic(() => import("@/components/DiamondShapeSection").then(mod => mod.DiamondShapeSection));
 const ScrollScene = nextDynamic(() => import("@/components/animation/ScrollScene").then(mod => mod.ScrollScene), {
     loading: () => <div className="min-h-screen bg-white flex items-center justify-center text-[#1A1A1A]/40 font-serif tracking-[0.2em] text-xs uppercase animate-pulse">Loading Storyline...</div>
 });
-
 const AdminStudio = nextDynamic(() => import("@/components/AdminStudio").then(mod => mod.AdminStudio));
 
 import { VisualEditButton } from "@/components/VisualEditButton";
-import { getServerSession } from "@/lib/auth";
 
 const prisma = new PrismaClient();
 
@@ -40,18 +40,140 @@ export const metadata: Metadata = {
     }
 };
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
+
+// Cached Prisma queries with select limits (take restricted to 4 for featured products)
+const getCachedFeaturedProducts = unstable_cache(
+    async () => {
+        return prisma.product.findMany({
+            where: { isFeatured: true },
+            orderBy: { createdAt: "desc" },
+            take: 4,
+            select: {
+                id: true,
+                name: true,
+                slug: true,
+                price: true,
+                images: true,
+            }
+        });
+    },
+    ["featured-products"],
+    { revalidate: 300, tags: ["featured-products"] }
+);
+
+const getCachedFeaturedDiamonds = unstable_cache(
+    async () => {
+        return prisma.diamond.findMany({
+            where: { stockStatus: "AVAILABLE" },
+            orderBy: [{ caratWeight: "desc" }, { createdAt: "desc" }],
+            take: 4,
+            select: {
+                id: true,
+            }
+        });
+    },
+    ["featured-diamonds"],
+    { revalidate: 300, tags: ["featured-diamonds"] }
+);
+
+const getCachedFeaturedSettings = unstable_cache(
+    async () => {
+        return prisma.setting.findMany({
+            orderBy: { createdAt: "desc" },
+            take: 4,
+            select: {
+                id: true,
+            }
+        });
+    },
+    ["featured-settings"],
+    { revalidate: 300, tags: ["featured-settings"] }
+);
 
 export default async function HomePage() {
-    const session = await getServerSession();
-    const isAdmin = session?.user?.role === "ADMIN";
-
-    // Query site assets immediately (small configuration table, resolves in ~10ms)
-    const siteAssets = await prisma.siteAsset.findMany();
+    // Query site assets immediately (resolved from DB)
+    const siteAssets = await prisma.siteAsset.findMany({
+        select: {
+            key: true,
+            url: true
+        }
+    });
     const assetsMap = siteAssets.reduce((acc: Record<string, string>, asset) => {
         acc[asset.key] = asset.url;
         return acc;
     }, {});
+
+    // Prune assets passed to HeroSlider (only hero slide 1 desktop + mobile)
+    const heroSlides = {
+        "hero-slide-1": assetsMap["hero-slide-1"],
+        "hero-slide-1-mobile": assetsMap["hero-slide-1-mobile"],
+    };
+
+    // Prune assets passed to category gallery (only category images)
+    const categoryImages = {
+        "category-engagement-ring": assetsMap["category-engagement-ring"],
+        "category-pendant": assetsMap["category-pendant"],
+        "category-bracelet-and-watch": assetsMap["category-bracelet-and-watch"],
+        "category-earrings": assetsMap["category-earrings"],
+        "category-necklace": assetsMap["category-necklace"],
+    };
+
+    // Prune assets passed to DiamondShapeSection (main image + icons + hovers)
+    const shapeImages: Record<string, string> = {};
+    const shapeKeys = [
+        "diamond-shape-main-image",
+        "diamond-shape-icon-oval", "diamond-shape-icon-round", "diamond-shape-icon-emerald",
+        "diamond-shape-icon-marquise", "diamond-shape-icon-radiant", "diamond-shape-icon-pear",
+        "diamond-shape-icon-elongated-cushion", "diamond-shape-icon-cushion", "diamond-shape-icon-princess",
+        "diamond-shape-icon-asscher", "diamond-shape-icon-heart",
+        "diamond-shape-hover-oval", "diamond-shape-hover-round", "diamond-shape-hover-emerald",
+        "diamond-shape-hover-marquise", "diamond-shape-hover-radiant", "diamond-shape-hover-pear",
+        "diamond-shape-hover-elongated-cushion", "diamond-shape-hover-cushion", "diamond-shape-hover-princess",
+        "diamond-shape-hover-asscher", "diamond-shape-hover-heart"
+    ];
+    for (const key of shapeKeys) {
+        if (assetsMap[key]) {
+            shapeImages[key] = assetsMap[key];
+        }
+    }
+
+    // Prune assets passed to ScrollScene (scroll-scene images and scroll-scene text)
+    const scrollImages: Record<string, string> = {};
+    const scrollKeys = [
+        "scroll-scene-1", "scroll-scene-2", "scroll-scene-3", "scroll-scene-4", "scroll-scene-5"
+    ];
+    for (const key of scrollKeys) {
+        if (assetsMap[key]) {
+            scrollImages[key] = assetsMap[key];
+        }
+    }
+
+    const scrollText: Record<string, string> = {};
+    for (let i = 1; i <= 5; i++) {
+        const kickerKey = `text:scroll-${i}-kicker`;
+        const titleKey = `text:scroll-${i}-title`;
+        const bodyKey = `text:scroll-${i}-body`;
+        if (assetsMap[kickerKey]) scrollText[kickerKey] = assetsMap[kickerKey];
+        if (assetsMap[titleKey]) scrollText[titleKey] = assetsMap[titleKey];
+        if (assetsMap[bodyKey]) scrollText[bodyKey] = assetsMap[bodyKey];
+    }
+
+    // Prune assets used directly inside HomeContent to prevent serializing the full assetsMap
+    const homeContentAssets = {
+        "journey-image": assetsMap["journey-image"],
+        "journey-image-2": assetsMap["journey-image-2"],
+        "journey-image-3": assetsMap["journey-image-3"],
+        "text:journey-kicker": assetsMap["text:journey-kicker"],
+        "text:journey-headline": assetsMap["text:journey-headline"],
+        "text:journey-body": assetsMap["text:journey-body"],
+        "featured-collection-bg": assetsMap["featured-collection-bg"],
+        "text:featured-heading": assetsMap["text:featured-heading"],
+        "text:trust-heading": assetsMap["text:trust-heading"],
+        "text:trust-body": assetsMap["text:trust-body"],
+        "text:cta-heading": assetsMap["text:cta-heading"],
+        "text:cta-body": assetsMap["text:cta-body"],
+    };
 
     const orgSchema = {
         "@context": "https://schema.org",
@@ -92,43 +214,46 @@ export default async function HomePage() {
             />
             {/* Header + Hero Slider loads immediately on first paint */}
             <div className="relative">
-                <HeroSlider customSlides={assetsMap} customText={assetsMap} />
+                <HeroSlider customSlides={heroSlides} />
                 {/* Admin: edit the single hero slide (desktop & mobile slots) */}
-                {isAdmin && (
-                    <>
-                        <VisualEditButton type="homepage" assetKey="hero-slide-1" className="top-24 left-6" />
-                        <VisualEditButton type="homepage" assetKey="hero-slide-1-mobile" className="top-24 left-16" />
-                    </>
-                )}
+                <VisualEditButton type="homepage" assetKey="hero-slide-1" className="top-24 left-6" />
+                <VisualEditButton type="homepage" assetKey="hero-slide-1-mobile" className="top-24 left-16" />
             </div>
 
             {/* Suspense streaming handles the heavy database calls progressively below-the-fold */}
             <Suspense fallback={<HomeSkeletonLoader />}>
-                <HomeContent isAdmin={isAdmin} assetsMap={assetsMap} />
+                <HomeContent 
+                    homeContentAssets={homeContentAssets} 
+                    categoryImages={categoryImages}
+                    shapeImages={shapeImages}
+                    scrollImages={scrollImages}
+                    scrollText={scrollText}
+                />
             </Suspense>
 
-            {isAdmin && <AdminStudio isAdmin={isAdmin} />}
+            <AdminStudio />
         </div>
     );
 }
 
 // Child component for query-reliant segments
-async function HomeContent({ isAdmin, assetsMap }: { isAdmin: boolean; assetsMap: Record<string, string> }) {
+async function HomeContent({ 
+    homeContentAssets, 
+    categoryImages,
+    shapeImages,
+    scrollImages,
+    scrollText
+}: { 
+    homeContentAssets: Record<string, string>;
+    categoryImages: Record<string, string>;
+    shapeImages: Record<string, string>;
+    scrollImages: Record<string, string>;
+    scrollText: Record<string, string>;
+}) {
     const [featuredProducts, featuredDiamonds, featuredSettings] = await Promise.all([
-        prisma.product.findMany({
-            where: { isFeatured: true },
-            orderBy: { createdAt: "desc" },
-            take: 8,
-        }),
-        prisma.diamond.findMany({
-            where: { stockStatus: "AVAILABLE" },
-            orderBy: [{ caratWeight: "desc" }, { createdAt: "desc" }],
-            take: 4,
-        }),
-        prisma.setting.findMany({
-            orderBy: { createdAt: "desc" },
-            take: 4,
-        })
+        getCachedFeaturedProducts(),
+        getCachedFeaturedDiamonds(),
+        getCachedFeaturedSettings()
     ]);
 
     const houseMetrics = [
@@ -157,10 +282,10 @@ async function HomeContent({ isAdmin, assetsMap }: { isAdmin: boolean; assetsMap
     return (
         <>
             {/* Section 1: Category Gallery — directly after Hero */}
-            <InteractiveCategoryGallery customImages={assetsMap} isAdmin={isAdmin} />
+            <InteractiveCategoryGallery customImages={categoryImages} />
 
             {/* Section 2: Shop Diamonds by Shape */}
-            <DiamondShapeSection customImages={assetsMap} isAdmin={isAdmin} />
+            <DiamondShapeSection customImages={shapeImages} />
 
             {/* Section 3: Custom Journey / Section Banners */}
             <AnimatedSection id="home-followup-section" className="py-24 md:py-32 bg-white story-section-frame">
@@ -168,44 +293,44 @@ async function HomeContent({ isAdmin, assetsMap }: { isAdmin: boolean; assetsMap
                     <FadeIn className="relative aspect-[4/5] sm:aspect-square lg:aspect-[4/5] w-full">
                         <div className="absolute top-0 right-0 w-[75%] h-[75%] luxury-shell overflow-hidden rounded-[20px] shadow-2xl z-20">
                             <SmartImage
-                                src={assetsMap["journey-image"] || "/products/ring-2.jpg"}
+                                src={homeContentAssets["journey-image"] || "/products/ring-2.jpg"}
                                 alt="Custom Ring Creation"
                                 fill
                                 fallbackType="setting"
                                 className="object-cover transition-transform duration-1000 hover:scale-[1.05]"
                             />
-                            {isAdmin && <VisualEditButton type="homepage" assetKey="journey-image" />}
+                            <VisualEditButton type="homepage" assetKey="journey-image" />
                         </div>
                         <div className="absolute bottom-10 left-0 w-[55%] h-[50%] luxury-shell overflow-hidden rounded-[16px] shadow-xl z-30 ring-1 ring-black/5">
                             <SmartImage
-                                src={assetsMap["journey-image-2"] || "/products/earrings-1.jpg"}
+                                src={homeContentAssets["journey-image-2"] || "/products/earrings-1.jpg"}
                                 alt="Detail shot"
                                 fill
                                 fallbackType="jewelry"
                                 className="object-cover transition-transform duration-1000 hover:scale-[1.05]"
                             />
-                            {isAdmin && <VisualEditButton type="homepage" assetKey="journey-image-2" />}
+                            <VisualEditButton type="homepage" assetKey="journey-image-2" />
                         </div>
                         <div className="absolute top-[10%] left-[5%] w-[40%] h-[40%] luxury-shell overflow-hidden rounded-[12px] shadow-md z-10 opacity-80 ring-1 ring-[#C9A14A]/20 blur-[1px] hover:blur-none transition-all duration-500">
                             <SmartImage
-                                src={assetsMap["journey-image-3"] || "/products/loose-diamond.jpg"}
+                                src={homeContentAssets["journey-image-3"] || "/products/loose-diamond.jpg"}
                                 alt="Diamond close-up"
                                 fill
                                 fallbackType="diamond"
                                 className="object-cover transition-transform duration-1000 hover:scale-[1.05]"
                             />
-                            {isAdmin && <VisualEditButton type="homepage" assetKey="journey-image-3" />}
+                            <VisualEditButton type="homepage" assetKey="journey-image-3" />
                         </div>
                     </FadeIn>
                     <FadeIn className="max-w-[640px]">
                         <span className="block text-[10px] md:text-[11px] uppercase tracking-[0.34em] text-[#C9A14A] mb-5 reveal-step-1">
-                            {assetsMap["text:journey-kicker"] || "The Custom Journey"}
+                            {homeContentAssets["text:journey-kicker"] || "The Custom Journey"}
                         </span>
                         <h2 className="text-[24px] md:text-[32px] leading-[1.1] mb-6 text-[#1A1A1A] reveal-step-2">
-                            {assetsMap["text:journey-headline"] || "Create a ring as rare as the moment it marks"}
+                            {homeContentAssets["text:journey-headline"] || "Create a ring as rare as the moment it marks"}
                         </h2>
                         <p className="text-[#666666] text-[15px] md:text-[16px] leading-[1.7] mb-10 max-w-[540px] reveal-step-3">
-                            {assetsMap["text:journey-body"] || "At ZynoraLuxe, we design with certified stones, refined settings, and precious metals. Every step is deliberate, calm, and built for an effortless experience."}
+                            {homeContentAssets["text:journey-body"] || "At ZynoraLuxe, we design with certified stones, refined settings, and precious metals. Every step is deliberate, calm, and built for an effortless experience."}
                         </p>
                         <div className="grid grid-cols-3 gap-3 mb-10">
                             {houseMetrics.map((metric, idx) => (
@@ -235,14 +360,14 @@ async function HomeContent({ isAdmin, assetsMap }: { isAdmin: boolean; assetsMap
             </AnimatedSection>
 
             {/* Journey Scroll Scene */}
-            <ScrollScene images={timelineImages} nextSectionSelector="#featured-products-section" customImages={assetsMap} customText={assetsMap} isAdmin={isAdmin} />
+            <ScrollScene images={timelineImages} nextSectionSelector="#featured-products-section" customImages={scrollImages} customText={scrollText} />
 
             {/* Section 2: Product Showcase (Featured Collection / Featured Products) */}
             <AnimatedSection 
                 id="featured-products-section"
                 className="py-24 md:py-28 relative overflow-hidden story-section-frame"
                 style={{
-                    backgroundImage: `url('${assetsMap["featured-collection-bg"] || "/images/about2.jpg"}')`,
+                    backgroundImage: `url('${homeContentAssets["featured-collection-bg"] || "/images/about2.jpg"}')`,
                     backgroundSize: "cover",
                     backgroundPosition: "center",
                     backgroundRepeat: "no-repeat"
@@ -252,22 +377,20 @@ async function HomeContent({ isAdmin, assetsMap }: { isAdmin: boolean; assetsMap
                 <div className="absolute inset-0 bg-white/85 pointer-events-none z-0" />
 
                 <div className="container-custom relative z-10 animate-fade-in">
-                    {isAdmin && (
-                        <div className="absolute -top-12 left-4 z-20">
-                            <VisualEditButton type="homepage" assetKey="featured-collection-bg" />
-                        </div>
-                    )}
+                    <div className="absolute -top-12 left-4 z-20">
+                        <VisualEditButton type="homepage" assetKey="featured-collection-bg" />
+                    </div>
                     <FadeIn className="mb-12 md:mb-16 max-w-2xl reveal-step-1">
                         <span className="block text-[10px] md:text-[11px] uppercase tracking-[0.34em] text-[#C9A14A] mb-4">Featured Collection</span>
                         <h2 className="text-[24px] md:text-[32px] leading-[1.1] text-[#1A1A1A] reveal-step-2">
-                            {assetsMap["text:featured-heading"] || "Signature pieces, hand-selected"}
+                            {homeContentAssets["text:featured-heading"] || "Signature pieces, hand-selected"}
                         </h2>
                     </FadeIn>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
                         {featuredProducts.slice(0, 4).map((product, index) => {
                             const cardAssetKey = `featured-product-${index + 1}`;
-                            const image = assetsMap[cardAssetKey] || selectCardImage(product.images, new Set(), "jewelry", index, product.id, product.name);
+                            const image = homeContentAssets[cardAssetKey] || selectCardImage(product.images, new Set(), "jewelry", index, product.id, product.name);
                             return (
                                 <FadeIn key={product.id} delay={index * 0.08} className={`reveal-step-${Math.min(index + 1, 4)}`}>
                                     <Link href={`/product/${product.slug}`} className="group block h-full">
@@ -282,7 +405,7 @@ async function HomeContent({ isAdmin, assetsMap }: { isAdmin: boolean; assetsMap
                                                     className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.08]"
                                                 />
                                                 <span className="absolute top-4 right-4 text-[10px] uppercase tracking-[0.24em] font-bold text-[#C9A14A] opacity-0 group-hover:opacity-100 transition-opacity duration-500">View</span>
-                                                {isAdmin && <VisualEditButton type="homepage" assetKey={cardAssetKey} />}
+                                                <VisualEditButton type="homepage" assetKey={cardAssetKey} />
                                             </div>
                                             <div className="p-5 md:p-6 bg-white text-center">
                                                 {/* 1. Price */}
@@ -307,10 +430,10 @@ async function HomeContent({ isAdmin, assetsMap }: { isAdmin: boolean; assetsMap
                     <FadeIn className="bg-[#FAF8F4] border border-[#EAEAEA] rounded-[22px] p-8 md:p-10 reveal-step-1">
                         <span className="block text-[10px] md:text-[11px] uppercase tracking-[0.34em] text-[#C9A14A] mb-4">Why Choose Us</span>
                         <h2 className="text-[24px] md:text-[32px] leading-[1.1] text-[#1A1A1A] mb-6 reveal-step-2">
-                            {assetsMap["text:trust-heading"] || "Designed with certainty, delivered with care"}
+                            {homeContentAssets["text:trust-heading"] || "Designed with certainty, delivered with care"}
                         </h2>
                         <p className="text-[#666666] leading-[1.7] text-[15px] md:text-[16px] max-w-xl mb-8 reveal-step-3">
-                            {assetsMap["text:trust-body"] || "Premium jewelry deserves a presentation that feels equally assured. Certified sourcing, insured delivery, and personal assistance guide every order."}
+                            {homeContentAssets["text:trust-body"] || "Premium jewelry deserves a presentation that feels equally assured. Certified sourcing, insured delivery, and personal assistance guide every order."}
                         </p>
                         <div className="grid sm:grid-cols-3 gap-4">
                             {[
@@ -355,10 +478,10 @@ async function HomeContent({ isAdmin, assetsMap }: { isAdmin: boolean; assetsMap
                     <FadeIn className="reveal-step-1">
                         <span className="block text-[10px] md:text-[11px] uppercase tracking-[0.34em] text-[#C9A14A] mb-5">Your Journey Starts Here</span>
                         <h2 className="text-[24px] md:text-[32px] leading-[1.1] text-[#1A1A1A] mb-6 reveal-step-2">
-                            {assetsMap["text:cta-heading"] || "Three ways to find your perfect piece"}
+                            {homeContentAssets["text:cta-heading"] || "Three ways to find your perfect piece"}
                         </h2>
                         <p className="text-[#666666] text-[15px] md:text-[16px] leading-[1.7] max-w-2xl mx-auto mb-12 reveal-step-3">
-                            {assetsMap["text:cta-body"] || "Whether you're creating a custom ring, exploring certified diamonds, or browsing signature pieces, we've designed a calm, intentional journey for you."}
+                            {homeContentAssets["text:cta-body"] || "Whether you're creating a custom ring, exploring certified diamonds, or browsing signature pieces, we've designed a calm, intentional journey for you."}
                         </p>
                     </FadeIn>
                     

@@ -168,14 +168,11 @@ export function ScrollScene({ images, nextSectionSelector, customImages = {}, is
                                     <div className="relative h-full w-full">
                                         <SmartImage src={item.src} alt={item.alt} fill fallbackType="jewelry" className="object-cover" sizes="(max-width: 1024px) 100vw, 50vw" />
                                         <div className="absolute inset-0 bg-gradient-to-t from-white/30 to-transparent" />
-                                        {/* Admin: edit overlay per scroll scene frame */}
-                                        {isAdmin && (
-                                            <VisualEditButton
-                                                type="homepage"
-                                                assetKey={`scroll-scene-${index + 1}`}
-                                                className="top-3 left-3"
-                                            />
-                                        )}
+                                        <VisualEditButton
+                                            type="homepage"
+                                            assetKey={`scroll-scene-${index + 1}`}
+                                            className="top-3 left-3"
+                                        />
                                     </div>
                                 </div>
                             ))}

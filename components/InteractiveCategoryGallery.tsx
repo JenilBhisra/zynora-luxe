@@ -84,11 +84,9 @@ export function InteractiveCategoryGallery({ customImages = {}, isAdmin = false 
                                         {/* Subtle gold line hover overlay */}
                                         <div className="absolute inset-0 border-2 border-transparent group-hover:border-[#C9A14A] rounded-[16px] transition-colors duration-500 pointer-events-none" />
                                         
-                                        {isAdmin && (
-                                            <div className="absolute top-2 left-2 z-20">
-                                                <VisualEditButton type="homepage" assetKey={cat.assetKey} />
-                                            </div>
-                                        )}
+                                        <div className="absolute top-2 left-2 z-20">
+                                            <VisualEditButton type="homepage" assetKey={cat.assetKey} />
+                                        </div>
                                     </div>
                                 </div>
                                 {/* Title below image */}
@@ -135,11 +133,9 @@ export function InteractiveCategoryGallery({ customImages = {}, isAdmin = false 
                                                     fallbackType="jewelry"
                                                     className="object-cover"
                                                 />
-                                                {isAdmin && (
                                                     <div className="absolute top-2 left-2 z-20">
                                                         <VisualEditButton type="homepage" assetKey={cat.assetKey} />
                                                     </div>
-                                                )}
                                             </div>
                                         </div>
                                         <div className="mt-3 text-center">

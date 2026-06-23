@@ -88,12 +88,9 @@ export function DiamondShapeSection({ customImages = {}, isAdmin = false }: Diam
                             className="relative w-full aspect-square overflow-hidden bg-white"
                             style={{ maxWidth: "520px" }}
                         >
-                            {/* Admin: edit default main image */}
-                            {isAdmin && (
-                                <div className="absolute top-3 left-3 z-30">
-                                    <VisualEditButton type="homepage" assetKey={DEFAULT_MAIN_KEY} />
-                                </div>
-                            )}
+                            <div className="absolute top-3 left-3 z-30">
+                                <VisualEditButton type="homepage" assetKey={DEFAULT_MAIN_KEY} />
+                            </div>
 
                             {/* Base fallback image */}
                             <div className="absolute inset-0" style={{ opacity: selectedShapeId ? 0 : 1, zIndex: 1 }}>
@@ -185,7 +182,7 @@ export function DiamondShapeSection({ customImages = {}, isAdmin = false }: Diam
                                             </div>
 
                                             {/* Admin edit button for icon */}
-                                            {isAdmin && isSelected && (
+                                            {isSelected && (
                                                 <div className="absolute top-0 left-0 z-20" style={{ transform: "scale(0.75)", transformOrigin: "top left" }}>
                                                     <VisualEditButton type="homepage" assetKey={shape.iconKey} />
                                                 </div>
@@ -249,11 +246,9 @@ export function DiamondShapeSection({ customImages = {}, isAdmin = false }: Diam
                                                 sizes="54px"
                                             />
                                         </div>
-                                        {isAdmin && (
                                             <div className="absolute top-0 left-0 z-20" style={{ transform: "scale(0.7)", transformOrigin: "top left" }}>
                                                 <VisualEditButton type="homepage" assetKey={shape.iconKey} />
                                             </div>
-                                        )}
                                     </div>
                                     <span
                                         style={{

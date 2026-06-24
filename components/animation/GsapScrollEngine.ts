@@ -90,16 +90,27 @@ export function createDesktopScrollEngine({
         },
     });
 
-    const parallaxBgY = isMobile ? 0 : -10;
-    const parallaxProductY = isMobile ? 0 : -8;
-    const parallaxTextY = isMobile ? 0 : -14;
+    // 1. Add scene transitions first to determine total duration
+    for (let i = 1; i < scenes.length; i++) {
+        master.add(createSceneTimeline(scenes[i], scenes[i - 1], imageLayers[i], imageLayers[i - 1]), ">-0.08");
+    }
+
+    master.to({}, { duration: 0.35 });
+
+    // 2. Query total duration of transitions
+    const totalDuration = master.duration();
+
+    // 3. Add smooth parallax layers mapped over the full timeline duration
+    const parallaxBgY = isMobile ? 0 : -4;
+    const parallaxProductY = isMobile ? 0 : -2;
+    const parallaxTextY = isMobile ? 0 : -3;
 
     master.to(
         backgroundLayer,
         {
             yPercent: parallaxBgY,
             ease: "none",
-            duration: 1,
+            duration: totalDuration,
         },
         0,
     );
@@ -109,7 +120,7 @@ export function createDesktopScrollEngine({
         {
             yPercent: parallaxProductY,
             ease: "none",
-            duration: 1,
+            duration: totalDuration,
         },
         0,
     );
@@ -119,16 +130,10 @@ export function createDesktopScrollEngine({
         {
             yPercent: parallaxTextY,
             ease: "none",
-            duration: 1,
+            duration: totalDuration,
         },
         0,
     );
-
-    for (let i = 1; i < scenes.length; i++) {
-        master.add(createSceneTimeline(scenes[i], scenes[i - 1], imageLayers[i], imageLayers[i - 1]), ">-0.08");
-    }
-
-    master.to({}, { duration: 0.35 });
 
     if (nextSection) {
         gsap.timeline({

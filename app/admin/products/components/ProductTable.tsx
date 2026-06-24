@@ -1,27 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import { useRef, useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { toast } from "sonner";
-import { compressImage } from "@/lib/image-compression";
 import Image from "next/image";
 import { Play, X, Search } from "lucide-react";
-
-type PendingMedia = {
-    file: File;
-    preview: string;
-    kind: "image" | "video";
-};
-
-const VIDEO_EXT_REGEX = /\.(mp4|webm|mov)(\?|#|$)/i;
+import AdminMediaManager from "@/app/admin/components/AdminMediaManager";
+import { VIDEO_EXT_REGEX } from "@/lib/media-utils";
 
 export function ProductTable({ initialProducts, categories }: { initialProducts: any[], categories: any[] }) {
     const [products, setProducts] = useState(initialProducts);
     const [isAdding, setIsAdding] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
 
-    const [pendingMedia, setPendingMedia] = useState<PendingMedia[]>([]);
     const [isUploading, setIsUploading] = useState(false);
-    const imageInputRef = useRef<HTMLInputElement | null>(null);
 
     const [formData, setFormData] = useState({
         sku: "",
@@ -38,7 +29,8 @@ export function ProductTable({ initialProducts, categories }: { initialProducts:
         goldPrice: "",
         silverPrice: "",
         platinumPrice: "",
-        karatPrices: { "10K": "", "14K": "", "18K": "", "22K": "" }
+        karatPrices: { "10K": "", "14K": "", "18K": "", "22K": "" },
+        images: "[]"
     });
 
     const [editingProduct, setEditingProduct] = useState<any | null>(null);
@@ -66,96 +58,13 @@ export function ProductTable({ initialProducts, categories }: { initialProducts:
         } catch { toast.error("Error"); }
     };
 
-    const clearPendingMedia = () => {
-        pendingMedia.forEach((media) => {
-            if (media.preview) URL.revokeObjectURL(media.preview);
-        });
-        setPendingMedia([]);
-    };
-
-    const handleMediaChange = (kind: "image" | "video") => (e: React.ChangeEvent<HTMLInputElement>) => {
-        const files = Array.from(e.target.files || []);
-        if (files.length > 0) {
-            const validMedia: PendingMedia[] = [];
-
-            const imageTypes = ["image/jpeg", "image/png", "image/webp"];
-            const videoTypes = ["video/mp4", "video/webm", "video/quicktime"];
-            const imageExt = /\.(jpg|jpeg|png|webp)$/i;
-            const videoExt = /\.(mp4|webm|mov)$/i;
-            const maxSize = kind === "image" ? 50 * 1024 * 1024 : 30 * 1024 * 1024;
-
-            for (const file of files) {
-                const isValidType = kind === "image"
-                    ? imageTypes.includes(file.type) || imageExt.test(file.name)
-                    : videoTypes.includes(file.type) || videoExt.test(file.name);
-
-                if (!isValidType) {
-                    toast.error(`Invalid file type for ${file.name}.`);
-                    continue;
-                }
-                if (file.size > maxSize) {
-                    toast.error(`File ${file.name} exceeds ${kind === "image" ? "50MB" : "30MB"} limit.`);
-                    continue;
-                }
-                validMedia.push({
-                    file,
-                    preview: URL.createObjectURL(file),
-                    kind,
-                });
-            }
-
-            setPendingMedia((prev) => [...prev, ...validMedia]);
-        }
-
-        e.target.value = "";
-    };
-
-    const removeMedia = (index: number) => {
-        setPendingMedia((prev) => {
-            const cloned = [...prev];
-            const removed = cloned.splice(index, 1)[0];
-            if (removed?.preview) {
-                URL.revokeObjectURL(removed.preview);
-            }
-            return cloned;
-        });
-    };
-
-    const imageCount = pendingMedia.filter((media) => media.kind === "image").length;
-
     const handleCreate = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (isUploading) {
+            toast.error("Please wait until all uploads are complete.");
+            return;
+        }
         try {
-            setIsUploading(true);
-            const uploadedMediaUrls: string[] = [];
-
-            for (const media of pendingMedia) {
-                const uploadFormData = new FormData();
-                if (media.kind === "image") {
-                    const compressedFile = await compressImage(media.file);
-                    uploadFormData.append("file", compressedFile);
-                } else {
-                    uploadFormData.append("file", media.file);
-                }
-                uploadFormData.append("type", "products");
-                uploadFormData.append("kind", media.kind);
-
-                const uploadRes = await fetch('/api/admin/upload', {
-                    method: 'POST',
-                    body: uploadFormData
-                });
-
-                const uploadData = await uploadRes.json();
-
-                if (!uploadRes.ok) {
-                    toast.error(`Failed to upload ${media.file.name}`);
-                    setIsUploading(false);
-                    return;
-                }
-
-                uploadedMediaUrls.push(uploadData.url);
-            }
-
             const availableMetalsStr = formData.availableMetals.join(",");
             const silverVal = formData.availableMetals.includes("Silver") ? parseFloat(formData.silverPrice) || null : null;
             const platVal = formData.availableMetals.includes("Platinum") ? parseFloat(formData.platinumPrice) || null : null;
@@ -186,7 +95,7 @@ export function ProductTable({ initialProducts, categories }: { initialProducts:
                 goldPrice: goldBase,
                 silverPrice: silverVal,
                 platinumPrice: platVal,
-                images: JSON.stringify(uploadedMediaUrls),
+                images: formData.images,
                 karatPrices: JSON.stringify(karatPricesObj)
             };
 
@@ -205,16 +114,14 @@ export function ProductTable({ initialProducts, categories }: { initialProducts:
                     name: "", description: "", categoryId: categories[0]?.name || "Rings", metalType: "Gold", stockCount: "1",
                     tags: "", extraKeywords: "", seoTitle: "", seoDescription: "",
                     availableMetals: ["Gold"], goldPrice: "", silverPrice: "", platinumPrice: "",
-                    karatPrices: { "10K": "", "14K": "", "18K": "", "22K": "" }
+                    karatPrices: { "10K": "", "14K": "", "18K": "", "22K": "" },
+                    images: "[]"
                 });
-                clearPendingMedia();
             } else {
                 toast.error(data.error || "Creation failed");
             }
         } catch {
             toast.error("Error");
-        } finally {
-            setIsUploading(false);
         }
     };
 
@@ -250,16 +157,19 @@ export function ProductTable({ initialProducts, categories }: { initialProducts:
             goldPrice: product.goldPrice !== null && product.goldPrice !== undefined ? String(product.goldPrice) : "",
             silverPrice: product.silverPrice !== null && product.silverPrice !== undefined ? String(product.silverPrice) : "",
             platinumPrice: product.platinumPrice !== null && product.platinumPrice !== undefined ? String(product.platinumPrice) : "",
-            karatPrices: kpObj
+            karatPrices: kpObj,
+            images: product.images || "[]"
         });
         setIsAdding(false);
     };
 
     const handleEditSave = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (isUploading) {
+            toast.error("Please wait until all uploads are complete.");
+            return;
+        }
         try {
-            setIsUploading(true);
-
             const availableMetalsStr = editFormData.availableMetals.join(",");
             const silverVal = editFormData.availableMetals.includes("Silver") ? parseFloat(editFormData.silverPrice) || null : null;
             const platVal = editFormData.availableMetals.includes("Platinum") ? parseFloat(editFormData.platinumPrice) || null : null;
@@ -290,7 +200,8 @@ export function ProductTable({ initialProducts, categories }: { initialProducts:
                 goldPrice: goldBase,
                 silverPrice: silverVal,
                 platinumPrice: platVal,
-                karatPrices: JSON.stringify(karatPricesObj)
+                karatPrices: JSON.stringify(karatPricesObj),
+                images: editFormData.images
             };
 
             const res = await fetch(`/api/admin/products?id=${editingProduct.id}`, {
@@ -309,8 +220,6 @@ export function ProductTable({ initialProducts, categories }: { initialProducts:
             }
         } catch {
             toast.error("Error");
-        } finally {
-            setIsUploading(false);
         }
     };
 
@@ -351,7 +260,6 @@ export function ProductTable({ initialProducts, categories }: { initialProducts:
                         setIsAdding(!isAdding);
                         setEditingProduct(null);
                         setEditFormData(null);
-                        clearPendingMedia();
                     }} className="bg-[#111111] text-white border border-transparent px-6 py-3 rounded-none font-bold text-xs uppercase tracking-widest transition-all shadow-md hover:shadow-lg hover:-translate-y-1 hover:bg-[#C9A14A] hover:text-white">
                         {isAdding ? "Cancel" : "+ Add Product"}
                     </button>
@@ -477,77 +385,32 @@ export function ProductTable({ initialProducts, categories }: { initialProducts:
 
                     <div className="md:col-span-3">
                         <label className="block text-xs font-bold uppercase tracking-widest text-gray-600 mb-3">Product Media</label>
-                        <div className="space-y-4">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500 mb-2">Images</label>
-                                    <div className="flex items-center gap-3 mb-3">
-                                        <button
-                                            type="button"
-                                            onClick={() => imageInputRef.current?.click()}
-                                            className="bg-[#111111] text-white px-4 py-2 text-[10px] uppercase tracking-[0.2em] font-bold rounded-none"
-                                        >
-                                            + Add Image
-                                        </button>
-                                        <span className="text-[11px] text-gray-500">{imageCount} image(s) added</span>
-                                    </div>
-                                    <input
-                                        ref={imageInputRef}
-                                        type="file"
-                                        accept="image/png, image/jpeg, image/webp"
-                                        onChange={handleMediaChange("image")}
-                                        className="hidden"
-                                    />
-                                    <input
-                                        type="file"
-                                        multiple
-                                        accept="image/png, image/jpeg, image/webp"
-                                        onChange={handleMediaChange("image")}
-                                        className="w-full text-sm text-gray-600 file:mr-4 file:py-2.5 file:px-6 file:rounded-full file:border-0 file:text-xs file:uppercase file:tracking-widest file:font-bold file:bg-gray-100 file:text-[#111111] hover:file:bg-white/20 transition-colors cursor-pointer"
-                                    />
-                                    <p className="mt-2 text-[10px] text-gray-500 uppercase tracking-widest">Or choose multiple at once</p>
-                                </div>
-                                <div>
-                                    <label className="block text-[10px] font-bold uppercase tracking-[0.2em] text-gray-500 mb-2">Videos</label>
-                                    <input
-                                        type="file"
-                                        multiple
-                                        accept="video/mp4, video/webm, video/quicktime,.mov"
-                                        onChange={handleMediaChange("video")}
-                                        className="w-full text-sm text-gray-600 file:mr-4 file:py-2.5 file:px-6 file:rounded-full file:border-0 file:text-xs file:uppercase file:tracking-widest file:font-bold file:bg-gray-100 file:text-[#111111] hover:file:bg-white/20 transition-colors cursor-pointer"
-                                    />
-                                </div>
-                            </div>
-
-                            {pendingMedia.length > 0 && (
-                                <div className="flex flex-wrap gap-4 mt-4">
-                                    {pendingMedia.map((media, index) => (
-                                        <div key={index} className="relative w-28 h-28 border border-gray-300 rounded-none overflow-hidden bg-gray-50 group shadow-[0_4px_10px_rgba(0,0,0,0.3)]">
-                                            {media.kind === "image" ? (
-                                                <Image src={media.preview} alt={`Preview ${index}`} width={112} height={112} className="w-full h-full object-cover" unoptimized />
-                                            ) : (
-                                                <>
-                                                    <video src={media.preview} className="w-full h-full object-cover" muted playsInline preload="metadata" />
-                                                    <div className="absolute inset-0 bg-black/25 flex items-center justify-center">
-                                                        <Play size={20} className="text-white" fill="currentColor" />
-                                                    </div>
-                                                </>
-                                            )}
-                                            <button
-                                                type="button"
-                                                onClick={() => removeMedia(index)}
-                                                className="absolute top-2 right-2 bg-gray-50/80 rounded-full p-1.5 text-red-400 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black"
-                                            >
-                                                <X size={14} />
-                                            </button>
-                                            <span className="absolute left-2 bottom-2 bg-black/70 text-white text-[9px] uppercase font-bold px-2 py-1 tracking-widest">
-                                                {media.kind}
-                                            </span>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
+                        {(() => {
+                            let parsedImages: string[] = [];
+                            let parsedVideos: string[] = [];
+                            try {
+                                const parsed = JSON.parse(formData.images || "[]");
+                                if (Array.isArray(parsed)) {
+                                    parsedImages = parsed.filter(url => !VIDEO_EXT_REGEX.test(url));
+                                    parsedVideos = parsed.filter(url => VIDEO_EXT_REGEX.test(url));
+                                }
+                            } catch {}
+                            return (
+                                <AdminMediaManager
+                                    uploadType="products"
+                                    existingImages={parsedImages}
+                                    existingVideos={parsedVideos}
+                                    onMediaChange={({ images, videos }) => {
+                                        const combined = [...images, ...videos];
+                                        setFormData(prev => ({
+                                            ...prev,
+                                            images: JSON.stringify(combined)
+                                        }));
+                                    }}
+                                    onUploadingStatusChange={setIsUploading}
+                                />
+                            );
+                        })()}
                     </div>
 
                     <div className="md:col-span-3"><label className="block text-xs font-bold uppercase tracking-widest text-gray-600 mb-2">Description</label>
@@ -735,6 +598,36 @@ export function ProductTable({ initialProducts, categories }: { initialProducts:
                             />
                         </div>
                     )}
+
+                    <div className="md:col-span-3">
+                        <label className="block text-xs font-bold uppercase tracking-widest text-gray-600 mb-3">Product Media</label>
+                        {(() => {
+                            let parsedImages: string[] = [];
+                            let parsedVideos: string[] = [];
+                            try {
+                                const parsed = JSON.parse(editFormData.images || "[]");
+                                if (Array.isArray(parsed)) {
+                                    parsedImages = parsed.filter(url => !VIDEO_EXT_REGEX.test(url));
+                                    parsedVideos = parsed.filter(url => VIDEO_EXT_REGEX.test(url));
+                                }
+                            } catch {}
+                            return (
+                                <AdminMediaManager
+                                    uploadType="products"
+                                    existingImages={parsedImages}
+                                    existingVideos={parsedVideos}
+                                    onMediaChange={({ images, videos }) => {
+                                        const combined = [...images, ...videos];
+                                        setEditFormData((prev: any) => ({
+                                            ...prev,
+                                            images: JSON.stringify(combined)
+                                        }));
+                                    }}
+                                    onUploadingStatusChange={setIsUploading}
+                                />
+                            );
+                        })()}
+                    </div>
 
                     <div className="md:col-span-3"><label className="block text-xs font-bold uppercase tracking-widest text-gray-600 mb-2">Description</label>
                         <textarea required className="w-full bg-gray-50 border rounded-none p-3 text-sm text-[#111111] outline-none focus:border-[#111111] border-gray-200 transition-colors" rows={3} value={editFormData.description} onChange={e => setEditFormData({ ...editFormData, description: e.target.value })} />

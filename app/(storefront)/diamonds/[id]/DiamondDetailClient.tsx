@@ -12,6 +12,8 @@ import dynamic from "next/dynamic";
 import { SmartImage } from "@/components/SmartImage";
 import { selectCardImage } from "@/lib/image-utils";
 import { CustomizerProgressBar } from "@/components/CustomizerProgressBar";
+import { getOrderedMedia } from "@/lib/media-utils";
+import { ErrorBoundary } from "react-error-boundary";
 import {
     ZYNORA_FAQ,
     ZYNORA_WARRANTY,
@@ -36,6 +38,13 @@ const ModelCanvas = dynamic(() => import("@/app/(storefront)/setting/[id]/ModelV
 
 const fmt = (v: number) =>
     new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(v);
+
+const ModelFallback = () => (
+    <div className="w-full h-full flex flex-col items-center justify-center bg-zinc-50 border border-zinc-200 p-6 text-center select-none animate-in fade-in duration-300">
+        <span className="text-xs uppercase tracking-widest text-[#C9A14A] font-bold mb-2">3D Preview Unavailable</span>
+        <span className="text-[10px] text-zinc-500">Could not initialize 3D canvas</span>
+    </div>
+);
 
 export default function DiamondDetailClient({ diamond }: { diamond: any }) {
     const router = useRouter();
@@ -82,10 +91,14 @@ export default function DiamondDetailClient({ diamond }: { diamond: any }) {
         | { type: "3d" };
 
     const mediaItems: MediaItem[] = useMemo(() => {
-        const items: MediaItem[] = [];
-        if (modelUrl || diamond.shape) items.push({ type: "3d" });
-        items.push({ type: "photo", src: imageSrc });
-        return items;
+        const ordered = getOrderedMedia({
+            images: [imageSrc],
+            model3d: modelUrl || (diamond.shape ? "fallback_shape" : null)
+        });
+        return ordered.map(item => ({
+            type: item.type === "model3d" ? ("3d" as const) : ("photo" as const),
+            src: item.url === "fallback_shape" ? "" : item.url
+        }));
     }, [imageSrc, modelUrl, diamond.shape]);
 
     const [activeIdx, setActiveIdx] = useState(0);
@@ -149,18 +162,18 @@ export default function DiamondDetailClient({ diamond }: { diamond: any }) {
             {isCustomizerMode && <CustomizerProgressBar currentStep={1} />}
 
             {/* ── Main Detail Content Grid ───────────────────── */}
-            <div className="max-w-7xl mx-auto px-4 md:px-8 py-8 md:py-16">
-                <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 items-start">
+            <div className="max-w-[1600px] w-full mx-auto px-4 md:px-8 py-8 md:py-12">
+                <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 items-start">
 
                     {/* Left: Gallery (Brilliant Earth 2-column Grid / Mobile viewport + thumbs) */}
-                    <div className="w-full lg:w-[68%] flex flex-col gap-4">
+                    <div className="w-full lg:w-[65%] flex flex-col gap-4">
                         {/* Desktop Grid Layout */}
-                        <div className="hidden md:grid grid-cols-2 gap-4 w-full">
+                        <div className="hidden md:grid grid-cols-2 gap-2 md:gap-3 w-full">
                             {mediaItems.map((item, idx) => (
                                 <div
                                     key={idx}
-                                    className={`relative aspect-[4/5] w-full overflow-hidden flex items-center justify-center p-2 group ${
-                                        mediaItems.length === 1 || (mediaItems.length % 2 !== 0 && idx === 0) ? "md:col-span-2" : ""
+                                    className={`relative aspect-square w-full overflow-hidden flex items-center justify-center group ${
+                                        mediaItems.length === 1 ? "md:col-span-2" : ""
                                     }`}
                                 >
                                     {item.type === "photo" && (
@@ -172,15 +185,17 @@ export default function DiamondDetailClient({ diamond }: { diamond: any }) {
                                             imageKey={`grid-${diamond.id}-${idx}`}
                                             sizeType="detail"
                                             priority={idx === 0}
-                                            className="object-contain p-4 transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+                                            className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
                                         />
                                     )}
                                     {item.type === "3d" && (
                                         <div className="relative w-full h-full">
-                                            <ModelCanvas url={diamond.modelUrl} shape={diamond.shape} />
+                                            <ErrorBoundary fallback={<ModelFallback />}>
+                                                <ModelCanvas url={diamond.modelUrl} shape={diamond.shape} />
+                                            </ErrorBoundary>
                                             <p className="absolute bottom-3 left-3 right-3 text-center text-[8px] text-zinc-400 uppercase tracking-widest pointer-events-none">
                                                 Drag to rotate · Scroll to zoom
-                                            </p>
+                                             </p>
                                         </div>
                                     )}
                                 </div>
@@ -189,7 +204,7 @@ export default function DiamondDetailClient({ diamond }: { diamond: any }) {
 
                         {/* Mobile Viewport + Thumbs selection */}
                         <div className="block md:hidden w-full">
-                            <div className="relative aspect-[4/5] w-full overflow-hidden flex items-center justify-center p-2 rounded-none">
+                            <div className="relative aspect-square w-full overflow-hidden flex items-center justify-center rounded-none">
                                 {mediaItems.length > 0 ? (
                                     mediaItems[activeIdx]?.type === "photo" ? (
                                          <SmartImage
@@ -200,11 +215,13 @@ export default function DiamondDetailClient({ diamond }: { diamond: any }) {
                                              imageKey={`mobile-main-${diamond.id}`}
                                              sizeType="detail"
                                              priority={true}
-                                             className="object-contain p-4"
+                                             className="object-cover"
                                          />
                                     ) : mediaItems[activeIdx]?.type === "3d" ? (
                                         <div className="relative w-full h-full">
-                                            <ModelCanvas url={diamond.modelUrl} shape={diamond.shape} />
+                                            <ErrorBoundary fallback={<ModelFallback />}>
+                                                <ModelCanvas url={diamond.modelUrl} shape={diamond.shape} />
+                                            </ErrorBoundary>
                                             <p className="absolute bottom-3 left-3 right-3 text-center text-[8px] text-zinc-400 uppercase tracking-widest pointer-events-none">
                                                 Drag to rotate · Scroll to zoom
                                             </p>
@@ -251,7 +268,7 @@ export default function DiamondDetailClient({ diamond }: { diamond: any }) {
                     </div>
 
                     {/* Right: Details Panel */}
-                    <div className="w-full lg:w-[32%] flex flex-col gap-6">
+                    <div className="w-full lg:w-[35%] lg:sticky lg:top-24 flex flex-col gap-6">
                         <div>
                             <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-[#C9A14A] mb-1">
                                 <Sparkles size={11} /> Conflict-Free Certified

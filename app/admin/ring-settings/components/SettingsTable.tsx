@@ -2,9 +2,9 @@
 "use client";
 import { useState, useMemo } from "react";
 import { toast } from "sonner";
-import { compressImage } from "@/lib/image-compression";
 import Image from "next/image";
 import { Edit2, Trash2, X, Search } from "lucide-react";
+import AdminMediaManager from "@/app/admin/components/AdminMediaManager";
 
 export function SettingsTable({ initialSettings }: { initialSettings: any[] }) {
     const [settings, setSettings] = useState(initialSettings);
@@ -14,14 +14,6 @@ export function SettingsTable({ initialSettings }: { initialSettings: any[] }) {
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [editingSetting, setEditingSetting] = useState<any | null>(null);
     const [settingToDelete, setSettingToDelete] = useState<any | null>(null);
-    const [imageFiles, setImageFiles] = useState<File[]>([]);
-    const [imagePreviews, setImagePreviews] = useState<string[]>([]);
-    const [existingImages, setExistingImages] = useState<string[]>([]);
-    const [videoFile, setVideoFile] = useState<File | null>(null);
-    const [videoPreview, setVideoPreview] = useState<string | null>(null);
-    const [existingVideo, setExistingVideo] = useState<string | null>(null);
-    const [modelFile, setModelFile] = useState<File | null>(null);
-    const [modelName, setModelName] = useState<string>("");
     const [isUploading, setIsUploading] = useState(false);
     const DIAMOND_SHAPES = ["Round", "Oval", "Emerald", "Cushion", "Elongated Cushion", "Pear", "Radiant", "Princess", "Marquise", "Asscher", "Heart"];
     const [supportedShapes, setSupportedShapes] = useState<string[]>([]);
@@ -67,14 +59,6 @@ export function SettingsTable({ initialSettings }: { initialSettings: any[] }) {
 
     const openCreateModal = () => {
         setEditingSetting(null);
-        setImageFiles([]);
-        setImagePreviews([]);
-        setExistingImages([]);
-        setVideoFile(null);
-        setVideoPreview(null);
-        setExistingVideo(null);
-        setModelFile(null);
-        setModelName("");
         setFormData({
             sku: "",
             name: "",
@@ -100,19 +84,6 @@ export function SettingsTable({ initialSettings }: { initialSettings: any[] }) {
 
     const openEditModal = (setting: any) => {
         setEditingSetting(setting);
-        setImageFiles([]);
-        setImagePreviews([]);
-        let parsedImages: string[] = [];
-        try { parsedImages = JSON.parse(setting.images || "[]"); } catch {}
-        if (!Array.isArray(parsedImages)) parsedImages = [];
-        if (parsedImages.length === 0 && setting.imageUrl) parsedImages = [setting.imageUrl];
-        setExistingImages(parsedImages);
-        setVideoFile(null);
-        setVideoPreview(null);
-        setExistingVideo(setting.videoUrl || null);
-        setModelFile(null);
-        setModelName(setting.modelUrl ? setting.modelUrl.split('/').pop() : "");
-
         const metalsList = setting.availableMetals 
             ? setting.availableMetals.split(",").map((m: string) => m.trim())
             : ["Gold"];
@@ -248,162 +219,17 @@ export function SettingsTable({ initialSettings }: { initialSettings: any[] }) {
         }
     };
 
-    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const files = Array.from(e.target.files || []);
-        const validFiles = files.filter(file => {
-            if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
-                toast.error(`${file.name} is invalid type.`);
-                return false;
-            }
-            if (file.size > 50 * 1024 * 1024) {
-                toast.error(`${file.name} exceeds 50MB.`);
-                return false;
-            }
-            return true;
-        });
-        
-        if (validFiles.length) {
-            setImageFiles(prev => [...prev, ...validFiles]);
-            const newPreviews = validFiles.map(f => URL.createObjectURL(f));
-            setImagePreviews(prev => [...prev, ...newPreviews]);
-        }
-        e.target.value = '';
-    };
-
-    const removeNewImage = (index: number) => {
-        setImageFiles(prev => prev.filter((_, i) => i !== index));
-        setImagePreviews(prev => prev.filter((_, i) => i !== index));
-    };
-
-    const removeExistingImage = (index: number) => {
-        setExistingImages(prev => prev.filter((_, i) => i !== index));
-    };
-
-    const handleVideoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (file) {
-            if (!['video/mp4', 'video/webm', 'video/quicktime'].includes(file.type)) {
-                toast.error("Invalid file type. Only MP4, WebM, and MOV are allowed.");
-                return;
-            }
-            if (file.size > 30 * 1024 * 1024) {
-                toast.error("File size exceeds 30MB limit.");
-                return;
-            }
-            setVideoFile(file);
-            setVideoPreview(URL.createObjectURL(file));
-        }
-    };
-
-    const removeVideo = () => {
-        setVideoFile(null);
-        setVideoPreview(null);
-    }
-    const removeExistingVideo = () => {
-        setExistingVideo(null);
-    }
-
-    const handleModelChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-        const isAllowedModeType = file.name.toLowerCase().endsWith('.glb') || file.name.toLowerCase().endsWith('.gltf') || file.name.toLowerCase().endsWith('.obj');
-        if (!isAllowedModeType) {
-            toast.error("Invalid model type. Only .glb, .gltf, and .obj files are allowed.");
-            return;
-        }
-        if (file.size > 30 * 1024 * 1024) {
-            toast.error("Model size exceeds 30MB limit.");
-            return;
-        }
-        setModelFile(file);
-        setModelName(file.name);
-    };
-
-    const removeModel = () => {
-        setModelFile(null);
-        setModelName("");
-        setFormData(prev => ({ ...prev, modelUrl: "" }));
-    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        console.log("Submitting form with formData:", formData);
-        console.log("Files:", { imageFiles, videoFile, modelFile });
+        if (isUploading) {
+            toast.error("Please wait until all uploads are complete.");
+            return;
+        }
         try {
-            setIsUploading(true);
-            let uploadedModelUrl = formData.modelUrl;
-            let finalImageUrls = [...existingImages];
-            let uploadedVideoUrl = existingVideo || "";
-
-            if (modelFile) {
-                console.log("Uploading model...");
-                const modelUploadFormData = new FormData();
-                modelUploadFormData.append("file", modelFile);
-                modelUploadFormData.append("type", "settings");
-                modelUploadFormData.append("kind", "model");
-
-                const modelUploadRes = await fetch('/api/admin/upload', {
-                    method: 'POST',
-                    body: modelUploadFormData
-                });
-
-                const modelUploadData = await modelUploadRes.json();
-
-                if (!modelUploadRes.ok) {
-                    console.error("Model upload error:", modelUploadData);
-                    toast.error(modelUploadData.error || "Model upload failed");
-                    setIsUploading(false);
-                    return;
-                }
-
-                uploadedModelUrl = modelUploadData.url;
-            }
-
-            if (videoFile) {
-                const videoFormData = new FormData();
-                videoFormData.append("file", videoFile);
-                videoFormData.append("type", "settings");
-                videoFormData.append("kind", "video");
-
-                const videoRes = await fetch('/api/admin/upload', {
-                    method: 'POST',
-                    body: videoFormData
-                });
-
-                const videoData = await videoRes.json();
-
-                if (!videoRes.ok) {
-                    toast.error(videoData.error || "Video upload failed");
-                    setIsUploading(false);
-                    return;
-                }
-
-                uploadedVideoUrl = videoData.url;
-            }
-
-            if (imageFiles.length > 0) {
-                for (const file of imageFiles) {
-                    const compressedFile = await compressImage(file);
-                    const uploadFormData = new FormData();
-                    uploadFormData.append("file", compressedFile);
-                    uploadFormData.append("type", "settings");
-
-                    const uploadRes = await fetch('/api/admin/upload', {
-                        method: 'POST',
-                        body: uploadFormData
-                    });
-
-                    const uploadData = await uploadRes.json();
-
-                    if (!uploadRes.ok) {
-                        toast.error(uploadData.error || `Image upload failed for ${file.name}`);
-                    } else {
-                        finalImageUrls.push(uploadData.url);
-                    }
-                }
-            }
-            
-            const primaryImageUrl = finalImageUrls.length > 0 ? finalImageUrls[0] : "";
+            let parsedImages = [];
+            try { parsedImages = JSON.parse(formData.images); } catch {}
+            const primaryImageUrl = parsedImages.length > 0 ? parsedImages[0] : "";
 
             // Build karatPrices object — only include karats with a value entered
             const karatPricesObj: Record<string, number> = {};
@@ -453,9 +279,9 @@ export function SettingsTable({ initialSettings }: { initialSettings: any[] }) {
                 name: formData.name,
                 description: formData.description,
                 imageUrl: primaryImageUrl,
-                images: JSON.stringify(finalImageUrls),
-                videoUrl: uploadedVideoUrl,
-                modelUrl: uploadedModelUrl,
+                images: formData.images,
+                videoUrl: formData.videoUrl,
+                modelUrl: formData.modelUrl,
                 price: basePrice,
                 stockCount: parseInt(formData.stockCount) || 1,
                 category: formData.category,
@@ -490,8 +316,6 @@ export function SettingsTable({ initialSettings }: { initialSettings: any[] }) {
         } catch (err: any) {
             console.error("Submit Exception:", err);
             toast.error(err.message || "Error");
-        } finally {
-            setIsUploading(false);
         }
     };
 
@@ -731,83 +555,28 @@ export function SettingsTable({ initialSettings }: { initialSettings: any[] }) {
                                 </div>
 
                                 <div className="md:col-span-2">
-                                    <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-600 mb-3">Setting Images (Photos)</label>
-                                    <div className="flex flex-col gap-5">
-                                        <div className="flex flex-wrap gap-4">
-                                            {existingImages.map((src, idx) => (
-                                                <div key={`existing-${idx}`} className="relative w-16 h-16 border rounded-none bg-gray-50 flex items-center justify-center overflow-hidden shrink-0 border-gray-200">
-                                                    <Image src={src} alt="Preview" fill className="object-cover" unoptimized />
-                                                    <button type="button" onClick={() => removeExistingImage(idx)} className="absolute top-0 right-0 bg-red-500 text-white w-4 h-4 flex items-center justify-center text-[10px]">×</button>
-                                                </div>
-                                            ))}
-                                            {imagePreviews.map((src, idx) => (
-                                                <div key={`new-${idx}`} className="relative w-16 h-16 border rounded-none bg-gray-50 flex items-center justify-center overflow-hidden shrink-0 border-gray-200">
-                                                    <Image src={src} alt="Preview" fill className="object-cover" unoptimized />
-                                                    <button type="button" onClick={() => removeNewImage(idx)} className="absolute top-0 right-0 bg-red-500 text-white w-4 h-4 flex items-center justify-center text-[10px]">×</button>
-                                                </div>
-                                            ))}
-                                        </div>
-                                        <div className="flex-1">
-                                            <input
-                                                type="file"
-                                                multiple
-                                                accept="image/png, image/jpeg, image/webp"
-                                                onChange={handleImageChange}
-                                                className="w-full text-xs text-gray-600 file:mr-4 file:py-2.5 file:px-6 file:rounded-full file:border-0 file:text-[10px] file:uppercase file:tracking-widest file:font-bold file:bg-gray-100 file:text-[#111111] hover:file:bg-white/20 transition-colors cursor-pointer"
+                                    <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-600 mb-3">Setting Media</label>
+                                    {(() => {
+                                        let parsedImages: string[] = [];
+                                        try { parsedImages = JSON.parse(formData.images || "[]"); } catch {}
+                                        return (
+                                            <AdminMediaManager
+                                                uploadType="settings"
+                                                existingImages={parsedImages}
+                                                existingVideos={formData.videoUrl ? [formData.videoUrl] : []}
+                                                existingModel3d={formData.modelUrl || null}
+                                                onMediaChange={({ images, videos, model3d }) => {
+                                                    setFormData(prev => ({
+                                                        ...prev,
+                                                        images: JSON.stringify(images),
+                                                        videoUrl: videos[0] || "",
+                                                        modelUrl: model3d || ""
+                                                    }));
+                                                }}
+                                                onUploadingStatusChange={setIsUploading}
                                             />
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="md:col-span-2">
-                                    <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-600 mb-3">Setting Video</label>
-                                    <div className="flex items-center gap-5">
-                                        <div className="w-16 h-16 border rounded-none bg-gray-50 flex items-center justify-center overflow-hidden shrink-0 border-gray-200 shadow-none">
-                                            {videoPreview || existingVideo ? (
-                                                <video src={videoPreview || existingVideo || ""} className="w-full h-full object-cover" muted />
-                                            ) : (
-                                                <span className="text-[9px] text-gray-300 font-bold uppercase tracking-[0.2em] px-2 text-center">No Vid</span>
-                                            )}
-                                        </div>
-                                        <div className="flex-1">
-                                            <input
-                                                type="file"
-                                                accept="video/mp4, video/webm, video/quicktime"
-                                                onChange={handleVideoChange}
-                                                className="w-full text-xs text-gray-600 file:mr-4 file:py-2.5 file:px-6 file:rounded-full file:border-0 file:text-[10px] file:uppercase file:tracking-widest file:font-bold file:bg-gray-100 file:text-[#111111] hover:file:bg-white/20 transition-colors cursor-pointer"
-                                            />
-                                            {(videoPreview || existingVideo) && (
-                                                <button type="button" onClick={videoPreview ? removeVideo : removeExistingVideo} className="text-red-400 text-[10px] uppercase tracking-widest mt-3 font-bold hover:text-red-300 transition-colors">
-                                                    Remove Video
-                                                </button>
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="md:col-span-2">
-                                    <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-600 mb-3">3D Model (.obj, .glb)</label>
-                                    <div className="flex items-center gap-5">
-                                        <div className="w-16 h-16 border rounded-none bg-gray-50 flex items-center justify-center overflow-hidden shrink-0 border-gray-200 shadow-none">
-                                            <span className="text-[9px] text-gray-500 font-bold uppercase tracking-[0.2em] px-2 text-center">3D</span>
-                                        </div>
-                                        <div className="flex-1">
-                                            <input
-                                                type="file"
-                                                accept=".glb,.gltf,.obj,model/gltf-binary,model/obj"
-                                                onChange={handleModelChange}
-                                                className="w-full text-xs text-gray-600 file:mr-4 file:py-2.5 file:px-6 file:rounded-full file:border-0 file:text-[10px] file:uppercase file:tracking-widest file:font-bold file:bg-gray-100 file:text-[#111111] hover:file:bg-white/20 transition-colors cursor-pointer"
-                                            />
-                                            {modelName ? (
-                                                <div className="mt-2 flex items-center gap-4">
-                                                    <span className="text-[11px] text-gray-600">{modelName}</span>
-                                                    <button type="button" onClick={removeModel} className="text-red-400 text-[10px] uppercase tracking-widest font-bold hover:text-red-300 transition-colors">
-                                                        Remove Model
-                                                    </button>
-                                                </div>
-                                            ) : null}
-                                        </div>
-                                    </div>
+                                        );
+                                    })()}
                                 </div>
                             </div>
                             <div className="flex justify-end gap-4 pt-6 border-t border-gray-100">

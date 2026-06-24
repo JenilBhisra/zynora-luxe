@@ -12,6 +12,8 @@ import { useCart } from "@/components/CartProvider";
 import { toast } from "sonner";
 import dynamic from "next/dynamic";
 import { CustomizerProgressBar } from "@/components/CustomizerProgressBar";
+import { getOrderedMedia } from "@/lib/media-utils";
+import { ErrorBoundary } from "react-error-boundary";
 import {
     ZYNORA_FAQ,
     ZYNORA_WARRANTY,
@@ -37,6 +39,20 @@ const ModelCanvas = dynamic(() => import("./ModelViewer3D"), {
 const fmt = (v: number) =>
     new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(v);
 
+const ModelFallback = () => (
+    <div className="w-full h-full flex flex-col items-center justify-center bg-zinc-50 border border-zinc-200 p-6 text-center select-none animate-in fade-in duration-300">
+        <span className="text-xs uppercase tracking-widest text-[#C9A14A] font-bold mb-2">3D Preview Unavailable</span>
+        <span className="text-[10px] text-zinc-500">Could not initialize 3D canvas</span>
+    </div>
+);
+
+const VideoFallback = () => (
+    <div className="w-full h-full flex flex-col items-center justify-center bg-zinc-50 border border-zinc-200 p-6 text-center select-none animate-in fade-in duration-300">
+        <span className="text-xs uppercase tracking-widest text-zinc-500 font-bold mb-2">Video Preview Unavailable</span>
+        <span className="text-[10px] text-zinc-400">Unable to load media stream</span>
+    </div>
+);
+
 const METAL_OPTIONS: { label: MetalType; color: string; ring: string; priceAdjustment: number }[] = [
     { label: "18K White Gold", color: "#E8E8E8", ring: "#ccc", priceAdjustment: 0 },
     { label: "18K Yellow Gold", color: "#D4AF37", ring: "#b89a2a", priceAdjustment: 0 },
@@ -60,6 +76,7 @@ export default function SettingDetailClient({ setting }: { setting: any }) {
     const { addToCart } = useCart();
 
     const [showStickyBottomBar, setShowStickyBottomBar] = useState(false);
+    const [videoErrors, setVideoErrors] = useState<Record<string, boolean>>({});
     const normalBtnRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
@@ -215,11 +232,15 @@ export default function SettingDetailClient({ setting }: { setting: any }) {
         | { type: "3d" };
 
     const mediaItems: MediaItem[] = useMemo(() => {
-        const items: MediaItem[] = [];
-        if (modelUrl) items.push({ type: "3d" });
-        images.forEach(src => items.push({ type: "photo", src }));
-        if (videoUrl) items.push({ type: "video" });
-        return items;
+        const ordered = getOrderedMedia({
+            images: images,
+            videos: videoUrl ? [videoUrl] : [],
+            model3d: modelUrl
+        });
+        return ordered.map(item => ({
+            type: item.type === "model3d" ? ("3d" as const) : item.type === "image" ? ("photo" as const) : ("video" as const),
+            src: item.url
+        }));
     }, [images, videoUrl, modelUrl]);
 
     const [activeIdx, setActiveIdx] = useState(0);
@@ -314,18 +335,18 @@ export default function SettingDetailClient({ setting }: { setting: any }) {
             {isCustomizerMode && <CustomizerProgressBar currentStep={2} />}
 
             {/* ── Main Detail Content Grid ───────────────────── */}
-            <div className="max-w-7xl mx-auto px-4 md:px-8 py-8 md:py-16">
-                <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 items-start">
+            <div className="max-w-[1600px] w-full mx-auto px-4 md:px-8 py-8 md:py-12">
+                <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 items-start">
 
                     {/* Left: Gallery (Brilliant Earth desktop grid / mobile viewport + thumbs) */}
-                    <div className="w-full lg:w-[68%] flex flex-col gap-4">
+                    <div className="w-full lg:w-[65%] flex flex-col gap-4">
                         {/* Desktop Grid Layout */}
-                        <div className="hidden md:grid grid-cols-2 gap-4 w-full">
+                        <div className="hidden md:grid grid-cols-2 gap-2 md:gap-3 w-full">
                             {mediaItems.map((item, idx) => (
                                 <div
                                     key={idx}
-                                    className={`relative aspect-[4/5] w-full overflow-hidden flex items-center justify-center p-2 group ${
-                                        mediaItems.length === 1 || (mediaItems.length % 2 !== 0 && idx === 0) ? "md:col-span-2" : ""
+                                    className={`relative aspect-square w-full overflow-hidden flex items-center justify-center group ${
+                                        mediaItems.length === 1 ? "md:col-span-2" : ""
                                     }`}
                                 >
                                     {item.type === "photo" && (
@@ -337,17 +358,28 @@ export default function SettingDetailClient({ setting }: { setting: any }) {
                                             imageKey={`grid-${setting.id}-${idx}`}
                                             sizeType="detail"
                                             priority={idx === 0}
-                                            className="object-contain p-4 transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+                                            className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
                                         />
                                     )}
                                     {item.type === "video" && videoUrl && (
                                         <div className="relative w-full h-full flex items-center justify-center">
-                                            <video src={videoUrl} controls className="w-full h-full object-contain p-2" />
+                                            {videoErrors[videoUrl] ? (
+                                                <VideoFallback />
+                                            ) : (
+                                                <video 
+                                                    src={videoUrl} 
+                                                    controls 
+                                                    className="w-full h-full object-cover" 
+                                                    onError={() => setVideoErrors(prev => ({ ...prev, [videoUrl]: true }))}
+                                                />
+                                            )}
                                         </div>
                                     )}
                                     {item.type === "3d" && modelUrl && (
                                         <div className="relative w-full h-full">
-                                            <ModelCanvas url={modelUrl} />
+                                            <ErrorBoundary fallback={<ModelFallback />}>
+                                                <ModelCanvas url={modelUrl} />
+                                            </ErrorBoundary>
                                             <p className="absolute bottom-3 left-3 right-3 text-center text-[8px] text-zinc-400 uppercase tracking-widest pointer-events-none">
                                                 Drag to rotate · Scroll to zoom
                                             </p>
@@ -359,7 +391,7 @@ export default function SettingDetailClient({ setting }: { setting: any }) {
 
                         {/* Mobile Viewport + Thumbs selection */}
                         <div className="block md:hidden w-full">
-                            <div className="relative aspect-[4/5] w-full overflow-hidden flex items-center justify-center p-2 rounded-none">
+                            <div className="relative aspect-square w-full overflow-hidden flex items-center justify-center rounded-none">
                                 {mediaItems.length > 0 ? (
                                     mediaItems[activeIdx]?.type === "photo" ? (
                                         <SmartImage
@@ -370,15 +402,26 @@ export default function SettingDetailClient({ setting }: { setting: any }) {
                                             imageKey={`mobile-main-${setting.id}`}
                                             sizeType="detail"
                                             priority={true}
-                                            className="object-contain p-4"
+                                            className="object-cover"
                                         />
                                     ) : mediaItems[activeIdx]?.type === "video" && videoUrl ? (
                                         <div className="relative w-full h-full flex items-center justify-center">
-                                            <video src={videoUrl} controls className="w-full h-full object-contain p-2" />
+                                            {videoErrors[videoUrl] ? (
+                                                <VideoFallback />
+                                            ) : (
+                                                <video 
+                                                    src={videoUrl} 
+                                                    controls 
+                                                    className="w-full h-full object-cover" 
+                                                    onError={() => setVideoErrors(prev => ({ ...prev, [videoUrl]: true }))}
+                                                />
+                                            )}
                                         </div>
                                     ) : mediaItems[activeIdx]?.type === "3d" && modelUrl ? (
                                         <div className="relative w-full h-full">
-                                            <ModelCanvas url={modelUrl} />
+                                            <ErrorBoundary fallback={<ModelFallback />}>
+                                                <ModelCanvas url={modelUrl} />
+                                            </ErrorBoundary>
                                             <p className="absolute bottom-3 left-3 right-3 text-center text-[8px] text-zinc-400 uppercase tracking-widest pointer-events-none">
                                                 Drag to rotate · Scroll to zoom
                                             </p>
@@ -425,7 +468,7 @@ export default function SettingDetailClient({ setting }: { setting: any }) {
                     </div>
 
                     {/* Right: Details Panel */}
-                    <div className="w-full lg:w-[32%] flex flex-col gap-6">
+                    <div className="w-full lg:w-[35%] lg:sticky lg:top-24 flex flex-col gap-6">
                         <div>
                             <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-[#C9A14A] mb-1 flex items-center gap-1.5">
                                 <Sparkles size={11} /> Handcrafted setting

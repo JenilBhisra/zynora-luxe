@@ -131,7 +131,8 @@ export default async function middleware(req: NextRequest) {
   }
 
   if (pathname.startsWith("/api/admin")) {
-    if (!user || user.role !== "ADMIN") {
+    const isPublicHomepageGet = pathname === "/api/admin/homepage" && method === "GET";
+    if (!isPublicHomepageGet && (!user || user.role !== "ADMIN")) {
       return new NextResponse(JSON.stringify({ error: "Unauthorized access denied." }), {
         status: 403,
         headers: { "Content-Type": "application/json" },

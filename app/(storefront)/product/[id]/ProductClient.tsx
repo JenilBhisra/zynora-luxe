@@ -10,14 +10,44 @@ import { useAuth } from "@/components/AuthProvider";
 import { useRouter } from "next/navigation";
 import { saveCheckoutIntent } from "@/lib/checkout-intent";
 import { SmartImage } from "@/components/SmartImage";
+import { getOrderedMedia } from "@/lib/media-utils";
+import { ErrorBoundary } from "react-error-boundary";
+import dynamic from "next/dynamic";
+
+const ModelCanvas = dynamic(() => import("@/app/(storefront)/setting/[id]/ModelViewer3D"), {
+    ssr: false,
+    loading: () => (
+        <div className="w-full h-full flex items-center justify-center bg-zinc-50">
+            <div className="flex flex-col items-center gap-3">
+                <div className="w-8 h-8 rounded-full border-2 border-[#C9A14A]/30 border-t-[#C9A14A] animate-spin" />
+                <p className="text-[#C9A14A] text-[9px] uppercase tracking-[0.25em] font-semibold">Loading 3D Model…</p>
+            </div>
+        </div>
+    ),
+});
 
 const VIDEO_EXT_REGEX = /\.(mp4|webm|mov)(\?|#|$)/i;
+
+const ModelFallback = () => (
+    <div className="w-full h-full flex flex-col items-center justify-center bg-zinc-50 border border-zinc-200 p-6 text-center select-none">
+        <span className="text-xs uppercase tracking-widest text-[#C9A14A] font-bold mb-2">3D Preview Unavailable</span>
+        <span className="text-[10px] text-zinc-500">Could not initialize 3D canvas</span>
+    </div>
+);
+
+const VideoFallback = () => (
+    <div className="w-full h-full flex flex-col items-center justify-center bg-zinc-50 border border-zinc-200 p-6 text-center select-none">
+        <span className="text-xs uppercase tracking-widest text-zinc-500 font-bold mb-2">Video Preview Unavailable</span>
+        <span className="text-[10px] text-zinc-400">Unable to load media stream</span>
+    </div>
+);
 
 export default function ProductClient({ product }: { product: any }) {
     const { addToCart } = useCart();
     const { user } = useAuth();
     const router = useRouter();
     const [activeTab, setActiveTab] = useState("specs");
+    const [videoErrors, setVideoErrors] = useState<Record<string, boolean>>({});
 
     const [showStickyBottomBar, setShowStickyBottomBar] = useState(false);
     const normalBtnRef = useRef<HTMLDivElement>(null);
@@ -213,22 +243,11 @@ export default function ProductClient({ product }: { product: any }) {
     };
     const availableOptions = getAvailableOptions();
 
-    let parsedMedia: string[] = [];
-    try {
-        if (typeof product.images === "string") {
-            parsedMedia = JSON.parse(product.images);
-        } else if (Array.isArray(product.images)) {
-            parsedMedia = product.images;
-        }
-    } catch (e) {
-        console.log("Error parsing media in product details", e);
-    }
-    const mediaItems = (parsedMedia.length > 0 ? parsedMedia : [])
-        .filter((src) => typeof src === "string" && src.trim().length > 0)
-        .map((src) => ({
-            src,
-            type: VIDEO_EXT_REGEX.test(src) ? "video" as const : "image" as const,
-        }));
+    const orderedMedia = getOrderedMedia({ images: product.images });
+    const mediaItems = orderedMedia.map((item) => ({
+        src: item.url,
+        type: item.type === "model3d" ? ("3d" as const) : item.type === "image" ? ("image" as const) : ("video" as const),
+    }));
     const imageItems = mediaItems.filter((item) => item.type === "image");
 
     const [activeMediaIndex, setActiveMediaIndex] = useState(0);
@@ -296,16 +315,16 @@ export default function ProductClient({ product }: { product: any }) {
                 <span className="text-zinc-900">{product.name}</span>
             </div>
 
-            <div className="container-custom flex flex-col lg:flex-row gap-8 lg:gap-12 mb-24 relative">
+            <div className="max-w-[1600px] w-full mx-auto px-4 md:px-8 flex flex-col lg:flex-row gap-6 lg:gap-8 mb-24 relative">
                 {/* Left: Gallery (Brilliant Earth 2-column Grid) */}
-                <section className="w-full lg:w-[68%] flex flex-col gap-4">
+                <section className="w-full lg:w-[65%] flex flex-col gap-4">
                     {/* Desktop Grid Layout */}
-                    <div className="hidden md:grid grid-cols-2 gap-4 w-full">
+                    <div className="hidden md:grid grid-cols-2 gap-2 md:gap-3 w-full">
                         {mediaItems.map((item, idx) => (
                             <FadeIn 
                                 key={`${item.src}-${idx}`} 
-                                className={`relative aspect-[4/5] w-full overflow-hidden flex items-center justify-center p-2 group ${
-                                    mediaItems.length === 1 || (mediaItems.length % 2 !== 0 && idx === 0) ? "md:col-span-2" : ""
+                                className={`relative aspect-square w-full overflow-hidden flex items-center justify-center group ${
+                                    mediaItems.length === 1 ? "md:col-span-2" : ""
                                 }`}
                             >
                                 {item.type === "image" ? (
@@ -317,21 +336,32 @@ export default function ProductClient({ product }: { product: any }) {
                                         imageKey={`${product.id}:grid:${idx}`}
                                         sizeType="detail"
                                         priority={idx === 0}
-                                        className="object-contain p-4 transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+                                        className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
                                     />
+                                ) : item.type === "video" ? (
+                                    videoErrors[item.src] ? (
+                                        <VideoFallback />
+                                    ) : (
+                                        <video
+                                            src={item.src}
+                                            className="w-full h-full object-cover"
+                                            controls
+                                            preload="metadata"
+                                            playsInline
+                                            onError={() => setVideoErrors(prev => ({ ...prev, [item.src]: true }))}
+                                        />
+                                    )
                                 ) : (
-                                    <video
-                                        src={item.src}
-                                        className="w-full h-full object-contain p-2"
-                                        controls
-                                        preload="metadata"
-                                        playsInline
-                                    />
+                                    <div className="relative w-full h-full">
+                                        <ErrorBoundary fallback={<ModelFallback />}>
+                                            <ModelCanvas url={item.src} />
+                                        </ErrorBoundary>
+                                    </div>
                                 )}
                             </FadeIn>
                         ))}
                         {mediaItems.length === 0 && (
-                            <div className="relative aspect-[4/5] w-full overflow-hidden flex items-center justify-center col-span-2">
+                            <div className="relative aspect-square w-full overflow-hidden flex items-center justify-center col-span-2">
                                 <SmartImage
                                     src=""
                                     alt={product.name}
@@ -346,7 +376,7 @@ export default function ProductClient({ product }: { product: any }) {
 
                     {/* Mobile Carousel / Thumbnail Selection */}
                     <div className="block md:hidden w-full">
-                        <div className="relative aspect-[4/5] w-full overflow-hidden flex items-center justify-center p-2 rounded-none">
+                        <div className="relative aspect-square w-full overflow-hidden flex items-center justify-center rounded-none">
                             {mediaItems.length > 0 ? (
                                 mediaItems[activeMediaIndex].type === "image" ? (
                                     <SmartImage
@@ -357,16 +387,27 @@ export default function ProductClient({ product }: { product: any }) {
                                         imageKey={`${product.id}:mobile-main`}
                                         sizeType="detail"
                                         priority={true}
-                                        className="object-contain p-4"
+                                        className="object-cover transition-transform duration-700 ease-out"
                                     />
+                                ) : mediaItems[activeMediaIndex].type === "video" ? (
+                                    videoErrors[mediaItems[activeMediaIndex].src] ? (
+                                        <VideoFallback />
+                                    ) : (
+                                        <video
+                                            src={mediaItems[activeMediaIndex].src}
+                                            className="w-full h-full object-cover"
+                                            controls
+                                            preload="metadata"
+                                            playsInline
+                                            onError={() => setVideoErrors(prev => ({ ...prev, [mediaItems[activeMediaIndex].src]: true }))}
+                                        />
+                                    )
                                 ) : (
-                                    <video
-                                        src={mediaItems[activeMediaIndex].src}
-                                        className="w-full h-full object-contain p-2"
-                                        controls
-                                        preload="metadata"
-                                        playsInline
-                                    />
+                                    <div className="relative w-full h-full">
+                                        <ErrorBoundary fallback={<ModelFallback />}>
+                                            <ModelCanvas url={mediaItems[activeMediaIndex].src} />
+                                        </ErrorBoundary>
+                                    </div>
                                 )
                             ) : (
                                 <SmartImage
@@ -403,9 +444,13 @@ export default function ProductClient({ product }: { product: any }) {
                                                 sizeType="thumbnail"
                                                 className="object-contain p-1"
                                             />
-                                        ) : (
+                                        ) : item.type === "video" ? (
                                             <div className="w-full h-full flex items-center justify-center bg-zinc-100 text-[10px] text-zinc-500 font-bold uppercase">
                                                 Video
+                                            </div>
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center bg-zinc-100 text-[9px] text-[#C9A14A] font-bold uppercase">
+                                                3D Model
                                             </div>
                                         )}
                                     </button>
@@ -416,7 +461,7 @@ export default function ProductClient({ product }: { product: any }) {
                 </section>
 
                 {/* Right: Details (Scrollable Flow) */}
-                <section className="w-full lg:w-[32%] pt-4 flex flex-col">
+                <section className="w-full lg:w-[35%] pt-4 lg:sticky lg:top-24 flex flex-col">
                     <FadeIn delay={0.2}>
                         <span className="text-[11px] md:text-xs tracking-[0.34em] font-semibold text-[#C9A14A] uppercase mb-3 block">Product Detail</span>
                         <h1 className="text-[22px] md:text-3xl lg:text-[34px] font-serif font-medium text-zinc-900 tracking-wide mb-6 max-w-[640px]">

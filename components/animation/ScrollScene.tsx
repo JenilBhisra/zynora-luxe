@@ -191,7 +191,7 @@ export function ScrollScene({ images, nextSectionSelector, customImages = {}, is
                         <div ref={productLayerRef} className="relative order-1 lg:order-1 h-[35vh] sm:h-[45vh] lg:h-[70vh] max-h-[760px] will-change-transform w-full">
                             <div className="absolute inset-0 luxury-shell rounded-[20px] lg:rounded-[28px] border border-[#C9A14A]/20" />
                             {timelineImages.map((item, index) => (
-                                <div key={`${item.src}-${index}`} className="scene-image absolute inset-1.5 lg:inset-2 rounded-[16px] lg:rounded-[24px] overflow-hidden opacity-0 scale-[0.95] will-change-transform">
+                                <div key={`scroll-image-layer-${index}`} className="scene-image absolute inset-1.5 lg:inset-2 rounded-[16px] lg:rounded-[24px] overflow-hidden opacity-0 scale-[0.95] will-change-transform">
                                     <div className="relative h-full w-full">
                                         <SmartImage src={item.src} alt={item.alt} fill fallbackType="jewelry" className="object-cover" sizes="(max-width: 1024px) 100vw, 50vw" />
                                         <div className="absolute inset-0 bg-gradient-to-t from-white/30 to-transparent" />

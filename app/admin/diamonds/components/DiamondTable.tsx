@@ -5,7 +5,7 @@ import { useState, useMemo } from "react";
 import Image from "next/image";
 import { toast } from "sonner";
 import { Search, Edit2, Trash2, X, ChevronLeft, ChevronRight } from "lucide-react";
-import { compressImage } from "@/lib/image-compression";
+import AdminMediaManager from "@/app/admin/components/AdminMediaManager";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -21,10 +21,6 @@ export function DiamondTable({ initialDiamonds }: { initialDiamonds: any[] }) {
     // Form States
     const [editingDiamond, setEditingDiamond] = useState<any | null>(null);
     const [diamondToDelete, setDiamondToDelete] = useState<any | null>(null);
-    const [imageFile, setImageFile] = useState<File | null>(null);
-    const [imagePreview, setImagePreview] = useState<string | null>(null);
-    const [modelFile, setModelFile] = useState<File | null>(null);
-    const [modelName, setModelName] = useState<string>("");
     const [isUploading, setIsUploading] = useState(false);
     const [formData, setFormData] = useState({
         sku: "",
@@ -67,10 +63,6 @@ export function DiamondTable({ initialDiamonds }: { initialDiamonds: any[] }) {
 
     const openAddModal = () => {
         setEditingDiamond(null);
-        setImageFile(null);
-        setImagePreview(null);
-        setModelFile(null);
-        setModelName("");
         setFormData({
             sku: "",
             shape: "Round", caratWeight: "1.0", cut: "Excellent", clarity: "VS1", color: "G", certification: "GIA", price: "150000", stockCount: "1", imageUrl: "", modelUrl: ""
@@ -80,10 +72,6 @@ export function DiamondTable({ initialDiamonds }: { initialDiamonds: any[] }) {
 
     const openEditModal = (diamond: any) => {
         setEditingDiamond(diamond);
-        setImageFile(null);
-        setImagePreview(diamond.imageUrl || null);
-        setModelFile(null);
-        setModelName(diamond.modelUrl ? diamond.modelUrl.split('/').pop() : "");
         setFormData({
             sku: diamond.sku || "",
             shape: diamond.shape,
@@ -124,102 +112,13 @@ export function DiamondTable({ initialDiamonds }: { initialDiamonds: any[] }) {
         }
     };
 
-    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (file) {
-            // Validate image type & size
-            if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
-                toast.error("Invalid file type. Only JPG, PNG, and WebP are allowed.");
-                return;
-            }
-            if (file.size > 50 * 1024 * 1024) {
-                toast.error("File size exceeds 50MB limit.");
-                return;
-            }
-            setImageFile(file);
-            setImagePreview(URL.createObjectURL(file));
-        }
-    };
-
-    const removeImage = () => {
-        setImageFile(null);
-        setImagePreview(null);
-        setFormData(prev => ({ ...prev, imageUrl: "" }));
-    }
-
-    const handleModelChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-        const isAllowedModeType = file.name.toLowerCase().endsWith('.glb') || file.name.toLowerCase().endsWith('.gltf') || file.name.toLowerCase().endsWith('.obj');
-        if (!isAllowedModeType) {
-            toast.error("Invalid model type. Only .glb, .gltf, and .obj files are allowed.");
-            return;
-        }
-        if (file.size > 30 * 1024 * 1024) {
-            toast.error("Model size exceeds 30MB limit.");
-            return;
-        }
-        setModelFile(file);
-        setModelName(file.name);
-    };
-
-    const removeModel = () => {
-        setModelFile(null);
-        setModelName("");
-        setFormData(prev => ({ ...prev, modelUrl: "" }));
-    };
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (isUploading) {
+            toast.error("Please wait until all uploads are complete.");
+            return;
+        }
         try {
-            setIsUploading(true);
-            let uploadedImageUrl = formData.imageUrl;
-            let uploadedModelUrl = formData.modelUrl;
-
-            if (modelFile) {
-                const modelUploadFormData = new FormData();
-                modelUploadFormData.append("file", modelFile);
-                modelUploadFormData.append("type", "diamonds");
-                modelUploadFormData.append("kind", "model");
-
-                const modelUploadRes = await fetch('/api/admin/upload', {
-                    method: 'POST',
-                    body: modelUploadFormData
-                });
-
-                const modelUploadData = await modelUploadRes.json();
-
-                if (!modelUploadRes.ok) {
-                    toast.error(modelUploadData.error || "Model upload failed");
-                    setIsUploading(false);
-                    return;
-                }
-
-                uploadedModelUrl = modelUploadData.url;
-            }
-
-            if (imageFile) {
-                const compressedFile = await compressImage(imageFile);
-                const uploadFormData = new FormData();
-                uploadFormData.append("file", compressedFile);
-                uploadFormData.append("type", "diamonds");
-
-                const uploadRes = await fetch('/api/admin/upload', {
-                    method: 'POST',
-                    body: uploadFormData
-                });
-
-                const uploadData = await uploadRes.json();
-
-                if (!uploadRes.ok) {
-                    toast.error(uploadData.error || "Image upload failed");
-                    setIsUploading(false);
-                    return;
-                }
-
-                uploadedImageUrl = uploadData.url;
-            }
-
             const isEditing = !!editingDiamond;
             const url = isEditing ? `/api/admin/diamonds/${editingDiamond.id}` : `/api/admin/diamonds`;
             const method = isEditing ? "PATCH" : "POST";
@@ -229,8 +128,6 @@ export function DiamondTable({ initialDiamonds }: { initialDiamonds: any[] }) {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     ...formData,
-                    imageUrl: uploadedImageUrl,
-                    modelUrl: uploadedModelUrl,
                     price: parseFloat(formData.price),
                     caratWeight: parseFloat(formData.caratWeight),
                     stockCount: parseInt(formData.stockCount) || 1
@@ -241,7 +138,7 @@ export function DiamondTable({ initialDiamonds }: { initialDiamonds: any[] }) {
             if (res.ok) {
                 toast.success(isEditing ? "Diamond updated" : "Diamond added successfully");
                 if (isEditing) {
-                    setDiamonds(diamonds.map(d => d.id === editingDiamond.id ? data.diamond || { ...d, ...formData, imageUrl: uploadedImageUrl, price: parseFloat(formData.price), caratWeight: parseFloat(formData.caratWeight), stockCount: parseInt(formData.stockCount) || 1 } : d));
+                    setDiamonds(diamonds.map(d => d.id === editingDiamond.id ? data.diamond || { ...d, ...formData, price: parseFloat(formData.price), caratWeight: parseFloat(formData.caratWeight), stockCount: parseInt(formData.stockCount) || 1 } : d));
                 } else {
                     setDiamonds([data.diamond, ...diamonds]);
                 }
@@ -251,8 +148,6 @@ export function DiamondTable({ initialDiamonds }: { initialDiamonds: any[] }) {
             }
         } catch {
             toast.error("Network error");
-        } finally {
-            setIsUploading(false);
         }
     };
 
@@ -509,55 +404,21 @@ export function DiamondTable({ initialDiamonds }: { initialDiamonds: any[] }) {
                                     <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-600 mb-2">Quantity (Stock)</label>
                                     <input type="number" required min="1" className="w-full bg-gray-50 border border-gray-200 rounded-none p-3 text-sm text-[#111111] outline-none focus:border-[#111111]" value={formData.stockCount} onChange={e => setFormData({ ...formData, stockCount: e.target.value })} />
                                 </div>
-                                <div className="sm:col-span-2">
-                                    <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-600 mb-3">Diamond Image</label>
-                                    <div className="flex items-center gap-5">
-                                        <div className="w-16 h-16 border rounded-none bg-gray-50 flex items-center justify-center overflow-hidden shrink-0 border-gray-200 shadow-none">
-                                            {imagePreview ? (
-                                                <Image src={imagePreview} alt="Preview" width={64} height={64} className="w-full h-full object-cover" unoptimized />
-                                            ) : (
-                                                <span className="text-[9px] text-gray-300 font-bold uppercase tracking-[0.2em] px-2 text-center">No Img</span>
-                                            )}
-                                        </div>
-                                        <div className="flex-1">
-                                            <input
-                                                type="file"
-                                                accept="image/png, image/jpeg, image/webp"
-                                                onChange={handleImageChange}
-                                                className="w-full text-xs text-gray-600 file:mr-4 file:py-2.5 file:px-6 file:rounded-full file:border-0 file:text-[10px] file:uppercase file:tracking-widest file:font-bold file:bg-gray-100 file:text-[#111111] hover:file:bg-white/20 transition-colors cursor-pointer"
-                                            />
-                                            {imagePreview && (
-                                                <button type="button" onClick={removeImage} className="text-red-400 text-[10px] uppercase tracking-widest mt-3 font-bold hover:text-red-300 transition-colors">
-                                                    Remove Image
-                                                </button>
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="sm:col-span-2">
-                                    <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-600 mb-3">3D Model (.obj, .glb)</label>
-                                    <div className="flex items-center gap-5">
-                                        <div className="w-16 h-16 border rounded-none bg-gray-50 flex items-center justify-center overflow-hidden shrink-0 border-gray-200 shadow-none">
-                                            <span className="text-[9px] text-gray-500 font-bold uppercase tracking-[0.2em] px-2 text-center">3D</span>
-                                        </div>
-                                        <div className="flex-1">
-                                            <input
-                                                type="file"
-                                                accept=".glb,.gltf,.obj,model/gltf-binary,model/obj"
-                                                onChange={handleModelChange}
-                                                className="w-full text-xs text-gray-600 file:mr-4 file:py-2.5 file:px-6 file:rounded-full file:border-0 file:text-[10px] file:uppercase file:tracking-widest file:font-bold file:bg-gray-100 file:text-[#111111] hover:file:bg-white/20 transition-colors cursor-pointer"
-                                            />
-                                            {modelName ? (
-                                                <div className="mt-2 flex items-center gap-4">
-                                                    <span className="text-[11px] text-gray-600">{modelName}</span>
-                                                    <button type="button" onClick={removeModel} className="text-red-400 text-[10px] uppercase tracking-widest font-bold hover:text-red-300 transition-colors">
-                                                        Remove Model
-                                                    </button>
-                                                </div>
-                                            ) : null}
-                                        </div>
-                                    </div>
+                                <div className="sm:col-span-3">
+                                    <label className="block text-[10px] font-bold uppercase tracking-widest text-gray-600 mb-3">Diamond Media</label>
+                                    <AdminMediaManager
+                                        uploadType="diamonds"
+                                        existingImages={formData.imageUrl ? [formData.imageUrl] : []}
+                                        existingModel3d={formData.modelUrl || null}
+                                        onMediaChange={({ images, model3d }) => {
+                                            setFormData(prev => ({
+                                                ...prev,
+                                                imageUrl: images[0] || "",
+                                                modelUrl: model3d || ""
+                                            }));
+                                        }}
+                                        onUploadingStatusChange={setIsUploading}
+                                    />
                                 </div>
                             </div>
 

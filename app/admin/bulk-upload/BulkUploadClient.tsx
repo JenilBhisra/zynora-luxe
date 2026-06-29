@@ -16,6 +16,7 @@ export default function BulkUploadClient() {
     const [activeTab, setActiveTab] = useState("diamond");
     const [importMode, setImportMode] = useState("create"); // create vs update
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [mediaFiles, setMediaFiles] = useState<File[]>([]);
     const [loading, setLoading] = useState(false);
     const [loadingText, setLoadingText] = useState("");
     
@@ -36,6 +37,7 @@ export default function BulkUploadClient() {
     } | null>(null);
 
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const mediaInputRef = useRef<HTMLInputElement>(null);
 
     const handleDownloadTemplate = async () => {
         try {
@@ -61,6 +63,87 @@ export default function BulkUploadClient() {
         }
     };
 
+    const handleMediaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = e.target.files;
+        if (files && files.length > 0) {
+            const fileList = Array.from(files);
+            setMediaFiles(prev => [...prev, ...fileList]);
+            toast.success(`Added ${fileList.length} media files`);
+        }
+    };
+
+    const uploadMediaFiles = async (): Promise<Record<string, string>> => {
+        if (mediaFiles.length === 0) return {};
+        
+        const mapping: Record<string, string> = {};
+        const uploadTypeMap: Record<string, string> = {
+            diamond: "diamonds",
+            ring: "products",
+            setting: "settings",
+            product: "products"
+        };
+        const uploadType = uploadTypeMap[activeTab] || "products";
+
+        for (let i = 0; i < mediaFiles.length; i++) {
+            const file = mediaFiles[i];
+            setLoadingText(`Uploading media ${i + 1}/${mediaFiles.length}: ${file.name}...`);
+
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("type", uploadType);
+            formData.append("kind", file.type.startsWith("video") ? "video" : "image");
+
+            const res = await fetch("/api/admin/upload", {
+                method: "POST",
+                body: formData
+            });
+
+            if (!res.ok) {
+                const errData = await res.json();
+                throw new Error(`Failed to upload ${file.name}: ${errData.error || res.statusText}`);
+            }
+
+            const data = await res.json();
+            mapping[file.name] = data.url;
+        }
+
+        return mapping;
+    };
+
+    const processExcelWithMediaMap = async (file: File, mediaMap: Record<string, string>): Promise<File> => {
+        if (Object.keys(mediaMap).length === 0) return file;
+
+        const arrayBuffer = await file.arrayBuffer();
+        const workbook = XLSX.read(arrayBuffer, { type: "array" });
+        const sheetName = workbook.SheetNames[0];
+        const sheet = workbook.Sheets[sheetName];
+        const jsonData = XLSX.utils.sheet_to_json(sheet) as any[];
+
+        const replaceKeys = ["imageurls", "videourls", "imageurl", "videourl", "imageUrl", "videoUrl", "imageUrls", "videoUrls"];
+
+        const updatedData = jsonData.map(row => {
+            const newRow = { ...row };
+            for (const key of Object.keys(newRow)) {
+                if (replaceKeys.includes(key.toLowerCase().trim())) {
+                    const val = String(newRow[key] || "").trim();
+                    if (val) {
+                        const replacedParts = val.split(",").map(part => {
+                            const trimmedPart = part.trim();
+                            return mediaMap[trimmedPart] || trimmedPart;
+                        });
+                        newRow[key] = replacedParts.join(",");
+                    }
+                }
+            }
+            return newRow;
+        });
+
+        const newSheet = XLSX.utils.json_to_sheet(updatedData);
+        workbook.Sheets[sheetName] = newSheet;
+        const outBuffer = XLSX.write(workbook, { type: "array", bookType: "xlsx" });
+        return new File([outBuffer], file.name, { type: file.type });
+    };
+
     const handlePreview = async () => {
         if (!selectedFile) {
             toast.error("Please upload an Excel file first");
@@ -69,10 +152,15 @@ export default function BulkUploadClient() {
 
         try {
             setLoading(true);
-            setLoadingText("Reading Excel & validating rows...");
+            setLoadingText("Uploading media files...");
+            const mediaMap = await uploadMediaFiles();
 
+            setLoadingText("Processing Excel data...");
+            const processedFile = await processExcelWithMediaMap(selectedFile, mediaMap);
+
+            setLoadingText("Validating rows...");
             const formData = new FormData();
-            formData.append("file", selectedFile);
+            formData.append("file", processedFile);
             formData.append("type", activeTab);
 
             const res = await fetch("/api/admin/bulk-upload/preview", {
@@ -104,10 +192,15 @@ export default function BulkUploadClient() {
 
         try {
             setLoading(true);
-            setLoadingText("Importing listings into database...");
+            setLoadingText("Uploading media files...");
+            const mediaMap = await uploadMediaFiles();
 
+            setLoadingText("Processing Excel data...");
+            const processedFile = await processExcelWithMediaMap(selectedFile, mediaMap);
+
+            setLoadingText("Importing listings into database...");
             const formData = new FormData();
-            formData.append("file", selectedFile);
+            formData.append("file", processedFile);
             formData.append("type", activeTab);
             formData.append("importMode", importMode);
 
@@ -123,6 +216,7 @@ export default function BulkUploadClient() {
 
             setImportResult(data);
             setPreviewData(null);
+            setMediaFiles([]); // Clear media files after successful import
             toast.success("Bulk import execution completed.");
         } catch (err: any) {
             console.error(err);
@@ -233,9 +327,42 @@ export default function BulkUploadClient() {
                         </div>
                     </div>
 
+                    {/* Media Upload */}
+                    <div className="space-y-2">
+                        <label className="block text-[11px] font-bold uppercase tracking-widest text-gray-500">Step 3: Select Images/Videos (Optional)</label>
+                        <input
+                            type="file"
+                            ref={mediaInputRef}
+                            onChange={handleMediaChange}
+                            multiple
+                            accept="image/*,video/*"
+                            className="hidden"
+                        />
+                        <div
+                            onClick={() => mediaInputRef.current?.click()}
+                            className="border-2 border-dashed border-gray-300 hover:border-[#C9A14A] p-6 text-center cursor-pointer transition-colors bg-gray-50/50 flex flex-col items-center justify-center gap-2"
+                        >
+                            <Upload className="text-gray-400" size={24} />
+                            <span className="text-xs text-gray-600 font-medium">
+                                {mediaFiles.length > 0 ? `Selected ${mediaFiles.length} media files` : "Choose local image/video files"}
+                            </span>
+                        </div>
+                        {mediaFiles.length > 0 && (
+                            <div className="flex justify-between items-center bg-gray-50 p-2.5 border border-gray-200 text-xs">
+                                <span className="text-zinc-500 font-medium">Filename match active</span>
+                                <button
+                                    onClick={() => setMediaFiles([])}
+                                    className="font-bold text-red-600 uppercase hover:underline"
+                                >
+                                    Clear
+                                </button>
+                            </div>
+                        )}
+                    </div>
+
                     {/* Import Settings */}
                     <div className="space-y-2">
-                        <label className="block text-[11px] font-bold uppercase tracking-widest text-gray-500">Step 3: Database Import Mode</label>
+                        <label className="block text-[11px] font-bold uppercase tracking-widest text-gray-500">Step 4: Database Import Mode</label>
                         <select
                             disabled={loading}
                             value={importMode}

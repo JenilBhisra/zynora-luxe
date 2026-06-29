@@ -46,8 +46,17 @@ export default function ProductClient({ product }: { product: any }) {
     const { addToCart } = useCart();
     const { user } = useAuth();
     const router = useRouter();
-    const [activeTab, setActiveTab] = useState("specs");
     const [videoErrors, setVideoErrors] = useState<Record<string, boolean>>({});
+    const [lightboxImage, setLightboxImage] = useState<string | null>(null);
+    const [isDescExpanded, setIsDescExpanded] = useState(false);
+
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === "Escape") setLightboxImage(null);
+        };
+        window.addEventListener("keydown", handleKeyDown);
+        return () => window.removeEventListener("keydown", handleKeyDown);
+    }, []);
 
     const [showStickyBottomBar, setShowStickyBottomBar] = useState(false);
     const normalBtnRef = useRef<HTMLDivElement>(null);
@@ -328,16 +337,21 @@ export default function ProductClient({ product }: { product: any }) {
                                 }`}
                             >
                                 {item.type === "image" ? (
-                                    <SmartImage
-                                        src={item.src}
-                                        alt={product.name}
-                                        fill
-                                        fallbackType={imageFallbackType}
-                                        imageKey={`${product.id}:grid:${idx}`}
-                                        sizeType="detail"
-                                        priority={idx === 0}
-                                        className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
-                                    />
+                                    <div 
+                                        className="w-full h-full relative cursor-zoom-in"
+                                        onDoubleClick={() => setLightboxImage(item.src)}
+                                    >
+                                        <SmartImage
+                                            src={item.src}
+                                            alt={product.name}
+                                            fill
+                                            fallbackType={imageFallbackType}
+                                            imageKey={`${product.id}:grid:${idx}`}
+                                            sizeType="detail"
+                                            priority={idx === 0}
+                                            className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+                                        />
+                                    </div>
                                 ) : item.type === "video" ? (
                                     videoErrors[item.src] ? (
                                         <VideoFallback />
@@ -345,9 +359,11 @@ export default function ProductClient({ product }: { product: any }) {
                                         <video
                                             src={item.src}
                                             className="w-full h-full object-cover"
-                                            controls
-                                            preload="metadata"
+                                            autoPlay
+                                            muted
+                                            loop
                                             playsInline
+                                            preload="auto"
                                             onError={() => setVideoErrors(prev => ({ ...prev, [item.src]: true }))}
                                         />
                                     )
@@ -376,7 +392,14 @@ export default function ProductClient({ product }: { product: any }) {
 
                     {/* Mobile Carousel / Thumbnail Selection */}
                     <div className="block md:hidden w-full">
-                        <div className="relative aspect-square w-full overflow-hidden flex items-center justify-center rounded-none">
+                        <div 
+                            className="relative aspect-square w-full overflow-hidden flex items-center justify-center rounded-none cursor-zoom-in"
+                            onDoubleClick={() => {
+                                if (mediaItems[activeMediaIndex]?.type === "image") {
+                                    setLightboxImage(mediaItems[activeMediaIndex].src);
+                                }
+                            }}
+                        >
                             {mediaItems.length > 0 ? (
                                 mediaItems[activeMediaIndex].type === "image" ? (
                                     <SmartImage
@@ -396,9 +419,11 @@ export default function ProductClient({ product }: { product: any }) {
                                         <video
                                             src={mediaItems[activeMediaIndex].src}
                                             className="w-full h-full object-cover"
-                                            controls
-                                            preload="metadata"
+                                            autoPlay
+                                            muted
+                                            loop
                                             playsInline
+                                            preload="auto"
                                             onError={() => setVideoErrors(prev => ({ ...prev, [mediaItems[activeMediaIndex].src]: true }))}
                                         />
                                     )
@@ -463,7 +488,15 @@ export default function ProductClient({ product }: { product: any }) {
                 {/* Right: Details (Scrollable Flow) */}
                 <section className="w-full lg:w-[35%] pt-4 lg:sticky lg:top-24 flex flex-col">
                     <FadeIn delay={0.2}>
-                        <span className="text-[11px] md:text-xs tracking-[0.34em] font-semibold text-[#C9A14A] uppercase mb-3 block">Product Detail</span>
+                        <div className="flex items-center gap-3 mb-3">
+                            <span className="text-[11px] md:text-xs tracking-[0.34em] font-semibold text-[#C9A14A] uppercase">Product Detail</span>
+                            {product.diamondType && (
+                                <>
+                                    <span className="text-zinc-300">|</span>
+                                    <span className="text-[10px] md:text-[11px] tracking-[0.18em] font-bold text-zinc-500 uppercase">{product.diamondType}</span>
+                                </>
+                            )}
+                        </div>
                         <h1 className="text-[22px] md:text-3xl lg:text-[34px] font-serif font-medium text-zinc-900 tracking-wide mb-6 max-w-[640px]">
                             {product.name}
                         </h1>
@@ -472,10 +505,6 @@ export default function ProductClient({ product }: { product: any }) {
                             <span className="text-[18px] md:text-[28px] font-medium text-zinc-900">₹{displayPrice.toLocaleString("en-IN")}</span>
                             <span className="text-[11px] md:text-[12px] uppercase tracking-[0.06em] text-zinc-400">Inclusive of all taxes</span>
                         </div>
-
-                        <p className="text-[14px] md:text-[15px] font-normal text-zinc-500 mb-10 max-w-[640px] leading-relaxed">
-                            {product.description}
-                        </p>
 
                         {/* Selectors */}
                         <div className="flex flex-col gap-6 mb-10">
@@ -525,6 +554,26 @@ export default function ProductClient({ product }: { product: any }) {
                                 </div>
                             )}
                         </div>
+
+                        {/* Product Description with Learn More */}
+                        {product.description && (
+                            <div className="mb-8 border-t border-zinc-100 pt-6">
+                                <div 
+                                    className={`text-[14.5px] md:text-[15.5px] font-normal text-zinc-500 max-w-[640px] leading-relaxed transition-all duration-300 ${
+                                        isDescExpanded ? "" : "line-clamp-2"
+                                    }`}
+                                    style={{ whiteSpace: "pre-line" }}
+                                >
+                                    {product.description}
+                                </div>
+                                <button
+                                    onClick={() => setIsDescExpanded(!isDescExpanded)}
+                                    className="mt-2.5 text-[10px] md:text-[11px] font-bold tracking-[0.18em] uppercase text-[#C9A14A] hover:text-[#111] transition-colors"
+                                >
+                                    {isDescExpanded ? "SHOW LESS" : "LEARN MORE"}
+                                </button>
+                            </div>
+                        )}
 
                         {/* Delivery Info */}
                         <div className="flex items-center gap-5 p-0 md:luxury-panel md:p-5 mb-8 relative overflow-hidden rounded-none border-0 md:border md:border-zinc-200">
@@ -584,75 +633,7 @@ export default function ProductClient({ product }: { product: any }) {
                     </button>
                 </div>
             )}
-
-            {/* Product Specifications & Details Tabs */}
-            <section className="max-w-[1100px] mx-auto pt-16 border-t border-zinc-200 px-5">
-                <FadeIn>
-                    <div className="flex justify-center gap-12 border-b border-zinc-200 mb-16">
-                        <button
-                            onClick={() => setActiveTab("specs")}
-                            className={`pb-5 text-xl font-heading tracking-wide transition-all duration-500 relative group ${activeTab === "specs" ? "text-zinc-900" : "text-zinc-400 hover:text-zinc-650"} ${activeTab === "specs" ? "after:absolute after:bottom-[-1px] after:left-0 after:w-full after:h-[2px] after:bg-[#C9A14A]" : "after:absolute after:bottom-[-1px] after:left-0 after:w-0 after:h-[1px] after:bg-[#C9A14A] after:group-hover:w-full after:transition-all after:duration-500"}`}
-                        >
-                            Product Specifications
-                        </button>
-                        <button
-                            onClick={() => setActiveTab("reviews")}
-                            className={`pb-5 text-xl font-heading tracking-wide transition-all duration-500 relative group ${activeTab === "reviews" ? "text-zinc-900" : "text-zinc-400 hover:text-zinc-650"} ${activeTab === "reviews" ? "after:absolute after:bottom-[-1px] after:left-0 after:w-full after:h-[2px] after:bg-[#C9A14A]" : "after:absolute after:bottom-[-1px] after:left-0 after:w-0 after:h-[1px] after:bg-[#C9A14A] after:group-hover:w-full after:transition-all after:duration-500"}`}
-                        >
-                            Customer Reviews
-                        </button>
-                    </div>
-
-                    <div className="animate-[fadeIn_0.5s_ease]">
-                        {activeTab === "specs" && (
-                                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                                {[
-                                    { label: "Diamond Shape", val: product.diamond?.shape || "Round" },
-                                    { label: "Carat Weight", val: `${product.diamond?.caratWeight || "1.00"} CT` },
-                                    { label: "Cut", val: product.diamond?.cut || "Excellent" },
-                                    { label: "Clarity", val: product.diamond?.clarity || "VVS1" },
-                                    { label: "Color", val: product.diamond?.color || "E - F" },
-                                    { label: "Certification", val: product.diamond?.certification || "GIA / IGI Certified" },
-                                    { 
-                                        label: isGold ? "Gold Purity" : "Metal Finish", 
-                                        val: finalMetalType 
-                                    },
-                                ].map((row, i) => (
-                                    <FadeIn key={i} delay={i * 0.06}>
-                                        <div className="border border-zinc-150 py-8 px-4 flex flex-col justify-center items-center text-center rounded-none md:rounded-[4px] cursor-pointer">
-                                            <span className="text-[10px] text-zinc-400 uppercase tracking-[0.28em] font-bold mb-3">{row.label}</span>
-                                            <span className="text-[16px] text-zinc-900 font-medium">{row.val}</span>
-                                        </div>
-                                    </FadeIn>
-                                ))}
-                            </div>
-                        )}
-
-                        {activeTab === "reviews" && (
-                            <div className="text-center py-10 max-w-[800px] mx-auto">
-                                <h3 className="text-6xl font-heading text-zinc-900 mb-4 tracking-wide">4.9</h3>
-                                <div className="flex justify-center gap-2 text-[#C9A14A] mb-4 w-40 mx-auto opacity-85">
-                                    <StarIcon /> <StarIcon /> <StarIcon /> <StarIcon /> <StarIcon />
-                                </div>
-                                <p className="text-zinc-500 text-base mb-16 uppercase tracking-widest font-medium">Based on 24 reviews</p>
-
-                                <div className="text-left border-t border-zinc-200 pt-10 pb-8">
-                                    <div className="flex gap-2 text-[#C9A14A] mb-4 w-24 opacity-85"><StarIcon /><StarIcon /><StarIcon /><StarIcon /><StarIcon /></div>
-                                    <h4 className="text-2xl text-zinc-900 mb-3 font-heading tracking-wide">Absolutely Stunning</h4>
-                                    <p className="text-zinc-600 mb-4 leading-relaxed font-light">The ring is even more beautiful in person. The craftsmanship is flawless, and the diamond sparkles incredibly.</p>
-                                    <p className="text-sm text-zinc-400 uppercase tracking-widest font-medium">Anjali S. — October 12, 2023</p>
-                                </div>
-
-                                <div className="mt-10">
-                                    <ReviewForm productId={product.id} />
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                </FadeIn>
-            </section>
-
-            {/* Customization Request Modal Overlay */}
+                      {/* Customization Request Modal Overlay */}
             {isCustomizing && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-50/80 backdrop-blur-md overflow-y-auto">
                     <div className="relative w-full max-w-2xl my-8 bg-white border border-zinc-200 rounded-none md:rounded-[4px] p-6 md:p-8 shadow-2xl text-zinc-900 overflow-hidden">
@@ -771,7 +752,7 @@ export default function ProductClient({ product }: { product: any }) {
                                                         value={metalType}
                                                         onChange={(e) => setMetalType(e.target.value)}
                                                         className="w-full bg-zinc-50 border border-zinc-200 rounded-none md:rounded-[4px] p-3 text-sm text-zinc-900 focus:outline-none focus:border-[#C9A14A] transition-colors appearance-none cursor-pointer"
-                                                    >
+                                                     >
                                                         {availableOptions.map((opt) => (
                                                             <option key={opt} value={opt}>{opt}</option>
                                                         ))}
@@ -889,7 +870,7 @@ export default function ProductClient({ product }: { product: any }) {
                                     </div>
                                 </form>
                              </div>
-                         ) : (
+                        ) : (
                             <div className="flex flex-col items-center justify-center py-16 text-center space-y-6">
                                 <div className="w-20 h-20 rounded-full border border-[#C9A14A] flex items-center justify-center bg-[#C9A14A]/10 animate-[scaleIn_0.5s_ease-out] shadow-[0_0_30px_rgba(201,161,74,0.15)]">
                                     <Check size={40} className="text-[#C9A14A]" />
@@ -916,70 +897,31 @@ export default function ProductClient({ product }: { product: any }) {
                     </div>
                 </div>
             )}
+
+            {/* Image Fullscreen Lightbox Overlay */}
+            {lightboxImage && (
+                <div 
+                    className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-sm transition-opacity duration-300 cursor-zoom-out animate-in fade-in"
+                    onClick={() => setLightboxImage(null)}
+                >
+                    <button 
+                        className="absolute top-6 right-6 text-white/70 hover:text-white transition-colors p-2 z-10"
+                        onClick={() => setLightboxImage(null)}
+                    >
+                        <X size={32} />
+                    </button>
+                    <div 
+                        className="relative max-w-[95vw] max-h-[95vh] flex items-center justify-center"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <img 
+                            src={lightboxImage} 
+                            alt="Product Fullscreen" 
+                            className="max-w-full max-h-[95vh] object-contain select-none shadow-2xl transition-transform duration-300"
+                        />
+                    </div>
+                </div>
+            )}
         </div>
-    );
-}
-
-function ReviewForm({ productId }: { productId: string }) {
-    const { user } = useAuth();
-    const [rating, setRating] = useState(5);
-    const [comment, setComment] = useState("");
-    const [isSubmitting, setIsSubmitting] = useState(false);
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setIsSubmitting(true);
-        try {
-            await fetch('/api/reviews', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ productId, rating, comment })
-            });
-            alert("Review submitted successfully");
-            setComment("");
-        } catch (err) {
-            console.error(err);
-        } finally {
-            setIsSubmitting(false);
-        }
-    };
-
-    if (!user) {
-        return <div className="mt-12 py-8 border-t border-zinc-200 text-zinc-500 tracking-widest uppercase text-base text-center font-medium">Please login to write a review.</div>;
-    }
-
-    return (
-        <form onSubmit={handleSubmit} className="mt-12 pt-10 border-t border-zinc-200 text-left max-w-[600px] mx-auto">
-            <h4 className="text-2xl font-heading text-zinc-900 mb-8">Write a Review</h4>
-            <div className="mb-6">
-                <label className="block text-sm uppercase tracking-widest text-zinc-650 mb-3 font-medium">Rating</label>
-                <select value={rating} onChange={(e) => setRating(Number(e.target.value))} className="w-full max-w-[200px] p-4 rounded-none border border-zinc-200 text-zinc-900 appearance-none bg-white focus:outline-none focus:border-[#C9A14A] transition-colors cursor-pointer font-medium">
-                    <option value="5">5 Stars</option>
-                    <option value="4">4 Stars</option>
-                    <option value="3">3 Stars</option>
-                    <option value="2">2 Stars</option>
-                    <option value="1">1 Star</option>
-                </select>
-            </div>
-            <div className="mb-8">
-                <label className="block text-sm uppercase tracking-widest text-zinc-650 mb-3 font-medium">Review</label>
-                <textarea
-                    value={comment}
-                    onChange={(e) => setComment(e.target.value)}
-                    rows={5}
-                    className="w-full p-5 rounded-none border border-zinc-200 bg-white text-zinc-900 focus:outline-none focus:border-[#C9A14A] transition-colors resize-none placeholder:text-zinc-400"
-                    placeholder="Share your experience..."
-                />
-            </div>
-            <Button disabled={isSubmitting} className="w-full md:w-auto">{isSubmitting ? "Submitting..." : "Submit Review"}</Button>
-        </form>
-    );
-}
-
-function StarIcon() {
-    return (
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
-            <path fillRule="evenodd" d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z" clipRule="evenodd" />
-        </svg>
     );
 }

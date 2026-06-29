@@ -145,6 +145,7 @@ export async function POST(req: Request) {
                 description: body.description,
                 price: parseFloat(body.price),
                 categoryId: category.id,
+                diamondType: body.diamondType || "Lab Grown Diamond",
                 metalType: body.metalType,
                 stockCount: parseInt(body.stockCount) || 1,
                 images: body.images || "[]",
@@ -214,6 +215,7 @@ export async function PATCH(req: Request) {
         if (body.description !== undefined) updateData.description = body.description;
         if (body.price !== undefined) updateData.price = parseFloat(body.price);
         if (body.metalType !== undefined) updateData.metalType = body.metalType;
+        if (body.diamondType !== undefined) updateData.diamondType = body.diamondType;
         if (body.stockCount !== undefined) updateData.stockCount = parseInt(body.stockCount) || 1;
         if (body.images !== undefined) updateData.images = body.images;
         if (body.karatPrices !== undefined) updateData.karatPrices = body.karatPrices;

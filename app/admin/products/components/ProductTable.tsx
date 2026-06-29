@@ -13,12 +13,14 @@ export function ProductTable({ initialProducts, categories }: { initialProducts:
     const [searchQuery, setSearchQuery] = useState("");
 
     const [isUploading, setIsUploading] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
 
     const [formData, setFormData] = useState({
         sku: "",
         name: "",
         description: "",
         categoryId: categories[0]?.name || "Rings",
+        diamondType: "Lab Grown Diamond",
         metalType: "Gold",
         stockCount: "1",
         tags: "",
@@ -64,6 +66,8 @@ export function ProductTable({ initialProducts, categories }: { initialProducts:
             toast.error("Please wait until all uploads are complete.");
             return;
         }
+        if (isSaving) return;
+        setIsSaving(true);
         try {
             const availableMetalsStr = formData.availableMetals.join(",");
             const silverVal = formData.availableMetals.includes("Silver") ? parseFloat(formData.silverPrice) || null : null;
@@ -85,6 +89,7 @@ export function ProductTable({ initialProducts, categories }: { initialProducts:
                 description: formData.description,
                 price: basePrice,
                 categoryId: formData.categoryId,
+                diamondType: formData.diamondType || "Lab Grown Diamond",
                 metalType: formData.metalType,
                 stockCount: formData.stockCount,
                 tags: formData.tags,
@@ -111,7 +116,9 @@ export function ProductTable({ initialProducts, categories }: { initialProducts:
                 setIsAdding(false);
                 setFormData({
                     sku: "",
-                    name: "", description: "", categoryId: categories[0]?.name || "Rings", metalType: "Gold", stockCount: "1",
+                    name: "", description: "", categoryId: categories[0]?.name || "Rings",
+                    diamondType: "Lab Grown Diamond",
+                    metalType: "Gold", stockCount: "1",
                     tags: "", extraKeywords: "", seoTitle: "", seoDescription: "",
                     availableMetals: ["Gold"], goldPrice: "", silverPrice: "", platinumPrice: "",
                     karatPrices: { "10K": "", "14K": "", "18K": "", "22K": "" },
@@ -122,6 +129,8 @@ export function ProductTable({ initialProducts, categories }: { initialProducts:
             }
         } catch {
             toast.error("Error");
+        } finally {
+            setIsSaving(false);
         }
     };
 
@@ -147,6 +156,7 @@ export function ProductTable({ initialProducts, categories }: { initialProducts:
             name: product.name,
             description: product.description,
             categoryId: product.category?.name || categories[0]?.name || "Rings",
+            diamondType: product.diamondType || "Lab Grown Diamond",
             metalType: product.metalType || "Gold",
             stockCount: String(product.stockCount),
             tags: product.tags || "",
@@ -169,6 +179,8 @@ export function ProductTable({ initialProducts, categories }: { initialProducts:
             toast.error("Please wait until all uploads are complete.");
             return;
         }
+        if (isSaving) return;
+        setIsSaving(true);
         try {
             const availableMetalsStr = editFormData.availableMetals.join(",");
             const silverVal = editFormData.availableMetals.includes("Silver") ? parseFloat(editFormData.silverPrice) || null : null;
@@ -190,6 +202,7 @@ export function ProductTable({ initialProducts, categories }: { initialProducts:
                 description: editFormData.description,
                 price: basePrice,
                 categoryId: editFormData.categoryId,
+                diamondType: editFormData.diamondType || "Lab Grown Diamond",
                 metalType: editFormData.metalType,
                 stockCount: parseInt(editFormData.stockCount) || 1,
                 tags: editFormData.tags,
@@ -220,6 +233,8 @@ export function ProductTable({ initialProducts, categories }: { initialProducts:
             }
         } catch {
             toast.error("Error");
+        } finally {
+            setIsSaving(false);
         }
     };
 
@@ -297,6 +312,18 @@ export function ProductTable({ initialProducts, categories }: { initialProducts:
                                     {c.name}
                                 </option>
                             ))}
+                        </select>
+                    </div>
+                    <div>
+                        <label className="block text-xs font-bold uppercase tracking-widest text-gray-600 mb-2">Diamond Type</label>
+                        <select 
+                            className="w-full bg-white border border-gray-200 rounded-none p-3 text-sm text-[#111111] outline-none focus:border-[#111111] transition-colors cursor-pointer"
+                            style={{ minHeight: "44px", WebkitAppearance: "menulist", appearance: "menulist" }}
+                            value={formData.diamondType || "Lab Grown Diamond"}
+                            onChange={e => setFormData({ ...formData, diamondType: e.target.value })}
+                        >
+                            <option value="Lab Grown Diamond">Lab Grown Diamond</option>
+                            <option value="Natural Diamond">Natural Diamond</option>
                         </select>
                     </div>
                     <div><label className="block text-xs font-bold uppercase tracking-widest text-gray-600 mb-2">Metal/Material Description</label>
@@ -472,8 +499,8 @@ export function ProductTable({ initialProducts, categories }: { initialProducts:
                     </div>
 
                     <div className="md:col-span-3 flex justify-end">
-                        <button type="submit" disabled={isUploading} className="bg-[#111111] text-white border border-transparent px-8 py-3 rounded-none font-bold uppercase tracking-widest text-xs disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg transition-all hover:bg-[#C9A14A] hover:text-white">
-                            {isUploading ? "Uploading..." : "Save Product"}
+                        <button type="submit" disabled={isSaving || isUploading} className="bg-[#111111] text-white border border-transparent px-8 py-3 rounded-none font-bold uppercase tracking-widest text-xs disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg transition-all hover:bg-[#C9A14A] hover:text-white">
+                            {isSaving ? "Uploading product..." : (isUploading ? "Uploading..." : "Save Product")}
                         </button>
                     </div>
                 </form>
@@ -513,6 +540,18 @@ export function ProductTable({ initialProducts, categories }: { initialProducts:
                                     {c.name}
                                 </option>
                             ))}
+                        </select>
+                    </div>
+                    <div>
+                        <label className="block text-xs font-bold uppercase tracking-widest text-gray-600 mb-2">Diamond Type</label>
+                        <select 
+                            className="w-full bg-white border border-gray-200 rounded-none p-3 text-sm text-[#111111] outline-none focus:border-[#111111] transition-colors cursor-pointer"
+                            style={{ minHeight: "44px", WebkitAppearance: "menulist", appearance: "menulist" }}
+                            value={editFormData.diamondType || "Lab Grown Diamond"}
+                            onChange={e => setEditFormData({ ...editFormData, diamondType: e.target.value })}
+                        >
+                            <option value="Lab Grown Diamond">Lab Grown Diamond</option>
+                            <option value="Natural Diamond">Natural Diamond</option>
                         </select>
                     </div>
                     <div><label className="block text-xs font-bold uppercase tracking-widest text-gray-600 mb-2">Metal/Material Description</label>
@@ -691,8 +730,8 @@ export function ProductTable({ initialProducts, categories }: { initialProducts:
                         <button type="button" onClick={() => { setEditingProduct(null); setEditFormData(null); }} className="bg-white text-gray-700 border border-gray-200 px-8 py-3 rounded-none font-bold uppercase tracking-widest text-xs shadow-sm hover:bg-gray-50 transition-all">
                             Cancel
                         </button>
-                        <button type="submit" disabled={isUploading} className="bg-[#111111] text-white border border-transparent px-8 py-3 rounded-none font-bold uppercase tracking-widest text-xs disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg transition-all hover:bg-[#C9A14A] hover:text-white">
-                            {isUploading ? "Saving..." : "Update Product"}
+                        <button type="submit" disabled={isSaving || isUploading} className="bg-[#111111] text-white border border-transparent px-8 py-3 rounded-none font-bold uppercase tracking-widest text-xs disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg transition-all hover:bg-[#C9A14A] hover:text-white">
+                            {isSaving ? "Saving changes..." : (isUploading ? "Saving..." : "Update Product")}
                         </button>
                     </div>
                 </form>

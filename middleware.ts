@@ -156,6 +156,7 @@ export default async function middleware(req: NextRequest) {
     "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://apis.google.com https://www.gstatic.com https://accounts.google.com https://checkout.razorpay.com https://challenges.cloudflare.com",
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "img-src 'self' data: https://*.firebaseusercontent.com https://lh3.googleusercontent.com https://firebasestorage.googleapis.com https://*.razorpay.com https://images.unsplash.com https://tse1.mm.bing.net https://raw.githack.com https://cdn.jsdelivr.net https://res.cloudinary.com https://raw.githubusercontent.com",
+    "media-src 'self' https://res.cloudinary.com",
     "connect-src 'self' https://*.googleapis.com https://securetoken.googleapis.com https://identitytoolkit.googleapis.com https://accounts.google.com https://api.razorpay.com https://challenges.cloudflare.com https://api.sandbox.co.in https://raw.githack.com https://cdn.jsdelivr.net https://res.cloudinary.com https://raw.githubusercontent.com",
     "frame-src 'self' https://*.firebaseapp.com https://accounts.google.com https://apis.google.com https://api.razorpay.com https://checkout.razorpay.com https://challenges.cloudflare.com",
     "object-src 'none'",

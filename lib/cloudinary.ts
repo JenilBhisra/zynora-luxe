@@ -109,43 +109,49 @@ export async function uploadToCloudinary(
         publicId += ext;
     }
 
+    const isVideo = resourceType === "video";
+
     return new Promise((resolve, reject) => {
-        const uploadStream = cloudinary.uploader.upload_stream(
-            {
-                public_id:     publicId,
-                resource_type: resourceType,
-                // Automatic optimisation — Cloudinary picks the best format (WebP/AVIF)
-                // and quality level per device and network conditions
-                transformation: resourceType === "image" || resourceType === "auto"
-                    ? [{ fetch_format: "auto", quality: "auto" }]
-                    : undefined,
-                // Preserve the original quality in the stored asset
-                overwrite: false,
-            },
-            (error, result) => {
-                if (error || !result) {
-                    reject(
-                        new Error(
-                            `[Cloudinary] Upload failed: ${error?.message ?? "Unknown error"}`
-                        )
-                    );
-                    return;
-                }
+        const uploadOptions = {
+            public_id:     publicId,
+            resource_type: resourceType,
+            chunk_size:    isVideo ? 6000000 : undefined,
+            // Automatic optimisation — Cloudinary picks the best format (WebP/AVIF)
+            // and quality level per device and network conditions
+            transformation: resourceType === "image" || resourceType === "auto"
+                ? [{ fetch_format: "auto", quality: "auto" }]
+                : undefined,
+            // Preserve the original quality in the stored asset
+            overwrite: false,
+        };
 
-                // Build delivery URL with f_auto,q_auto for best performance
-                const optimizedUrl = buildOptimizedUrl(result.secure_url);
-
-                resolve({
-                    url:       optimizedUrl,
-                    publicId:  result.public_id,
-                    secureUrl: result.secure_url,
-                    width:     result.width   ?? 0,
-                    height:    result.height  ?? 0,
-                    format:    result.format  ?? "",
-                    bytes:     result.bytes   ?? 0,
-                });
+        const callback = (error: any, result: any) => {
+            if (error || !result) {
+                reject(
+                    new Error(
+                        `[Cloudinary] Upload failed: ${error?.message ?? "Unknown error"}`
+                    )
+                );
+                return;
             }
-        );
+
+            // Build delivery URL with f_auto,q_auto for best performance
+            const optimizedUrl = buildOptimizedUrl(result.secure_url);
+
+            resolve({
+                url:       optimizedUrl,
+                publicId:  result.public_id,
+                secureUrl: result.secure_url,
+                width:     result.width   ?? 0,
+                height:    result.height  ?? 0,
+                format:    result.format  ?? "",
+                bytes:     result.bytes   ?? 0,
+            });
+        };
+
+        const uploadStream = isVideo
+            ? cloudinary.uploader.upload_chunked_stream(uploadOptions, callback)
+            : cloudinary.uploader.upload_stream(uploadOptions, callback);
 
         uploadStream.end(buffer);
     });

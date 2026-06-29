@@ -200,15 +200,14 @@ export async function POST(req: Request) {
                         });
                         createdCount++;
                     }
-                } else if (type === "ring" || type === "product") {
+                } else if (type === "product") {
                     // Category
                     const catName = row.category ? String(row.category).trim() : "";
                     if (!catName) throw new Error("Category name is required");
                     const category = await getOrCreateCategory(catName);
 
                     // Price
-                    const priceKey = type === "ring" ? "baseprice" : "price";
-                    const priceVal = parseFloat(row[priceKey] || 0);
+                    const priceVal = parseFloat(row.price || 0);
                     if (isNaN(priceVal) || priceVal <= 0) throw new Error("Price must be a positive number");
 
                     // Stock

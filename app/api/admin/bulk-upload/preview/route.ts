@@ -135,22 +135,14 @@ export async function POST(req: Request) {
                         errors.push(`SKU already exists in DB`);
                     }
                 }
-            } else if (type === "ring" || type === "product") {
+            } else if (type === "product") {
                 // Category
                 const catName = row.category ? String(row.category).trim() : "";
                 if (!catName) errors.push("Category is required");
 
                 // Price
-                const priceKey = type === "ring" ? "baseprice" : "price";
-                const priceVal = parseFloat(row[priceKey] || 0);
+                const priceVal = parseFloat(row.price || 0);
                 if (isNaN(priceVal) || priceVal <= 0) errors.push("Price must be a positive number");
-
-                // Metal & Karat options
-                const metalOptions = row.metaloptions ? String(row.metaloptions).trim() : "";
-                if (type === "ring" && !metalOptions) errors.push("metalOptions is required");
-
-                const karatOptions = row.karatoptions ? String(row.karatoptions).trim() : "";
-                if (type === "ring" && !karatOptions) errors.push("karatOptions is required");
 
                 // Check DB uniqueness
                 if (finalSku && !errors.length) {

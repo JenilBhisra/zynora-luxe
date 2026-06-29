@@ -33,34 +33,6 @@ const templatesMap: Record<string, { headers: string[]; sample: string[]; notes:
             ["isActive", "YES", "TRUE, FALSE", "Must be uppercase TRUE or FALSE"]
         ]
     },
-    ring: {
-        headers: [
-            "sku", "title", "category", "diamondType", "diamondShape", "caratWeight", "metalOptions", "karatOptions",
-            "defaultMetal", "defaultKarat", "basePrice", "salePrice", "stock", "sizeOptions", "imageUrls", "videoUrls",
-            "description", "tags", "seoTitle", "seoDescription", "searchKeywords", "isActive"
-        ],
-        sample: [
-            "RNG-SOL-001", "Classic Cushion Cut Solitaire Diamond Ring", "Engagement Ring", "Lab Grown Diamond", "Cushion", "1.50", "Gold,Silver,Platinum", "14K,18K",
-            "Gold", "18K", "65000", "60000", "5", "6,7,8", "https://res.cloudinary.com/...", "https://res.cloudinary.com/...",
-            "Elegant twisted band solitaire diamond ring.", "solitaire, engagement ring", "Classic Cushion Cut Solitaire Diamond Ring", "Zynora Luxe classic cushion solitaire.", "engagement ring, cushion solitaire", "TRUE"
-        ],
-        notes: [
-            ["Column", "Required", "Allowed Values / Format", "Notes"],
-            ["sku", "YES", "Alphanumeric and hyphens only", "Must be unique"],
-            ["title", "YES", "Text", "Ring product name"],
-            ["category", "YES", "Engagement Ring, Pendant, Bracelet and Watch, Earrings, Necklace", "Matches website collection category"],
-            ["diamondType", "YES", "Lab Grown Diamond, Natural Diamond", "Diamond origin"],
-            ["metalOptions", "YES", "Comma-separated values (Gold, Silver, Platinum)", "e.g., Gold,Silver"],
-            ["karatOptions", "YES", "Comma-separated values (10K, 14K, 18K, 22K)", "e.g., 14K,18K"],
-            ["defaultMetal", "YES", "Gold, Silver, Platinum", "Default finish option"],
-            ["defaultKarat", "YES", "10K, 14K, 18K, 22K", "Default gold karat purity"],
-            ["basePrice", "YES", "Positive Number", "Product base price"],
-            ["stock", "YES", "Non-negative Integer", "Total pieces in inventory"],
-            ["imageUrls", "NO", "Comma-separated URLs", "Cloudinary links preferred"],
-            ["videoUrls", "NO", "Comma-separated URLs", "Autoplay video preview link"],
-            ["isActive", "YES", "TRUE, FALSE", "Uppercase TRUE or FALSE"]
-        ]
-    },
     setting: {
         headers: [
             "sku", "title", "settingType", "compatibleShapes", "metalOptions", "karatOptions", "sizeOptions",

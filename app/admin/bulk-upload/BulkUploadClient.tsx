@@ -7,7 +7,6 @@ import * as XLSX from "xlsx";
 
 const listingTypes = [
     { id: "diamond", name: "Diamonds" },
-    { id: "ring", name: "Rings" },
     { id: "setting", name: "Ring Settings" },
     { id: "product", name: "Jewellery Products" }
 ];
@@ -78,7 +77,6 @@ export default function BulkUploadClient() {
         const mapping: Record<string, string> = {};
         const uploadTypeMap: Record<string, string> = {
             diamond: "diamonds",
-            ring: "products",
             setting: "settings",
             product: "products"
         };

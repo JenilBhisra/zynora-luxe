@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { logOut } from "@/lib/auth.client";
 import Image from "next/image";
-import { LayoutDashboard, Gem, Settings2, ShoppingBag, Users, LogOut as LogOutIcon, BarChart, Menu, X, Store, Sparkles } from "lucide-react";
+import { LayoutDashboard, Gem, Settings2, ShoppingBag, Users, LogOut as LogOutIcon, BarChart, Menu, X, Store, Sparkles, Upload } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -15,6 +15,7 @@ const adminNav = [
     { name: "Products", href: "/admin/products", icon: ShoppingBag },
     { name: "Orders", href: "/admin/orders", icon: ShoppingBag },
     { name: "Bespoke Requests", href: "/admin/customization-requests", icon: Sparkles },
+    { name: "Bulk Upload", href: "/admin/bulk-upload", icon: Upload },
     { name: "Users", href: "/admin/users", icon: Users },
     { name: "Analytics", href: "/admin/analytics", icon: BarChart },
 ];
